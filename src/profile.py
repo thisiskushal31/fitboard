@@ -1,3 +1,5 @@
+"""Candidate profile loaded from `data/profile.yaml`."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -136,6 +138,7 @@ class Profile:
 
 
 def load_profile(path: Path | None = None) -> Profile:
+    """Parse YAML into a Profile. Missing cloud lists default to AWS/GCP + Azure."""
     data = yaml.safe_load((path or PROFILE_PATH).read_text())
     core = list(data.get("skills", {}).get("core", []))
     supporting = list(data.get("skills", {}).get("supporting", []))

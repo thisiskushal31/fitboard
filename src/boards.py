@@ -1,3 +1,5 @@
+"""Company ATS fetchers (Greenhouse, Lever, Ashby, Recruitee, SmartRecruiters) and RSS."""
+
 from __future__ import annotations
 
 import xml.etree.ElementTree as ET
@@ -123,6 +125,7 @@ def is_relevant_listing(title: str, description: str = "") -> bool:
 
 
 def fetch_greenhouse(company: str, board: str) -> list[Job]:
+    """Public Greenhouse board JSON. Filters to target roles and skill-led listings."""
     resp = _get(f"https://boards-api.greenhouse.io/v1/boards/{board}/jobs")
     resp.raise_for_status()
     jobs: list[Job] = []
@@ -322,6 +325,7 @@ def fetch_smartrecruiters(company: str, board: str) -> list[Job]:
 
 
 def collect_board_jobs() -> tuple[list[Job], list[str]]:
+    """Fetch every slug in `data/company-boards.yaml`. Dead slugs become warnings."""
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
     config = load_boards()

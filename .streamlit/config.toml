@@ -1,3 +1,4 @@
+# Light theme for Streamlit Community Cloud and local `streamlit run`.
 [theme]
 base = "light"
 primaryColor = "#3f3f46"

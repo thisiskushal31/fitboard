@@ -1,15 +1,14 @@
-# Career path — edit this in a minute. Fitboard reads it on every run.
-# Companies are not the plan. This file is. Two layoffs is enough.
+# Career path — edit and re-run. Fitboard reads this on every crawl.
 # Every list can hold multiple roles. Add a line; run again.
 
-# What you are applying as right now (multiple is the point).
+# Titles the profile is applying as right now.
 current_roles:
   - DevOps Engineer
   - Software Engineer
   - Cloud Engineer
   - Site Reliability Engineer
 
-# Where you are moving next (run in parallel, not one-at-a-time).
+# Roles in motion next (run in parallel, not one at a time).
 next_roles:
   - Platform Engineer
   - MLOps Engineer
@@ -25,7 +24,7 @@ trending:
   - name: Forward-Deployed Engineer
     active: true
 
-# Skills you started learning that are not yet in profile.yaml
+# Skills started that are not yet in profile.yaml.
 learning_now:
   - RAG evaluation
   - MITRE ATT&CK

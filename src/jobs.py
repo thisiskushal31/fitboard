@@ -1,3 +1,5 @@
+"""Public job aggregators and country APIs. ATS boards live in `boards.py`."""
+
 from __future__ import annotations
 
 import html
@@ -12,7 +14,7 @@ import requests
 
 from .regions import ADZUNA_COUNTRIES
 
-USER_AGENT = "Fitboard/1.0 (personal job search; +https://github.com/thisiskushal31)"
+USER_AGENT = "Fitboard/1.0 (public ATS job search)"
 TIMEOUT = 20
 
 TAG_RE = re.compile(r"<[^>]+>")
@@ -28,6 +30,7 @@ def strip_html(value: str | None) -> str:
 
 @dataclass
 class Job:
+    """One listing from a public board. `haystack` is the lowercase search blob."""
     id: str
     source: str
     title: str
@@ -123,6 +126,7 @@ def codeforces_jobs_from_payload(payload: dict) -> list[Job]:
 
 
 def fetch_codeforces_hiring() -> list[Job]:
+    """Codeforces `recentActions` API — hiring blog posts only, not the full feed."""
     resp = _get("https://codeforces.com/api/recentActions", params={"maxCount": 100})
     resp.raise_for_status()
     payload = resp.json()
@@ -203,6 +207,7 @@ def fetch_arbeitnow() -> list[Job]:
 
 
 def fetch_adzuna(query: str, country: str) -> list[Job]:
+    """Optional Adzuna search. No-ops when ADZUNA_APP_ID / ADZUNA_APP_KEY are unset."""
     app_id = os.getenv("ADZUNA_APP_ID")
     app_key = os.getenv("ADZUNA_APP_KEY")
     if not app_id or not app_key:
@@ -399,6 +404,7 @@ def fetch_hn_who_is_hiring() -> list[Job]:
 
 
 def collect_jobs(queries: list[str]) -> tuple[list[Job], list[str]]:
+    """Fan out aggregator + ATS fetches. Source failures become warnings, not crashes."""
     tasks: dict[str, Any] = {
         "RemoteOK": fetch_remoteok,
         "Arbeitnow": fetch_arbeitnow,

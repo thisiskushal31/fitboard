@@ -1,3 +1,5 @@
+"""Career-path report: multiple current/next/destination roles and live skill gaps."""
+
 from __future__ import annotations
 
 import unittest
@@ -57,7 +59,7 @@ class CareerPathTests(unittest.TestCase):
         lacking_names = {g.skill for g in report.checks}
         self.assertTrue({"mlflow", "kubeflow", "sigma", "siem"} & lacking_names)
         text = render_career_markdown(report)
-        self.assertIn("Companies fire without notice", text)
+        self.assertIn("Employer-independent career path", text)
         self.assertIn("You're lacking", text)
         self.assertIn("Forward-Deployed Engineer", text)
         self.assertIn("sit with a real user problem", text.lower())

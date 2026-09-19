@@ -1,3 +1,5 @@
+"""Public-API payload parsers: Codeforces, MyCareersFuture, Agentur für Arbeit."""
+
 from __future__ import annotations
 
 import unittest

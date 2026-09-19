@@ -1,3 +1,5 @@
+"""Skill and title counts for the current crawl — not a global salary survey."""
+
 from __future__ import annotations
 
 from collections import Counter
@@ -48,6 +50,7 @@ WATCHLIST = [
 
 
 def market_trends(jobs: list[Job], profile: Profile) -> dict:
+    """Count WATCHLIST skills, role-title tokens, regions, and remote share."""
     skill_counts: Counter[str] = Counter()
     title_counts: Counter[str] = Counter()
     source_counts: Counter[str] = Counter()

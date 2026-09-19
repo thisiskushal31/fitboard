@@ -1,3 +1,4 @@
+# Streamlit Community Cloud / Cloud Run image. Python 3.12 matches .python-version.
 FROM python:3.12-slim
 
 WORKDIR /app

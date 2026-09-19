@@ -1,19 +1,17 @@
+"""Job-search briefing: crawl, score, then write a heuristic or LLM brief."""
+
 from __future__ import annotations
 
 import json
-import os
 import textwrap
-
-import requests
 
 from .boards import official_careers
 from .career import build_career_report, extra_search_queries, load_career_config, render_career_markdown, report_to_dict
 from .jobs import collect_jobs
+from .llm import active_provider, complete, cursor_needs_chat_gateway, has_llm_key
 from .match import ScoredJob, rank_jobs
 from .profile import Profile
 from .trends import market_trends
-
-USER_AGENT = "Fitboard/1.0 (personal job search; +https://github.com/thisiskushal31)"
 
 
 def _job_payload(item: ScoredJob) -> dict:
@@ -38,6 +36,7 @@ def _job_payload(item: ScoredJob) -> dict:
 
 
 def _llm_brief(profile: Profile, ranked: list[ScoredJob], trends: dict, career: dict) -> str | None:
+    """Ask the configured LLM for a briefing. Returns None when no usable API key is set."""
     suited = [item for item in ranked if item.fit == "suited"]
     stretch = [item for item in ranked if item.fit == "stretch"]
     not_suited = [item for item in ranked if item.fit == "not_suited"]
@@ -63,7 +62,7 @@ def _llm_brief(profile: Profile, ranked: list[ScoredJob], trends: dict, career: 
         Rank India first after remote, then Singapore, then UK. Do not invent LinkedIn or LeetCode scrapes; those are official links only.
         X roles come from xAI Greenhouse. Codeforces hiring comes from their public API.
 
-        Companies fire without notice. Lead with the career path: current roles (plural), next roles, trending titles, destination roles, and skill gaps from this crawl. Do not tell the user the market is fine.
+        Lead with the career path: current roles, next roles, trending titles, destination roles, and skill gaps from this crawl. Treat listings as signals, not promises.
 
         Write a concise briefing:
 
@@ -87,34 +86,7 @@ def _llm_brief(profile: Profile, ranked: list[ScoredJob], trends: dict, career: 
         """
     ).strip()
 
-    gemini_key = os.getenv("GEMINI_API_KEY")
-    if gemini_key:
-        resp = requests.post(
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
-            params={"key": gemini_key},
-            headers={"User-Agent": USER_AGENT},
-            json={"contents": [{"parts": [{"text": prompt}]}]},
-            timeout=60,
-        )
-        resp.raise_for_status()
-        return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
-
-    openai_key = os.getenv("OPENAI_API_KEY")
-    if openai_key:
-        resp = requests.post(
-            "https://api.openai.com/v1/chat/completions",
-            headers={"Authorization": f"Bearer {openai_key}", "User-Agent": USER_AGENT},
-            json={
-                "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-                "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.3,
-            },
-            timeout=60,
-        )
-        resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]["content"]
-
-    return None
+    return complete(prompt)
 
 
 def _bucket_lines(items: list[ScoredJob], heading: str) -> list[str]:
@@ -132,6 +104,7 @@ def _bucket_lines(items: list[ScoredJob], heading: str) -> list[str]:
 
 
 def _heuristic_brief(profile: Profile, ranked: list[ScoredJob], trends: dict, path_md: str = "") -> str:
+    """Markdown briefing used when no LLM key is set, or as the fallback."""
     suited = [item for item in ranked if item.fit == "suited"][:5]
     stretch = [item for item in ranked if item.fit == "stretch"][:5]
     not_suited = [item for item in ranked if item.fit == "not_suited"][:5]
@@ -144,7 +117,7 @@ def _heuristic_brief(profile: Profile, ranked: list[ScoredJob], trends: dict, pa
         "Public boards only (Greenhouse, Lever, Ashby, RemoteOK, We Work Remotely, Remotive, HN, Codeforces API, xAI/X Greenhouse, MyCareersFuture, Agentur für Arbeit, Berlin Startup Jobs). LinkedIn, X timelines, and LeetCode HTML are not scraped.",
         f"Roles: Software Engineer, Cloud Engineer, SRE, Platform Engineer — titles optional; skills and clouds also qualify.",
         f"Regions (India first after remote): {', '.join(profile.wanted_regions)}. US listings stay in the list but score lower.",
-        f"Confident clouds: {', '.join(profile.confident_clouds)}. Also works: Azure and the handbook set.",
+        f"Confident clouds: {', '.join(profile.confident_clouds)}. Also works: Azure and the other named clouds.",
     ]
     lines += _bucket_lines(suited, "Apply this week (suited)")
     lines += _bucket_lines(stretch, "Stretch")
@@ -170,14 +143,16 @@ def _heuristic_brief(profile: Profile, ranked: list[ScoredJob], trends: dict, pa
     lines += [
         "",
         "### Architecture narrative",
-        "Keep 'architect and operate' — design the platform shape, then own it in production. Do not say Architect at Purplle.",
+        "Keep 'architect and operate' — design the platform shape, then own it in production. Do not claim an Architect title the profile does not hold.",
         "",
-        "Set GEMINI_API_KEY or OPENAI_API_KEY for a written agent brief on top of this list.",
+        "Set ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY for a written agent brief on top of this list. "
+        "A Cursor IDE key is not a chat API unless CURSOR_BASE_URL points at an OpenAI-compatible gateway.",
     ]
     return "\n".join(lines)
 
 
 def run_agent(profile: Profile) -> dict:
+    """Crawl public boards, score them, and return a briefing dict for the UI."""
     cfg = load_career_config()
     queries = list(dict.fromkeys(list(profile.search_queries) + extra_search_queries(cfg)))
     jobs, errors = collect_jobs(queries)
@@ -186,6 +161,11 @@ def run_agent(profile: Profile) -> dict:
     path = build_career_report(jobs, profile, cfg)
     path_md = render_career_markdown(path)
     brief = _heuristic_brief(profile, ranked, trends, path_md)
+    if cursor_needs_chat_gateway():
+        errors = list(errors) + [
+            "CURSOR_API_KEY is set, but Cursor does not expose a chat-completions API. "
+            "Add ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY — or set CURSOR_BASE_URL to an OpenAI-compatible gateway."
+        ]
     llm_error = None
     try:
         llm = _llm_brief(profile, ranked, trends, report_to_dict(path))
@@ -201,5 +181,6 @@ def run_agent(profile: Profile) -> dict:
         "errors": errors,
         "brief": brief,
         "llm_error": llm_error,
-        "used_llm": llm_error is None and bool(os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY")),
+        "used_llm": llm_error is None and has_llm_key() and bool(active_provider()),
+        "llm_provider": active_provider(),
     }

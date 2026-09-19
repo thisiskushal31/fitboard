@@ -1,3 +1,5 @@
+"""Score listings against the profile: role, skills, clouds, region, recency."""
+
 from __future__ import annotations
 
 import re
@@ -73,8 +75,8 @@ MARKET_SKILLS: dict[str, str] = {
 
 CLOUD_HOW_TO = {
     "Azure": "Azure (AKS, Entra ID, ARM/Bicep) — map the same jobs you already do on AWS/GCP",
-    "Oracle Cloud": "Oracle Cloud (OKE, compartments) — Floor 1 jobs, OCI names",
-    "IBM Cloud": "IBM Cloud (VPC, IKS/ROKS) — same platform jobs, IBM names",
+    "Oracle Cloud": "Oracle Cloud (OKE, compartments) — same platform work, OCI names",
+    "IBM Cloud": "IBM Cloud (VPC, IKS/ROKS) — same platform work, IBM names",
     "Alibaba Cloud": "Alibaba Cloud (ACK, ECS) — same jobs, Aliyun names",
     "Tencent Cloud": "Tencent Cloud (TKE, CVM) — same jobs, Tencent names",
     "Huawei Cloud": "Huawei Cloud (CCE) — same jobs, Huawei names",
@@ -173,6 +175,7 @@ def _required_years(blob: str) -> int | None:
 
 @dataclass
 class ScoredJob:
+    """A listing plus fit bucket, matched skills/clouds, and a gap plan."""
     job: Job
     score: float
     role_score: float
@@ -224,7 +227,7 @@ def _gap_plan(
                 gaps.append(CLOUD_HOW_TO[cloud])
     elif cloud_fit == "other":
         for cloud in matched_clouds:
-            gaps.append(CLOUD_HOW_TO.get(cloud, f"{cloud} literacy — other cloud also works; map Floor 1 jobs"))
+            gaps.append(CLOUD_HOW_TO.get(cloud, f"{cloud} literacy — map the same platform work onto this cloud"))
 
     if required_years and required_years > profile.years_experience + 0.5:
         gaps.append(
@@ -245,6 +248,7 @@ def _classify(
     gap_plan: list[str],
     matched_role: str,
 ) -> str:
+    """suited / stretch / not_suited. Hard seniority or language gaps push not_suited."""
     hard_gaps = [g for g in gap_plan if "years listed" in g or "Staff/principal" in g or g in ("Java", "Rust", "OpenShift", "Istio", "Pulumi", "Crossplane")]
     if skill_hits == 0 and role_score < 0.5:
         return "not_suited"
@@ -268,6 +272,7 @@ def _classify(
 
 
 def score_job(job: Job, profile: Profile) -> ScoredJob | None:
+    """Return a scored listing, or None when the title is excluded or off-track."""
     title = job.title.lower()
     if any(term in title for term in profile.exclude_title_terms):
         return None
@@ -345,6 +350,7 @@ def score_job(job: Job, profile: Profile) -> ScoredJob | None:
     elif cloud_fit == "transferable":
         cloud_bonus = 0.04
 
+    # Skills outweigh title. Region and recency are tie-breakers.
     score = (
         0.34 * role_score
         + 0.36 * skill_score
@@ -417,6 +423,7 @@ def score_job(job: Job, profile: Profile) -> ScoredJob | None:
 
 
 def rank_jobs(jobs: list[Job], profile: Profile, limit: int = 80) -> list[ScoredJob]:
+    """Suited first, then stretch, then not-suited — each bucket by score descending."""
     suited: list[ScoredJob] = []
     stretch: list[ScoredJob] = []
     not_suited: list[ScoredJob] = []

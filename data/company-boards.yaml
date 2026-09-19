@@ -1,14 +1,14 @@
 # Public career boards Fitboard can fetch (Greenhouse, Lever, Ashby APIs).
 # Board slug = token in boards.greenhouse.io/<slug>, jobs.lever.co/<slug>, jobs.ashbyhq.com/<slug>.
 #
-# Google, Meta, Amazon, Apple, Microsoft, NVIDIA, Salesforce and most banks/IT majors
-# do not publish those APIs. They live under official_careers (open the URL yourself).
+# Google, Meta, Amazon, Apple, Microsoft, NVIDIA, Salesforce, and most banks/IT majors
+# do not publish those APIs. They live under official_careers (open the URL in a browser).
 # LinkedIn / Instahyre / Naukri / Indeed are not scraped.
-# Unicorn coverage: Inc42 India list (133) + CB Insights global names with live GH/Lever/Ashby
+# Unicorn coverage: Inc42 India list + CB Insights global names with live GH/Lever/Ashby
 # boards; remaining India unicorns are under official_careers.
 # Rank: Remote, India, Singapore, UK, Middle East, Germany, Europe, APAC, US, Americas.
-# SG MyCareersFuture and DE Jobbörse are crawled.
-# Dead slugs show as warnings, not a crash. Expanded Sep 2026.
+# Singapore MyCareersFuture and Germany Jobbörse are crawled.
+# Dead slugs show as warnings, not a crash.
 
 greenhouse:
   - { name: Abnormal Security, board: abnormalsecurity }

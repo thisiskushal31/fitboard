@@ -1,5 +1,14 @@
+"""Fitboard Streamlit UI.
+
+Loads the candidate profile, crawls public boards (cached for 30 minutes),
+and scores listings into suited / stretch / not-suited buckets. Streamlit
+Cloud secrets are copied into the process environment so the same `.env`
+keys work locally and in production.
+"""
+
 from __future__ import annotations
 
+import os
 import sys
 from datetime import date, datetime
 from pathlib import Path
@@ -7,9 +16,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
-import os
 
 def _load_dotenv() -> None:
+    """Read KEY=VALUE lines from `.env` without overriding existing env vars."""
     path = ROOT / ".env"
     if not path.exists():
         return
@@ -26,7 +35,9 @@ _load_dotenv()
 import pandas as pd
 import streamlit as st
 
+
 def _export_streamlit_secrets() -> None:
+    """Copy Streamlit Cloud secrets into os.environ for the rest of the stack."""
     try:
         for key, value in st.secrets.items():
             if isinstance(value, str) and value:
@@ -53,9 +64,12 @@ from src.trends import market_trends
 st.set_page_config(page_title="Fitboard", page_icon="📋", layout="wide")
 
 PROFILE = load_profile()
+CAREER = load_career_config()
+SEARCH_QUERIES = tuple(dict.fromkeys(list(PROFILE.search_queries) + extra_search_queries(CAREER)))
 
 
 def _show_role_cards(roles) -> None:
+    """Render one career-path role: closeness, next move, and live skill gaps."""
     for role in roles:
         with st.container(border=True):
             st.markdown(f"**{role.name}** — {role.closeness}")
@@ -73,12 +87,9 @@ def _show_role_cards(roles) -> None:
                 st.write("Boards in this crawl are not asking for skills you lack on this track.")
 
 
-CAREER = load_career_config()
-SEARCH_QUERIES = tuple(dict.fromkeys(list(PROFILE.search_queries) + extra_search_queries(CAREER)))
-
-
 @st.cache_data(ttl=30 * 60, show_spinner=False)
 def load_market(queries: tuple[str, ...]):
+    """Crawl, score, and summarise. Cache key is the search-query tuple."""
     jobs, errors = collect_jobs(list(queries))
     ranked = rank_jobs(jobs, PROFILE)
     trends = market_trends(jobs, PROFILE)
@@ -90,20 +101,28 @@ def main() -> None:
     st.title("Fitboard")
     st.caption(
         f"{PROFILE.name} · current: {', '.join(CAREER.current_roles)} · "
-        f"next: {', '.join(CAREER.next_roles)} · destination: {', '.join(CAREER.destination_roles)} · "
-        "companies are not the plan"
+        f"next: {', '.join(CAREER.next_roles)} · destination: {', '.join(CAREER.destination_roles)}"
     )
 
     with st.sidebar:
         st.header("Search")
         min_score = st.slider("Minimum match score", 10, 90, 35)
         only_remote = st.checkbox("Remote-friendly only", value=False)
-        max_age = st.select_slider("Posted within", options=[7, 14, 30, 90, 365], value=30, format_func=lambda d: f"{d} days")
+        max_age = st.select_slider(
+            "Posted within",
+            options=[7, 14, 30, 90, 365],
+            value=30,
+            format_func=lambda d: f"{d} days",
+        )
         show_fits = st.multiselect(
             "Fit",
             ["suited", "stretch", "not_suited"],
             default=["suited", "stretch", "not_suited"],
-            format_func=lambda v: {"suited": "Suited", "stretch": "Stretch", "not_suited": "Not suited (gap plan)"}[v],
+            format_func=lambda v: {
+                "suited": "Suited",
+                "stretch": "Stretch",
+                "not_suited": "Not suited (gap plan)",
+            }[v],
         )
         show_regions = st.multiselect(
             "Regions",
@@ -140,7 +159,7 @@ def main() -> None:
             "First crawl hits hundreds of company boards and can take a few minutes."
         )
 
-    with st.spinner("Pulling live jobs and scoring them against your profile…"):
+    with st.spinner("Pulling live jobs and scoring them against the profile…"):
         jobs, ranked, trends, errors, path = load_market(SEARCH_QUERIES)
 
     filtered = []
@@ -219,7 +238,7 @@ def main() -> None:
                     st.info(item.fit_summary)
                 else:
                     st.write(item.fit_summary)
-                st.write(" · ".join(item.reasons) or "Role or skill overlap with your profile.")
+                st.write(" · ".join(item.reasons) or "Role or skill overlap with the profile.")
                 if item.matched_skills:
                     st.markdown("Matched skills: `" + "` · `".join(item.matched_skills[:10]) + "`")
                 if item.matched_clouds:
@@ -238,7 +257,8 @@ def main() -> None:
         st.write(
             "Runs the public-board crawl, scores listings against roles, skills, and clouds, then writes a briefing. "
             "Not-suited jobs stay on the list with: I am not suited, but this is what you need to get suited here. "
-            "Add `GEMINI_API_KEY` or `OPENAI_API_KEY` in `.env` for an LLM write-up; without a key you still get the apply list."
+            "Add `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, or `GEMINI_API_KEY` in `.env` for an LLM write-up. "
+            "A Cursor subscription key is not enough on its own. Without a key the apply list still appears."
         )
         if st.button("Run agent", type="primary"):
             with st.spinner("Agent is crawling public boards and writing a briefing…"):
@@ -262,7 +282,7 @@ def main() -> None:
             st.bar_chart(demand_df)
         cols = st.columns(2)
         with cols[0]:
-            st.markdown("**Already on your profile**")
+            st.markdown("**Already on the profile**")
             if trends["you_have"]:
                 st.dataframe(
                     pd.DataFrame(trends["you_have"], columns=["skill", "mentions"]),
@@ -270,9 +290,9 @@ def main() -> None:
                     use_container_width=True,
                 )
             else:
-                st.write("None of the top tokens matched your profile skills.")
+                st.write("None of the top tokens matched the profile skills.")
         with cols[1]:
-            st.markdown("**Showing up, thinner on your profile**")
+            st.markdown("**Showing up, thinner on the profile**")
             if trends["gaps"]:
                 st.dataframe(
                     pd.DataFrame(trends["gaps"], columns=["skill", "mentions"]),
@@ -313,7 +333,7 @@ def main() -> None:
             f"{len(boards.get('lever') or [])} Lever · "
             f"{len(boards.get('ashby') or [])} Ashby"
         )
-        st.markdown("**Official career sites (open yourself — no public JSON API)**")
+        st.markdown("**Official career sites (open in a browser — no public JSON API)**")
         for row in official_careers():
             name, url = row.get("name"), row.get("url")
             if name and url:

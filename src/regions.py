@@ -1,3 +1,5 @@
+"""Region tags and rank weights. Remote first, then India, then the rest of the map."""
+
 from __future__ import annotations
 
 import re
@@ -368,6 +370,7 @@ def _hit(blob: str, needle: str) -> bool:
 
 
 def detect_regions(text: str, remote: bool | None = None) -> list[str]:
+    """Tag a listing with canonical regions. UK/DE/Nordics also imply EMEA; SG/IN imply APAC."""
     blob = (text or "").lower()
     found: list[str] = []
     if remote or _hit(blob, "remote") or _hit(blob, "worldwide"):
@@ -393,6 +396,7 @@ def detect_regions(text: str, remote: bool | None = None) -> list[str]:
 
 
 def location_score(text: str, remote: bool | None, profile: Profile) -> tuple[float, list[str]]:
+    """Highest LOCATION_WEIGHT among detected regions. Remote is always 1.0."""
     regions = detect_regions(text, remote)
     if "Remote" in regions:
         return 1.0, regions

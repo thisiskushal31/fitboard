@@ -1,110 +1,121 @@
 # Fitboard
 
-A Streamlit job-search **agent**: crawls **public** career boards, scores listings against your Software Engineer / Cloud / SRE / Platform profile (skills and clouds, not just titles), and writes a briefing (apply list + stretch + not-suited gap plans).
+Fitboard is a Streamlit job-search agent. It crawls **public** career boards, scores listings against a Software Engineer / Cloud / SRE / Platform profile, and produces a briefing: apply list, stretch roles, and not-suited gap plans.
 
-## What it will not do
+Matching is skill-led. A listing can qualify on skills and clouds even when the title is a generic Software Engineer or SDE role. The app also keeps a company-independent career path — current roles, next roles, destination roles, and skills this crawl asked for that the profile still lacks.
 
-**LinkedIn, Instahyre, Naukri, Indeed, X timelines, and LeetCode HTML are not scraped.** Those sites forbid unofficial scraping or they block non-browser clients (LeetCode jobs returns 403). I will not build a LinkedIn crawler or a LeetCode/X HTML scraper.
+## What it crawls
 
-What *is* crawled for those names:
+Public APIs and RSS feeds that companies publish on purpose:
 
-- **X jobs** — xAI Greenhouse public board (`xai`). X hiring moved there; `careers.x.com` redirects.
-- **Codeforces** — documented public API `recentActions`, hiring posts only. There is no Codeforces jobs board.
-
-**LinkedIn Jobs** and **LeetCode** are listed as official links to open yourself (India, US, UK, Singapore/APAC, Germany, UAE, EMEA). There is no unofficial scrape.
-
-Global search covers **Remote, India, Singapore, UK, Middle East, Germany, Nordics, EMEA, APAC, US, and Americas**. Rank: Remote → India → Singapore → UK → Middle East → Germany → rest of Europe (including Nordics) → APAC → US → Americas. US listings stay in the list and rank last among those regions.
-
-With Adzuna keys set, Fitboard queries GB, SG, DE, IN, IE, NL, FR, AT, IT, PL, BE, ES, CH, AU, NZ, and US. Singapore’s **MyCareersFuture** and Germany’s **Agentur für Arbeit** public APIs are crawled directly. Other EU country employment sites are listed under official_careers to open yourself (France Travail, Werk.nl, AMS, JobsIreland, Cliclavoro, Praca.gov.pl, SEPE, VDAB, IEFP, Arbetsförmedlingen, Jobnet, EURES, UK Find a job).
-
-The agent instead hits APIs and RSS feeds companies publish on purpose:
-
-- Remotive, RemoteOK, Arbeitnow, HN Who is Hiring
+- Remotive, RemoteOK, Arbeitnow, Hacker News Who is Hiring
 - We Work Remotely RSS (DevOps / programming)
 - Berlin Startup Jobs RSS
 - Singapore MyCareersFuture
 - Germany Agentur für Arbeit Jobbörse
-- Codeforces public API (hiring blog posts)
-- xAI Greenhouse (X / Twitter roles)
-- Greenhouse, Lever, Ashby, Recruitee, and SmartRecruiters job-board APIs for companies in `data/company-boards.yaml`
-- Optional Adzuna if you set keys
+- Codeforces public API (`recentActions`, hiring posts only)
+- xAI Greenhouse (X / Twitter roles — `careers.x.com` redirects here)
+- Greenhouse, Lever, Ashby, Recruitee, and SmartRecruiters boards listed in `data/company-boards.yaml`
+- Optional [Adzuna](https://developer.adzuna.com/) if `ADZUNA_APP_ID` and `ADZUNA_APP_KEY` are set
 
-Add more companies by appending their **career-site slug** to `company-boards.yaml` (the token in `boards.greenhouse.io/<slug>`, `jobs.lever.co/<slug>`, or `jobs.ashbyhq.com/<slug>`).
+`data/company-boards.yaml` already includes a large Greenhouse / Lever / Ashby set (global product companies, India fintech and SaaS, and unicorns that publish those boards), plus `official_careers` links for employers with no public JSON API (Google, Meta, Amazon, Apple, Microsoft, banks, and others).
 
-`data/company-boards.yaml` already includes:
+Add a company by appending its **career-site slug** — the token in `boards.greenhouse.io/<slug>`, `jobs.lever.co/<slug>`, or `jobs.ashbyhq.com/<slug>`. Dead slugs show as warnings, not a crash.
 
-- Global names that publish Greenhouse / Lever / Ashby (Stripe, Databricks, SpaceX, OpenAI, Anthropic, Cursor, CRED, Razorpay, Zomato, Thoughtworks, UiPath, Deliveroo, Wise, Monzo, …)
-- A large India ATS set (fintech, consumer internet, SaaS, deep tech, AI ops)
-- Unicorn coverage: every company on Inc42’s India unicorn tracker, plus CB Insights global unicorns that publish Greenhouse / Lever / Ashby
-- Names taken from Naukri’s India hiring list (especially Software Product) then mapped to public boards or official career URLs
-- `official_careers` for giants and unicorns with **no** public JSON board: Google, Meta, Amazon, Apple, Microsoft, ByteDance, Revolut, Zerodha, Pine Labs, DBS, OCBC, UOB, ARM, DeepMind, Darktrace, Sea, Standard Chartered, …
+This is not every employer. Shops that only post on LinkedIn or Naukri, or that have no public ATS, will not appear until they publish a crawlable board.
 
-This is **not** every employer in those markets. Shops that only post on LinkedIn/Naukri, or that have no public ATS, will not appear until they publish a crawlable board.
+## What it does not crawl
 
-Naukri itself is **not scraped**. The listing is only a company-name source.
+**LinkedIn, Instahyre, Naukri, Indeed, X timelines, and LeetCode HTML are not scraped.** Those sites forbid unofficial scraping or they block non-browser clients. Fitboard does not collect logins, cookies, or session tokens.
 
-Those official URLs are listed in the **Profile used** tab and in the agent briefing. They are not crawled.
+Those names are handled as follows:
 
-## Career path (this is first)
+- **X jobs** — xAI Greenhouse public board (`xai`)
+- **Codeforces** — documented public API, hiring posts only
+- **LinkedIn Jobs** and **LeetCode** — official links to open in a browser
+- **Naukri** — used only as a company-name source when mapping public boards; the site itself is not scraped
 
-Companies fire without notice. Fitboard leads with a company-independent path: current role, next roles, a trending title you can change in a minute, and skills this crawl asked for that you still lack.
+## Regions
 
-Edit `data/career-path.yaml` (current_roles / next_roles / destination_roles / trending — every list accepts multiple titles), then:
+Listings are tagged and ranked:
+
+1. Remote
+2. India
+3. Singapore
+4. UK
+5. Middle East
+6. Germany
+7. Nordics / rest of Europe (EMEA)
+8. APAC
+9. US
+10. Americas
+
+US listings stay in the list and rank last among those regions. With Adzuna keys set, Fitboard queries GB, SG, DE, IN, IE, NL, FR, AT, IT, PL, BE, ES, CH, AU, NZ, and US. Other EU employment sites (France Travail, Werk.nl, AMS, JobsIreland, EURES, and similar) are listed under `official_careers` to open in a browser.
+
+## Career path
+
+The first tab is a company-independent path, not an employer promise. Edit `data/career-path.yaml` — `current_roles`, `next_roles`, `destination_roles`, and `trending` all accept multiple titles — then refresh the app or run:
 
 ```bash
-cd /Users/kushalgupta/Documents/Personal_Project/fitboard
-.venv/bin/python -m src.career --json
+python -m src.career --json
 ```
 
-That writes `out/career-path.md` (and `out/career-path.json` with `--json`). The Streamlit app shows the same report on the **Career path** tab, first.
+That writes `out/career-path.md` (and `out/career-path.json` with `--json`). Each run reports skills the live crawl asked for that the profile still lacks.
 
 ## Run locally
 
-If Streamlit is already running, stop it (Ctrl+C) and start again so this code loads.
+Python 3.12 is pinned in `.python-version`.
 
 ```bash
-cd /Users/kushalgupta/Documents/Personal_Project/fitboard
-.venv/bin/streamlit run app.py
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+streamlit run app.py
 ```
 
 Open http://localhost:8501 → **Agent briefing** → **Run agent**.
 
-## Make it an LLM agent
+Copy `.env.example` to `.env` and set **one** LLM API key for a written briefing. Without a key, Run agent still returns a scored apply list from the public crawl. Optional Adzuna keys widen aggregator coverage.
 
-Copy `.env.example` to `.env` and set **one** of:
+| Key | Who it is for |
+| --- | --- |
+| `ANTHROPIC_API_KEY` | Claude, from [console.anthropic.com](https://console.anthropic.com/) |
+| `OPENAI_API_KEY` | OpenAI, from [platform.openai.com](https://platform.openai.com/) |
+| `GEMINI_API_KEY` | Gemini, from [Google AI Studio](https://aistudio.google.com/) |
+| `CURSOR_API_KEY` + `CURSOR_BASE_URL` | Only with an OpenAI-compatible gateway in front of Cursor |
 
-- `GEMINI_API_KEY` (Gemini 2.0 Flash)
-- `OPENAI_API_KEY`
+**A Cursor IDE subscription, Claude.ai Pro, or ChatGPT Plus is not an API key.** Those plans run chat inside the product. Fitboard needs a developer key from the tables above. Cursor's official API is Cloud Agents (repo workflows), not `chat/completions`.
 
-Without a key, Run agent still returns a scored apply list from the public crawl.
+If several keys are set, Fitboard uses Cursor (when a gateway URL is present), then Claude, then OpenAI, then Gemini. Set `LLM_PROVIDER=anthropic|openai|gemini|cursor` to force one.
+
+Do not commit `.env`.
 
 ## Deploy (free): Streamlit Community Cloud
 
-This is the $0 path. Cloud Run needs a GCP billing account even if usage stays in the free tier.
-
-1. Put `fitboard/` on GitHub (public repo is enough for the free plan).
+1. Push this repository to GitHub.
 2. Open [share.streamlit.io](https://share.streamlit.io), sign in with GitHub, **Create app**.
-3. Repository: that repo. Branch: `main`. Main file: `app.py`.
-4. App settings → Secrets — paste only what you use (do not commit `.env`):
+3. Main file: `app.py`. Branch: `main`.
+4. App settings → **Secrets** — paste only keys that are in use:
 
 ```toml
+ANTHROPIC_API_KEY = "your-key"
+OPENAI_API_KEY = "your-key"
 GEMINI_API_KEY = "your-key"
 ADZUNA_APP_ID = "your-id"
 ADZUNA_APP_KEY = "your-key"
 ```
 
-5. Deploy. URL looks like `https://<you>-fitboard.streamlit.app`.
+5. Deploy. The URL looks like `https://<account>-fitboard.streamlit.app`.
 
-The first crawl hits hundreds of boards and can take a few minutes. The free app sleeps when idle; the next open is a cold start. The URL is public, so treat API keys as burnable and skip keys if you do not want strangers triggering Gemini.
+The first crawl hits hundreds of boards and can take a few minutes. The free app sleeps when idle; the next visit is a cold start. The URL is public, so treat API keys as rotatable and skip them if strangers should not trigger the LLM.
 
-Hugging Face Spaces is the other free option (Docker, existing `Dockerfile`, can be private). Cloud Run is below if you already have GCP billing.
+[Hugging Face Spaces](https://huggingface.co/docs/hub/spaces-sdks-docker) is the other free option (Docker, existing `Dockerfile`, can be private).
 
 ## Deploy on Cloud Run
 
-Needs a GCP billing account. Not a free platform.
+Requires a GCP billing account.
 
 ```bash
-cd /Users/kushalgupta/Documents/Personal_Project/fitboard
 gcloud run deploy fitboard \
   --source . \
   --region asia-south1 \
@@ -112,14 +123,35 @@ gcloud run deploy fitboard \
   --set-env-vars PORT=8080
 ```
 
-Pass LLM keys with `--set-env-vars` if you use them. Do not commit `.env`.
+Pass LLM keys with `--set-env-vars` if they are used. Do not commit `.env`.
 
-## Tune
+## Configuration
 
-- Career path (multiple current / next / destination / trending titles): `data/career-path.yaml`
-- Profile / roles / skills / clouds: `data/profile.yaml` (keep aligned with `thisiskushal31/ai-data/career-info.md` and `Deep-Dives/DevOps-Handbook/Cloud/`)
-- Company ATS list: `data/company-boards.yaml`
+| File | Purpose |
+| --- | --- |
+| `data/profile.yaml` | Name, roles, skills, clouds, region preference, search queries |
+| `data/career-path.yaml` | Current / next / destination / trending titles |
+| `data/company-boards.yaml` | ATS slugs and official career URLs |
 
-Matching keeps **Software Engineer**, **Cloud Engineer**, **SRE**, and **Platform Engineer**, and also keeps listings whose **skills** match even when the title is not on that list. AWS and GCP are confident clouds; Azure and the handbook set (OCI, IBM, Alibaba, Tencent, Huawei, OVH, OTC, CtrlS/Yotta, Linode, DigitalOcean, Cloudflare) also work. If a role is not a fit, the UI and agent say **I am not suited, but this is what you need to get suited here** plus the gap plan.
+AWS and GCP are treated as confident clouds. Azure and the other named clouds (Oracle, IBM, Alibaba, Tencent, Huawei, OVH, Open Telekom, CtrlS, Yotta, Linode, DigitalOcean, Cloudflare) still match, with a transfer note. If a listing is not a fit, the UI and agent keep it with a gap plan: **I am not suited, but this is what you need to get suited here.**
 
-Some board slugs 404 when a company moved ATS. That shows up as a warning, not a crash.
+## Layout
+
+```
+app.py                 Streamlit UI
+src/agent.py           Briefing (heuristic + optional LLM)
+src/llm.py             Claude / OpenAI / Gemini / optional Cursor gateway
+src/jobs.py            Aggregators and public job APIs
+src/boards.py          Greenhouse, Lever, Ashby, Recruitee, SmartRecruiters, RSS
+src/match.py           Skill / role / region scoring
+src/career.py          Career-path report
+src/profile.py         Profile loader
+src/regions.py         Region tags and rank weights
+src/trends.py          Skill demand in the current crawl
+data/                  YAML config
+tests/                 Unit tests
+```
+
+```bash
+python -m unittest discover -s tests
+```

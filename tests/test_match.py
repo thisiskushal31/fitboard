@@ -1,3 +1,5 @@
+"""Listing scoring: skill-led matches, fit buckets, and region rank."""
+
 from __future__ import annotations
 
 import unittest

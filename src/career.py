@@ -1,3 +1,9 @@
+"""Company-independent career path from live board demand.
+
+Reads `data/career-path.yaml`, maps each title onto software / platform / AI /
+security layers, and reports skills this crawl asked for that the profile lacks.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -220,8 +226,7 @@ class CareerReport:
     checks: list[SkillGap]
     job_count: int
     stance: str = (
-        "Companies fire without notice. Two layoffs is the evidence. "
-        "This path is the plan. A listing is a signal, not a promise."
+        "Employer-independent career path. Listings are market signals, not promises."
     )
 
 
@@ -243,6 +248,7 @@ def _as_names(data: dict, plural: str, singular: str) -> list[str]:
 
 
 def load_career_config(path: Path | None = None) -> CareerConfig:
+    """Load current / next / destination / trending titles from YAML."""
     data = yaml.safe_load((path or PATH_FILE).read_text()) or {}
     trending = []
     for row in data.get("trending") or []:
@@ -265,6 +271,7 @@ def load_career_config(path: Path | None = None) -> CareerConfig:
 
 
 def extra_search_queries(config: CareerConfig | None = None) -> list[str]:
+    """YAML search strings plus lowercased role names, de-duplicated."""
     cfg = config or load_career_config()
     from_roles = [name.lower() for name in cfg.all_target_roles]
     return list(dict.fromkeys(cfg.search_queries + from_roles))
@@ -442,6 +449,7 @@ def _role_path(jobs: list[Job], name: str, kind: str, owned: set[str]) -> RolePa
 
 
 def build_career_report(jobs: list[Job], profile: Profile, config: CareerConfig | None = None) -> CareerReport:
+    """Compare each configured role against this crawl and collect skill-gap checks."""
     cfg = config or load_career_config()
     owned = _owned(profile, cfg.learning_now)
     current = [_role_path(jobs, name, "current", owned) for name in cfg.current_roles]

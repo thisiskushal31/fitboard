@@ -1,3 +1,5 @@
+# Candidate profile Fitboard scores listings against.
+# Edit skills, clouds, and regions here; career titles live in career-path.yaml.
 name: Kushal Gupta
 headline: Software Engineer | Cloud, SRE, Platform
 years_experience: 3.8
@@ -44,19 +46,21 @@ target_roles:
 role_aliases:
   platform engineer: 1.0
   platform engineering: 1.0
-  site reliability: 0.95
-  sre: 0.95
-  cloud engineer: 0.95
-  devops: 0.92
-  mlops: 0.9
+  site reliability: 1.0
+  sre: 1.0
+  cloud engineer: 1.0
+  devops: 1.0
+  devops engineer: 1.0
+  mlops: 1.0
+  mlops engineer: 1.0
   ai engineer: 0.88
   machine learning engineer: 0.85
-  software engineer: 0.82
-  software development engineer: 0.8
-  backend engineer: 0.78
-  backend developer: 0.72
-  sde: 0.75
-  swe: 0.72
+  software engineer: 0.92
+  software development engineer: 0.9
+  backend engineer: 0.86
+  backend developer: 0.82
+  sde: 0.88
+  swe: 0.88
   cloud architect: 0.9
   platform architect: 0.9
   infrastructure architect: 0.9
