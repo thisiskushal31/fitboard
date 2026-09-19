@@ -1,0 +1,168 @@
+name: Kushal Gupta
+headline: Software Engineer | Cloud, SRE, Platform
+years_experience: 3.8
+location: Kolkata, India
+open_to:
+  - remote
+  - hybrid
+  - onsite
+  - india
+  - singapore
+  - uk
+  - middle east
+  - germany
+  - nordics
+  - emea
+  - apac
+  - us
+  - americas
+  - global
+regions:
+  - Remote
+  - India
+  - Singapore
+  - UK
+  - Middle East
+  - Germany
+  - Nordics
+  - EMEA
+  - APAC
+  - US
+  - Americas
+target_roles:
+  - Software Engineer
+  - Cloud Engineer
+  - Site Reliability Engineer
+  - Platform Engineer
+  - DevOps Engineer
+  - MLOps Engineer
+  - AI Engineer
+  - Cloud Architect
+  - Platform Architect
+  - Infrastructure Architect
+  - Infrastructure Engineer
+role_aliases:
+  platform engineer: 1.0
+  platform engineering: 1.0
+  site reliability: 0.95
+  sre: 0.95
+  cloud engineer: 0.95
+  devops: 0.92
+  mlops: 0.9
+  ai engineer: 0.88
+  machine learning engineer: 0.85
+  software engineer: 0.82
+  software development engineer: 0.8
+  backend engineer: 0.78
+  backend developer: 0.72
+  sde: 0.75
+  swe: 0.72
+  cloud architect: 0.9
+  platform architect: 0.9
+  infrastructure architect: 0.9
+  infrastructure engineer: 0.85
+  production engineer: 0.8
+  systems engineer: 0.72
+  reliability engineer: 0.88
+  security engineer: 0.8
+  threat intelligence: 0.78
+  detection engineer: 0.78
+  forward-deployed: 0.8
+  forward deployed: 0.8
+  kubernetes: 0.7
+  gitops: 0.65
+clouds:
+  confident:
+    - AWS
+    - GCP
+  also_ok:
+    - Azure
+    - Oracle Cloud
+    - IBM Cloud
+    - Alibaba Cloud
+    - Tencent Cloud
+    - Huawei Cloud
+    - OVHcloud
+    - Open Telekom Cloud
+    - CtrlS
+    - Yotta
+    - Linode
+    - DigitalOcean
+    - Cloudflare
+skills:
+  core:
+    - Kubernetes
+    - GKE
+    - Terraform
+    - ArgoCD
+    - Atlantis
+    - Helm
+    - GitOps
+    - GCP
+    - AWS
+    - Cloud Run
+    - Python
+    - CI/CD
+    - Infrastructure as Code
+    - OpenTelemetry
+    - Prometheus
+    - Grafana
+    - Zero Trust
+    - IAM
+    - Docker
+    - Linux
+  supporting:
+    - Azure
+    - EKS
+    - AKS
+    - GitHub Actions
+    - GitLab CI
+    - Jenkins
+    - Ansible
+    - PostgreSQL
+    - MySQL
+    - MongoDB
+    - Redis
+    - Kafka
+    - Elasticsearch
+    - Trivy
+    - Secrets Manager
+    - Cloud Monitoring
+    - Bash
+    - Networking
+    - Go
+    - OpenTofu
+    - n8n
+    - Vertex AI
+keywords:
+  - architect
+  - architecture
+  - platform
+  - observability
+  - reliability
+  - cost optimization
+  - SOC 2
+  - least privilege
+  - multi-cloud
+  - production
+  - software engineer
+exclude_title_terms:
+  - intern
+  - internship
+  - internships
+  - vice president
+  - vp of
+  - director of
+  - head of
+  - chief
+  - distinguished
+  - fellow
+search_queries:
+  - devops engineer
+  - platform engineer
+  - site reliability engineer
+  - cloud engineer
+  - software engineer kubernetes
+  - software engineer cloud
+  - sre aws gcp
+  - infrastructure engineer
