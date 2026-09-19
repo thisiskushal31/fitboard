@@ -1,7 +1,14 @@
 .venv/
 __pycache__/
 *.pyc
-.env
-.streamlit/secrets.toml
 .DS_Store
 out/
+
+# Secrets — never commit. Copy .env.example → .env locally.
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+secrets.toml
+credentials.json
+*.pem
