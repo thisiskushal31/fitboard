@@ -1,7 +1,8 @@
 # Candidate profile Fitboard scores listings against.
-# Edit skills, clouds, and regions here; career titles live in career-path.yaml.
+# Aligned with https://github.com/thisiskushal31, resume-latex, and career-info.md.
+# Career titles live in career-path.yaml.
 name: Kushal Gupta
-headline: Software Engineer | Cloud, SRE, Platform
+headline: Software Engineer | DevOps, Platform & Cloud Architecture
 years_experience: 3.8
 location: Kolkata, India
 open_to:
@@ -102,6 +103,7 @@ skills:
     - Atlantis
     - Helm
     - GitOps
+    - Ansible
     - GCP
     - AWS
     - Cloud Run
@@ -119,25 +121,38 @@ skills:
     - Azure
     - EKS
     - AKS
+    - Compute Engine
+    - Cloud SQL
+    - BigQuery
+    - Pub/Sub
+    - VPC
+    - WAF
+    - Route 53
     - GitHub Actions
     - GitLab CI
     - Jenkins
-    - Ansible
     - PostgreSQL
     - MySQL
     - MongoDB
     - Redis
     - Kafka
     - Elasticsearch
+    - Qdrant
     - Trivy
     - Secrets Manager
     - Cloud Monitoring
     - Bash
     - Networking
+    - FastAPI
+    - TypeScript
+    - JavaScript
+    - Node.js
     - Go
     - OpenTofu
     - n8n
     - Vertex AI
+    - MCP
+    - RBAC
 keywords:
   - architect
   - architecture
@@ -145,11 +160,14 @@ keywords:
   - observability
   - reliability
   - cost optimization
-  - SOC 2
+  - GitOps
+  - MLOps
+  - distributed systems
   - least privilege
   - multi-cloud
   - production
   - software engineer
+  - incident response
 exclude_title_terms:
   - intern
   - internship
@@ -170,3 +188,5 @@ search_queries:
   - software engineer cloud
   - sre aws gcp
   - infrastructure engineer
+  - mlops engineer
+  - gitops kubernetes

@@ -1,4 +1,4 @@
-"""Optional LLM briefing. First configured provider wins unless LLM_PROVIDER is set.
+"""Optional LLM briefing. Off unless the caller passes enabled=True.
 
 Supported API keys (not consumer chat subscriptions):
 
@@ -171,8 +171,15 @@ _HANDLERS: dict[str, Callable[[str], str]] = {
 }
 
 
-def complete(prompt: str) -> str | None:
-    """Call the active provider. Returns None when no usable API key is set."""
+def default_llm_toggle() -> bool:
+    """Sidebar default. Unset or any non-true value means LLM stays off."""
+    return _strip(os.getenv("FITBOARD_ENABLE_LLM")).lower() in {"1", "true", "yes", "on"}
+
+
+def complete(prompt: str, *, enabled: bool = False) -> str | None:
+    """Call the active provider. Does not hit the network unless enabled is True."""
+    if not enabled:
+        return None
     name = active_provider()
     if not name:
         return None

@@ -7,8 +7,10 @@ from unittest.mock import patch
 
 from src.llm import (
     active_provider,
+    complete,
     cursor_chat_url,
     cursor_needs_chat_gateway,
+    default_llm_toggle,
     has_llm_key,
 )
 
@@ -61,6 +63,20 @@ class LlmProviderTests(unittest.TestCase):
         }
         with patch.dict("os.environ", env, clear=True):
             self.assertEqual(active_provider(), "openai")
+
+    def test_toggle_defaults_off(self) -> None:
+        with patch.dict("os.environ", {}, clear=True):
+            self.assertFalse(default_llm_toggle())
+
+    def test_toggle_reads_enable_flag(self) -> None:
+        with patch.dict("os.environ", {"FITBOARD_ENABLE_LLM": "true"}, clear=True):
+            self.assertTrue(default_llm_toggle())
+
+    def test_complete_does_not_hit_network_when_disabled(self) -> None:
+        with patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}, clear=True):
+            with patch("src.llm.requests.post") as post:
+                self.assertIsNone(complete("hello"))
+                post.assert_not_called()
 
 
 if __name__ == "__main__":

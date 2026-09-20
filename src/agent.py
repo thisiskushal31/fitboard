@@ -86,7 +86,7 @@ def _llm_brief(profile: Profile, ranked: list[ScoredJob], trends: dict, career: 
         """
     ).strip()
 
-    return complete(prompt)
+    return complete(prompt, enabled=True)
 
 
 def _bucket_lines(items: list[ScoredJob], heading: str) -> list[str]:
@@ -145,42 +145,66 @@ def _heuristic_brief(profile: Profile, ranked: list[ScoredJob], trends: dict, pa
         "### Architecture narrative",
         "Keep 'architect and operate' — design the platform shape, then own it in production. Do not claim an Architect title the profile does not hold.",
         "",
-        "Set ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY for a written agent brief on top of this list. "
-        "A Cursor IDE key is not a chat API unless CURSOR_BASE_URL points at an OpenAI-compatible gateway.",
+        "LLM briefing is off unless the sidebar toggle is on and an API key is set.",
     ]
     return "\n".join(lines)
 
 
-def run_agent(profile: Profile) -> dict:
-    """Crawl public boards, score them, and return a briefing dict for the UI."""
+def run_agent(
+    profile: Profile,
+    *,
+    use_llm: bool = False,
+    jobs: list | None = None,
+    ranked: list | None = None,
+    trends: dict | None = None,
+    errors: list | None = None,
+) -> dict:
+    """Score public listings and write a briefing.
+
+    Crawl and match always run (or reuse a crawl the UI already did). The LLM
+    path is not called unless use_llm is True.
+    """
     cfg = load_career_config()
-    queries = list(dict.fromkeys(list(profile.search_queries) + extra_search_queries(cfg)))
-    jobs, errors = collect_jobs(queries)
-    ranked = rank_jobs(jobs, profile, limit=80)
-    trends = market_trends(jobs, profile)
+    source_errors = list(errors or [])
+    if jobs is None:
+        queries = list(dict.fromkeys(list(profile.search_queries) + extra_search_queries(cfg)))
+        jobs, source_errors = collect_jobs(queries)
+    if ranked is None:
+        ranked = rank_jobs(jobs, profile, limit=80)
+    if trends is None:
+        trends = market_trends(jobs, profile)
     path = build_career_report(jobs, profile, cfg)
     path_md = render_career_markdown(path)
     brief = _heuristic_brief(profile, ranked, trends, path_md)
-    if cursor_needs_chat_gateway():
-        errors = list(errors) + [
-            "CURSOR_API_KEY is set, but Cursor does not expose a chat-completions API. "
-            "Add ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY — or set CURSOR_BASE_URL to an OpenAI-compatible gateway."
-        ]
     llm_error = None
-    try:
-        llm = _llm_brief(profile, ranked, trends, report_to_dict(path))
-        if llm:
-            brief = path_md + "\n\n" + llm
-    except Exception as exc:
-        llm_error = str(exc)
-        errors = list(errors) + [f"LLM: {exc}"]
+    used_llm = False
+    if use_llm:
+        if cursor_needs_chat_gateway() and not has_llm_key():
+            source_errors.append(
+                "CURSOR_API_KEY is set, but Cursor does not expose a chat-completions API. "
+                "Add ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY — or set CURSOR_BASE_URL."
+            )
+        elif not has_llm_key():
+            source_errors.append(
+                "LLM enhancement is on, but no API key is set. "
+                "Add ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY to `.env`."
+            )
+        else:
+            try:
+                llm = _llm_brief(profile, ranked, trends, report_to_dict(path))
+                if llm:
+                    brief = path_md + "\n\n" + llm
+                    used_llm = True
+            except Exception as exc:
+                llm_error = str(exc)
+                source_errors.append(f"LLM: {exc}")
     return {
         "jobs": jobs,
         "ranked": ranked,
         "trends": trends,
-        "errors": errors,
+        "errors": source_errors,
         "brief": brief,
         "llm_error": llm_error,
-        "used_llm": llm_error is None and has_llm_key() and bool(active_provider()),
-        "llm_provider": active_provider(),
+        "used_llm": used_llm,
+        "llm_provider": active_provider() if used_llm else None,
     }

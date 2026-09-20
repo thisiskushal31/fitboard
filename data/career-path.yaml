@@ -28,6 +28,8 @@ trending:
 learning_now:
   - RAG evaluation
   - MITRE ATT&CK
+  - FastAPI
+  - TypeScript
 
 # Extra search strings mixed into the crawl. Role names above are added automatically.
 search_queries:

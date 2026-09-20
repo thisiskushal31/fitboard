@@ -1,9 +1,9 @@
 """Fitboard Streamlit UI.
 
 Loads the candidate profile, crawls public boards (cached for 30 minutes),
-and scores listings into suited / stretch / not-suited buckets. Streamlit
-Cloud secrets are copied into the process environment so the same `.env`
-keys work locally and in production.
+and scores listings into suited / stretch / not-suited buckets. LLM briefing
+is off unless the sidebar toggle is on. Streamlit Cloud secrets are copied
+into the process environment so Adzuna keys work without a local `.env`.
 """
 
 from __future__ import annotations
@@ -57,6 +57,7 @@ from src.career import (
     render_career_markdown,
 )
 from src.jobs import collect_jobs
+from src.llm import active_provider, default_llm_toggle, has_llm_key
 from src.match import rank_jobs
 from src.profile import load_profile
 from src.trends import market_trends
@@ -132,6 +133,17 @@ def main() -> None:
         if st.button("Refresh jobs", use_container_width=True):
             load_market.clear()
             st.rerun()
+        st.divider()
+        st.markdown("**LLM enhancement**")
+        use_llm = st.toggle("Enhance briefing with LLM", value=default_llm_toggle())
+        if use_llm:
+            provider = active_provider()
+            if provider:
+                st.caption(f"Using {provider}. Keys stay in `.env`, not git.")
+            else:
+                st.caption("Toggle is on, but no API key is set. Add ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY to `.env`.")
+        else:
+            st.caption("Off by default. Crawl, match, and career path still run.")
         st.divider()
         st.markdown("**Career path**")
         st.write("Now: " + ", ".join(CAREER.current_roles))
@@ -249,23 +261,37 @@ def main() -> None:
                     st.markdown("To get suited: `" + "` · `".join(item.gap_plan[:8]) + "`")
                 if job.url:
                     st.link_button("Open listing", job.url)
-                with st.expander("Description preview"):
-                    st.write(job.description[:1200] or "No description from this source.")
+                with st.expander("Full description"):
+                    text = (job.description or "").strip()
+                    if text:
+                        st.markdown(text)
+                    else:
+                        st.caption("This board did not publish a description on the public API.")
 
     with agent_tab:
         st.subheader("Job-search agent")
         st.write(
             "Runs the public-board crawl, scores listings against roles, skills, and clouds, then writes a briefing. "
             "Not-suited jobs stay on the list with: I am not suited, but this is what you need to get suited here. "
-            "Add `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, or `GEMINI_API_KEY` in `.env` for an LLM write-up. "
-            "A Cursor subscription key is not enough on its own. Without a key the apply list still appears."
+            "LLM is off unless the sidebar toggle is on. Without it, the apply list and career path still run."
         )
         if st.button("Run agent", type="primary"):
-            with st.spinner("Agent is crawling public boards and writing a briefing…"):
-                report = run_agent(PROFILE)
+            with st.spinner("Writing a briefing from the public-board crawl…"):
+                report = run_agent(
+                    PROFILE,
+                    use_llm=use_llm,
+                    jobs=jobs,
+                    ranked=ranked,
+                    trends=trends,
+                    errors=errors,
+                )
             st.session_state["agent_report"] = report
         report = st.session_state.get("agent_report")
         if report:
+            if report.get("used_llm"):
+                st.caption(f"LLM enhancement: {report.get('llm_provider')}")
+            else:
+                st.caption("Heuristic briefing — LLM was not called.")
             st.markdown(report["brief"])
             if report.get("errors"):
                 with st.expander(f"{len(report['errors'])} warning(s)"):

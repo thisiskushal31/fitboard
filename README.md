@@ -73,9 +73,9 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Open http://localhost:8501 → **Agent briefing** → **Run agent**.
+Open http://localhost:8501. Crawl, match, career path, and the apply list run with **no LLM**. Turn on **Enhance briefing with LLM** in the sidebar only when a written brief from Claude, OpenAI, or Gemini is wanted.
 
-Copy `.env.example` to `.env` and set **one** LLM API key for a written briefing. Without a key, Run agent still returns a scored apply list from the public crawl. Optional Adzuna keys widen aggregator coverage.
+Copy `.env.example` to `.env` and set **one** LLM API key if that toggle will be used. Keys are ignored while the toggle is off. Optional Adzuna keys widen aggregator coverage and are not LLM.
 
 | Key | Who it is for |
 | --- | --- |
@@ -86,7 +86,7 @@ Copy `.env.example` to `.env` and set **one** LLM API key for a written briefing
 
 **A Cursor IDE subscription, Claude.ai Pro, or ChatGPT Plus is not an API key.** Those plans run chat inside the product. Fitboard needs a developer key from the tables above. Cursor's official API is Cloud Agents (repo workflows), not `chat/completions`.
 
-If several keys are set, Fitboard uses Cursor (when a gateway URL is present), then Claude, then OpenAI, then Gemini. Set `LLM_PROVIDER=anthropic|openai|gemini|cursor` to force one.
+If several keys are set, Fitboard uses Cursor (when a gateway URL is present), then Claude, then OpenAI, then Gemini. Set `LLM_PROVIDER=anthropic|openai|gemini|cursor` to force one. `FITBOARD_ENABLE_LLM=true` turns the sidebar toggle on by default; the LLM still is not called until **Run agent** runs with the toggle on.
 
 Do not commit `.env`.
 

@@ -125,13 +125,17 @@ def is_relevant_listing(title: str, description: str = "") -> bool:
 
 
 def fetch_greenhouse(company: str, board: str) -> list[Job]:
-    """Public Greenhouse board JSON. Filters to target roles and skill-led listings."""
-    resp = _get(f"https://boards-api.greenhouse.io/v1/boards/{board}/jobs")
+    """Public Greenhouse board JSON, including full job HTML when the board publishes it."""
+    resp = _get(
+        f"https://boards-api.greenhouse.io/v1/boards/{board}/jobs",
+        params={"content": "true"},
+    )
     resp.raise_for_status()
     jobs: list[Job] = []
     for item in resp.json().get("jobs", []):
         title = item.get("title") or ""
-        if not is_relevant_listing(title):
+        desc = strip_html(item.get("content"))
+        if not is_relevant_listing(title, desc):
             continue
         loc = (item.get("location") or {}).get("name") or ""
         jobs.append(
@@ -142,8 +146,9 @@ def fetch_greenhouse(company: str, board: str) -> list[Job]:
                 company=company,
                 url=item.get("absolute_url") or "",
                 location=loc,
+                description=desc,
                 posted_at=_parse_date(item.get("updated_at") or item.get("created_at")),
-                remote="remote" in loc.lower() or "remote" in title.lower(),
+                remote="remote" in loc.lower() or "remote" in title.lower() or "remote" in desc.lower(),
             )
         )
     return jobs
@@ -306,6 +311,15 @@ def fetch_smartrecruiters(company: str, board: str) -> list[Job]:
             loc = item.get("location") or {}
             loc_str = loc.get("fullLocation") or loc.get("city") or ""
             job_id = item.get("id") or item.get("uuid")
+            ad = item.get("jobAd") or {}
+            desc_parts: list[str] = []
+            if isinstance(ad, dict):
+                sections = ad.get("sections") or {}
+                if isinstance(sections, dict):
+                    for section in sections.values():
+                        if isinstance(section, dict):
+                            desc_parts.append(str(section.get("text") or ""))
+            desc = strip_html(" ".join(desc_parts))
             jobs.append(
                 Job(
                     id=f"smartrecruiters-{board}-{job_id}",
@@ -314,6 +328,7 @@ def fetch_smartrecruiters(company: str, board: str) -> list[Job]:
                     company=company,
                     url=f"https://jobs.smartrecruiters.com/{board}/{job_id}",
                     location=str(loc_str),
+                    description=desc,
                     posted_at=_parse_date(item.get("releasedDate")),
                     remote=bool(loc.get("remote")) or "remote" in str(loc_str).lower(),
                 )
