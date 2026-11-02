@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Help installing Fitboard
+    url: https://github.com/thisiskushal31/fitboard/wiki
+    about: Step-by-step guides for Docker, Docker Compose, Node.js, an Ubuntu server, CapRover, Coolify and Dokploy.
+  - name: Troubleshooting
+    url: https://github.com/thisiskushal31/fitboard/wiki/Troubleshooting
+    about: What to do about the problems people run into most.
+  - name: Report a security problem
+    url: https://github.com/thisiskushal31/fitboard/security/advisories/new
+    about: Report it privately, never in a public issue. docs/security.md says how.

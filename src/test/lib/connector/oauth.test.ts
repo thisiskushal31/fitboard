@@ -1,0 +1,153 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const env = vi.hoisted(() => ({ FITBOARD_SECRET: "s".repeat(40), FITBOARD_PASSWORD: "argon2id:m=19456,t=2,p=1:c2FsdA:aGFzaA" }));
+vi.mock("@/lib/core/env", () => ({ env }));
+const settings = vi.hoisted(() => ({ connectorEnabledAt: "2026-10-23T09:00:00.000Z" as string | null, connectorRedirects: ["https://n8n.example/rest/oauth2-credential/callback"] }));
+vi.mock("@/lib/settings/settings-data", () => ({ loadSettings: async () => settings }));
+
+import {
+  addedRedirects,
+  allowedRedirect,
+  authorizationServerMetadata,
+  challengeOf,
+  clientAllows,
+  exchangeCode,
+  issueCode,
+  protectedResourceMetadata,
+  readClient,
+  redirectProblem,
+  refresh,
+  registerClient,
+  verifyAccessToken,
+} from "@/lib/connector/oauth";
+
+const CLAUDE = "https://claude.ai/api/mcp/auth_callback";
+const VERIFIER = "v".repeat(50);
+
+async function signIn(redirectUri = CLAUDE) {
+  const clientId = await registerClient({ name: "Claude", redirectUris: [redirectUri] });
+  const code = await issueCode({ clientId, redirectUri, codeChallenge: challengeOf(VERIFIER), resource: "https://fitboard.example/api/mcp" });
+  return { clientId, code };
+}
+
+beforeEach(() => {
+  settings.connectorEnabledAt = "2026-10-23T09:00:00.000Z";
+  env.FITBOARD_PASSWORD = "argon2id:m=19456,t=2,p=1:c2FsdA:aGFzaA";
+});
+
+describe("the Claude connector's sign-in", () => {
+  it("only sends Claude back to its own callbacks, or a loopback address for Claude's command-line app", () => {
+    expect(allowedRedirect(CLAUDE)).toBe(true);
+    expect(allowedRedirect("https://claude.com/api/mcp/auth_callback")).toBe(true);
+    expect(allowedRedirect("http://localhost:33418/callback")).toBe(true);
+    expect(allowedRedirect("http://127.0.0.1:9/callback")).toBe(true);
+    expect(allowedRedirect("https://evil.example/api/mcp/auth_callback")).toBe(false);
+    expect(allowedRedirect("https://claude.ai/api/mcp/auth_callback/../evil")).toBe(false);
+    expect(allowedRedirect("http://localhost:33418/other")).toBe(false);
+    expect(allowedRedirect("https://localhost/callback")).toBe(false);
+    expect(allowedRedirect("not a url")).toBe(false);
+  });
+
+  it("sends another app back to an address added in Settings → MCP connector, exactly", async () => {
+    const added = await addedRedirects();
+    expect(added).toEqual(["https://n8n.example/rest/oauth2-credential/callback"]);
+    expect(allowedRedirect("https://n8n.example/rest/oauth2-credential/callback", added)).toBe(true);
+    expect(allowedRedirect("https://n8n.example/rest/oauth2-credential/callback/", added)).toBe(false);
+    expect(allowedRedirect("https://n8n.example/rest/oauth2-credential/callback?x=1", added)).toBe(false);
+    expect(allowedRedirect("https://n8n.example/rest/oauth2-credential/callback")).toBe(false);
+  });
+
+  it("takes an https callback address, or http on this computer or a private network", () => {
+    for (const ok of [
+      "https://n8n.example/rest/oauth2-credential/callback",
+      "http://localhost:5678/rest/oauth2-credential/callback",
+      "http://192.168.1.20:5678/callback",
+      "http://10.0.0.5/callback",
+      "http://172.20.1.1/callback",
+      "http://n8n:5678/callback",
+      "http://n8n.local/callback",
+      "http://n8n.home.arpa/callback",
+    ]) {
+      expect(redirectProblem(ok), ok).toBeNull();
+    }
+    expect(redirectProblem("http://n8n.example/callback")).toBe("Use an https:// address, or http:// only for an app on this computer or your own network.");
+    expect(redirectProblem("http://10.example.com/callback")).toBe("Use an https:// address, or http:// only for an app on this computer or your own network.");
+    expect(redirectProblem("http://172.32.0.1/callback")).toBe("Use an https:// address, or http:// only for an app on this computer or your own network.");
+    expect(redirectProblem("https://n8n.example/callback#done")).toBe("A callback address can't have a # part or a user name in it.");
+    expect(redirectProblem("https://me@n8n.example/callback")).toBe("A callback address can't have a # part or a user name in it.");
+    expect(redirectProblem("javascript:alert(1)")).toBe("That isn't a web address. Copy it from the app, starting with https://.");
+    expect(redirectProblem("n8n.example/callback")).toBe("That isn't a web address. Copy it from the app, starting with https://.");
+  });
+
+  it("keeps a client's redirects in its id, ignoring a loopback port that changes", async () => {
+    const clientId = await registerClient({ name: "Claude CLI", redirectUris: ["http://localhost:1234/callback"] });
+    const client = await readClient(clientId);
+    expect(client).toEqual({ name: "Claude CLI", redirectUris: ["http://localhost:1234/callback"] });
+    expect(clientAllows(client!, "http://localhost:5678/callback")).toBe(true);
+    expect(clientAllows(client!, CLAUDE)).toBe(false);
+    expect(await readClient("forged")).toBeNull();
+  });
+
+  it("trades a code for tokens with the PKCE verifier, and refreshes them", async () => {
+    const { clientId, code } = await signIn();
+    const tokens = await exchangeCode({ code, clientId, redirectUri: CLAUDE, verifier: VERIFIER });
+    expect(tokens).toMatchObject({ token_type: "Bearer", expires_in: 3600, scope: "fitboard" });
+    expect(await verifyAccessToken(tokens.access_token)).toEqual({ clientId });
+    // A refresh token isn't an access token.
+    expect(await verifyAccessToken(tokens.refresh_token)).toBeNull();
+
+    const renewed = await refresh({ refreshToken: tokens.refresh_token, clientId });
+    expect(await verifyAccessToken(renewed.access_token)).toEqual({ clientId });
+    await expect(refresh({ refreshToken: tokens.refresh_token, clientId: "someone else" })).rejects.toThrow("The refresh token is invalid or has expired.");
+  });
+
+  it("refuses a wrong verifier, another client or another redirect", async () => {
+    const { clientId, code } = await signIn();
+    await expect(exchangeCode({ code, clientId, redirectUri: CLAUDE, verifier: "w".repeat(50) })).rejects.toThrow("The code verifier doesn't match.");
+    await expect(exchangeCode({ code, clientId: "other", redirectUri: CLAUDE, verifier: VERIFIER })).rejects.toThrow("The code was issued to another client.");
+    await expect(exchangeCode({ code, clientId, redirectUri: "https://claude.com/api/mcp/auth_callback", verifier: VERIFIER })).rejects.toThrow(
+      "The redirect URI doesn't match.",
+    );
+    await expect(exchangeCode({ code: "forged", clientId, redirectUri: CLAUDE, verifier: VERIFIER })).rejects.toThrow("The code is invalid or has expired.");
+  });
+
+  it("signs Claude out on Disconnect Claude, when the connector goes off, and with a new password", async () => {
+    const { clientId, code } = await signIn();
+    const tokens = await exchangeCode({ code, clientId, redirectUri: CLAUDE, verifier: VERIFIER });
+
+    // Disconnect Claude: a new time on the connector.
+    settings.connectorEnabledAt = "2026-10-23T10:00:00.000Z";
+    expect(await verifyAccessToken(tokens.access_token)).toBeNull();
+    await expect(refresh({ refreshToken: tokens.refresh_token, clientId })).rejects.toThrow("invalid or has expired");
+    await expect(exchangeCode({ code, clientId, redirectUri: CLAUDE, verifier: VERIFIER })).rejects.toThrow("invalid or has expired");
+
+    // Off: nothing is issued or accepted.
+    const fresh = await signIn();
+    const freshTokens = await exchangeCode({ code: fresh.code, clientId: fresh.clientId, redirectUri: CLAUDE, verifier: VERIFIER });
+    settings.connectorEnabledAt = null;
+    expect(await verifyAccessToken(freshTokens.access_token)).toBeNull();
+    await expect(signIn()).rejects.toThrow("The MCP connector is off.");
+
+    // A new password, like every browser session.
+    settings.connectorEnabledAt = "2026-10-23T11:00:00.000Z";
+    const again = await signIn();
+    const againTokens = await exchangeCode({ code: again.code, clientId: again.clientId, redirectUri: CLAUDE, verifier: VERIFIER });
+    env.FITBOARD_PASSWORD = "argon2id:m=19456,t=2,p=1:c2FsdA:bmV3";
+    expect(await verifyAccessToken(againTokens.access_token)).toBeNull();
+  });
+
+  it("describes itself at the addresses Claude looks for", () => {
+    expect(authorizationServerMetadata("https://fitboard.example")).toMatchObject({
+      issuer: "https://fitboard.example",
+      authorization_endpoint: "https://fitboard.example/oauth/authorize",
+      token_endpoint: "https://fitboard.example/api/oauth/token",
+      registration_endpoint: "https://fitboard.example/api/oauth/register",
+      code_challenge_methods_supported: ["S256"],
+      token_endpoint_auth_methods_supported: ["none"],
+    });
+    expect(protectedResourceMetadata("https://fitboard.example")).toMatchObject({
+      resource: "https://fitboard.example/api/mcp",
+      authorization_servers: ["https://fitboard.example"],
+    });
+  });
+});

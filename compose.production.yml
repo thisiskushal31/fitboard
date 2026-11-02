@@ -1,0 +1,88 @@
+# Fitboard with Docker Compose (see the installation guide, https://github.com/thisiskushal31/fitboard/wiki). Save this
+# file as compose.yml in a folder of its own, put POSTGRES_PASSWORD,
+# FITBOARD_PASSWORD (a hash of your password, from `docker run --rm -it
+# ghcr.io/thisiskushal31/fitboard hash-password`) and FITBOARD_SECRET in a .env file
+# next to it, then:
+#
+#   docker compose up -d
+#
+# Add COMPOSE_PROFILES=ai to .env to run Ollama for a local model as well.
+
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: fitboard
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: fitboard
+    volumes:
+      # Postgres 18+ keeps data in a versioned subdirectory, so mount the parent.
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fitboard -d fitboard"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    image: ${FITBOARD_IMAGE:-ghcr.io/thisiskushal31/fitboard:latest}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://fitboard:${POSTGRES_PASSWORD}@db:5432/fitboard
+      FITBOARD_PASSWORD: ${FITBOARD_PASSWORD:?Set FITBOARD_PASSWORD in .env to a hash from hash-password}
+      FITBOARD_SECRET: ${FITBOARD_SECRET:?Set FITBOARD_SECRET in .env}
+      FITBOARD_BACKUP_RETENTION_DAYS: ${FITBOARD_BACKUP_RETENTION_DAYS:-}
+      # Your time zone, e.g. Europe/Berlin: nightly backups run at 03:00 in it.
+      TZ: ${TZ:-UTC}
+      FITBOARD_AI_PROVIDER: ${FITBOARD_AI_PROVIDER:-}
+      FITBOARD_AI_URL: ${FITBOARD_AI_URL:-}
+      FITBOARD_AI_MODEL: ${FITBOARD_AI_MODEL:-}
+      FITBOARD_AI_KEY: ${FITBOARD_AI_KEY:-}
+      FITBOARD_AI_TIMEOUT_SECONDS: ${FITBOARD_AI_TIMEOUT_SECONDS:-}
+      # The daily usage ping: unset, Fitboard asks after sign-in; on or off answers in advance (see Privacy in the wiki).
+      FITBOARD_TELEMETRY: ${FITBOARD_TELEMETRY:-}
+      # Defaults for Settings → Job search.
+      FITBOARD_JOBS_SOURCE: ${FITBOARD_JOBS_SOURCE:-}
+      FITBOARD_JSEARCH_KEY: ${FITBOARD_JSEARCH_KEY:-}
+      FITBOARD_JSEARCH_HOST: ${FITBOARD_JSEARCH_HOST:-}
+      FITBOARD_ADZUNA_APP_ID: ${FITBOARD_ADZUNA_APP_ID:-}
+      FITBOARD_ADZUNA_KEY: ${FITBOARD_ADZUNA_KEY:-}
+      FITBOARD_FREEHIRE_URL: ${FITBOARD_FREEHIRE_URL:-}
+      FITBOARD_JOBS_ARBEITSAGENTUR: ${FITBOARD_JOBS_ARBEITSAGENTUR:-}
+      # Defaults for Settings → Scoring: ai or jev (Jev by TypeSafe, with its key).
+      FITBOARD_SCORER: ${FITBOARD_SCORER:-}
+      FITBOARD_TYPESAFE_KEY: ${FITBOARD_TYPESAFE_KEY:-}
+      # Gmail and Calendar: a Google OAuth client (or enter it in Settings → Google).
+      FITBOARD_GOOGLE_CLIENT_ID: ${FITBOARD_GOOGLE_CLIENT_ID:-}
+      FITBOARD_GOOGLE_CLIENT_SECRET: ${FITBOARD_GOOGLE_CLIENT_SECRET:-}
+      # The address Fitboard is reached at, for Google's redirect.
+      FITBOARD_PUBLIC_URL: ${FITBOARD_PUBLIC_URL:-}
+    # Only on the server itself: put a reverse proxy with HTTPS in front.
+    ports:
+      - "127.0.0.1:${FITBOARD_PORT:-3000}:3000"
+    volumes:
+      - data:/data
+    # Room for Chromium, which prints the PDFs.
+    mem_limit: 1g
+    # Lets http://host.docker.internal reach Ollama (:11434) or LM Studio
+    # (:1234) on the host.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # A local model, with COMPOSE_PROFILES=ai in .env: `docker compose up -d`,
+  # then pull one (see "Choosing an AI provider" in the wiki). Fitboard reaches it at http://ollama:11434.
+  ollama:
+    profiles: [ai]
+    image: ollama/ollama:0.40.10
+    restart: unless-stopped
+    volumes:
+      - ollama:/root/.ollama
+
+volumes:
+  pgdata:
+  data:
+  ollama:

@@ -1,0 +1,38 @@
+import "server-only";
+
+import { z } from "zod";
+
+import { fullText } from "@/lib/job-search/find";
+import { foundPostingSchema, postingKey, type FoundPosting } from "@/lib/job-search/search";
+import { saveScore } from "@/lib/postings/posting-scores";
+import { loadProfile } from "@/lib/profile/profile-data";
+import { loadPostingScorer } from "@/lib/scoring";
+
+import { defineJob } from "./runner";
+
+/** The key of a posting's scoring job, so a second click follows the one under way. */
+export const scoreJobKey = (posting: Pick<FoundPosting, "source" | "externalId">) => `posting-score:${postingKey(posting)}`;
+
+/**
+ * Score in Find jobs: how well one posting fits the profile, as the
+ * job agent scores them, with the scorer Settings → Scoring chose. A
+ * source that sent only the start of it is asked for the rest first. The
+ * score is kept with the posting.
+ */
+export const scorePostingJob = defineJob({
+  type: "posting-score",
+  input: z.object({ posting: foundPostingSchema }),
+  result: z.object({ score: z.number().int(), reasons: z.array(z.string()), redFlags: z.array(z.string()) }),
+  async run({ posting }, { step, signal }) {
+    let description = posting.description;
+    if (!posting.complete) {
+      await step("Getting the whole posting");
+      description = (await fullText(posting)) ?? posting.description;
+    }
+    await step("Scoring it against your profile");
+    const [score, profile] = await Promise.all([loadPostingScorer(), loadProfile()]);
+    const { data, scoredWith } = await score({ ...posting, description }, profile, signal);
+    await saveScore(posting, data, scoredWith);
+    return data;
+  },
+});
