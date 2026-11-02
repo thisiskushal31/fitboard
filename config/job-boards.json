@@ -215,6 +215,14 @@
       "url": "https://talent.alibaba.com/en/home"
     },
     {
+      "name": "Allcargo Logistics",
+      "url": "https://allcargo.darwinbox.in/ms/candidate/careers"
+    },
+    {
+      "name": "Allegro",
+      "url": "https://jobs.smartrecruiters.com/Allegro"
+    },
+    {
       "name": "Allianz",
       "url": "https://careers.allianz.com/global/en"
     },
@@ -225,6 +233,10 @@
     {
       "name": "Altana AI",
       "url": "https://job-boards.greenhouse.io/altanaai"
+    },
+    {
+      "name": "Alvarez & Marsal",
+      "url": "https://www.alvarezandmarsal.com/"
     },
     {
       "name": "Amagi",
@@ -283,6 +295,10 @@
       "url": "https://www.apiholdings.in/careers"
     },
     {
+      "name": "APM Terminals",
+      "url": "https://jobs.smartrecruiters.com/apmterminals"
+    },
+    {
       "name": "Apna",
       "url": "https://jobs.ashbyhq.com/apna-com"
     },
@@ -305,6 +321,10 @@
     {
       "name": "AppViewX",
       "url": "https://job-boards.greenhouse.io/appviewx"
+    },
+    {
+      "name": "Aramco",
+      "url": "https://www.aramco.com/"
     },
     {
       "name": "Aramex",
@@ -337,6 +357,10 @@
     {
       "name": "ASML",
       "url": "https://www.asml.com/en/careers"
+    },
+    {
+      "name": "ASOS",
+      "url": "https://jobs.smartrecruiters.com/asos"
     },
     {
       "name": "Assort Health",
@@ -439,6 +463,10 @@
       "url": "https://www.bajajauto.com/careers"
     },
     {
+      "name": "Baker Hughes",
+      "url": "https://www.bakerhughes.com/"
+    },
+    {
       "name": "Bank of America",
       "url": "https://careers.bankofamerica.com/en-us"
     },
@@ -471,12 +499,24 @@
       "url": "https://careers.bcg.com/"
     },
     {
+      "name": "BDO",
+      "url": "https://www.bdo.in/en-gb/home"
+    },
+    {
+      "name": "BearingPoint",
+      "url": "https://www.bearingpoint.com/en/"
+    },
+    {
       "name": "Bedrock Robotics",
       "url": "https://jobs.ashbyhq.com/bedrock-robotics"
     },
     {
       "name": "Beiersdorf",
       "url": "https://www.beiersdorf.com/career/your-application/job-search"
+    },
+    {
+      "name": "Best Buy",
+      "url": "https://jobs.bestbuy.com/bby"
     },
     {
       "name": "BetterPlace",
@@ -545,6 +585,10 @@
     {
       "name": "Blowhorn",
       "url": "https://jobs.lever.co/blowhorn"
+    },
+    {
+      "name": "Blue Dart",
+      "url": "https://www.bluedart.com/"
     },
     {
       "name": "BMC Software",
@@ -647,6 +691,10 @@
       "url": "https://jobs.bytedance.com/en/"
     },
     {
+      "name": "C.H. Robinson",
+      "url": "https://chrobinson.wd5.myworkdayjobs.com/CHRobinson"
+    },
+    {
       "name": "C3 AI",
       "url": "https://job-boards.greenhouse.io/c3iot"
     },
@@ -681,6 +729,10 @@
     {
       "name": "Canva",
       "url": "https://jobs.lever.co/canva"
+    },
+    {
+      "name": "Capco",
+      "url": "https://www.capco.com/"
     },
     {
       "name": "Capgemini",
@@ -723,6 +775,10 @@
       "url": "https://careers.carousell.com/"
     },
     {
+      "name": "Carrefour",
+      "url": "https://jobs.smartrecruiters.com/carrefour"
+    },
+    {
       "name": "Cars24",
       "url": "https://jobs.ashbyhq.com/cars24"
     },
@@ -755,6 +811,14 @@
       "url": "https://job-boards.greenhouse.io/censys"
     },
     {
+      "name": "CEVA",
+      "url": "https://www.cevalogistics.com/"
+    },
+    {
+      "name": "CGI",
+      "url": "https://www.cgi.com/en"
+    },
+    {
       "name": "Chai Discovery",
       "url": "https://jobs.ashbyhq.com/chaidiscovery"
     },
@@ -781,6 +845,10 @@
     {
       "name": "Chevron",
       "url": "https://careers.chevron.com/search-jobs"
+    },
+    {
+      "name": "Chewy",
+      "url": "https://careers.chewy.com/us/en/search-results"
     },
     {
       "name": "Chime",
@@ -861,6 +929,10 @@
     {
       "name": "CloudWalk",
       "url": "https://jobs.lever.co/cloudwalk"
+    },
+    {
+      "name": "CMA CGM",
+      "url": "https://jobs.cmacgm-group.com/viewalljobs/?locale=en_GB"
     },
     {
       "name": "CME Group",
@@ -967,12 +1039,24 @@
       "url": "https://jobs.ashbyhq.com/contrast-security"
     },
     {
+      "name": "COSCO Shipping",
+      "url": "https://en.coscoshipping.com/Careers/SearchforaJob/index.html"
+    },
+    {
+      "name": "Costco",
+      "url": "https://www.costco.com/"
+    },
+    {
       "name": "Coty",
       "url": "https://careers.coty.com/"
     },
     {
       "name": "Country Delight",
       "url": "https://jobs.lever.co/countrydelight"
+    },
+    {
+      "name": "Coupang",
+      "url": "https://www.coupang.com/"
     },
     {
       "name": "Coverfox",
@@ -1083,6 +1167,10 @@
       "url": "https://job-boards.greenhouse.io/dataweave"
     },
     {
+      "name": "DB Schenker",
+      "url": "https://jobs.smartrecruiters.com/dbschenker"
+    },
+    {
       "name": "DBS",
       "url": "https://dbs.wd3.myworkdayjobs.com/DBS_Careers"
     },
@@ -1147,6 +1235,10 @@
       "url": "https://dhan.co/careers"
     },
     {
+      "name": "DHL",
+      "url": "https://careers.dhl.com/global/en/search-results"
+    },
+    {
       "name": "Diebold Nixdorf",
       "url": "https://jobs.dieboldnixdorf.com/"
     },
@@ -1173,6 +1265,10 @@
     {
       "name": "DJI",
       "url": "https://we.dji.com/career.html"
+    },
+    {
+      "name": "DMart",
+      "url": "https://jobs.smartrecruiters.com/dmart"
     },
     {
       "name": "dnata",
@@ -1215,6 +1311,14 @@
       "url": "https://job-boards.greenhouse.io/druva"
     },
     {
+      "name": "DSV",
+      "url": "https://www.dsv.com/en/careers/job-search"
+    },
+    {
+      "name": "DTDC",
+      "url": "https://www.dtdc.com/"
+    },
+    {
       "name": "Dubai Airports",
       "url": "https://careers.dubaiairports.ae/en/search-and-apply/"
     },
@@ -1229,6 +1333,10 @@
     {
       "name": "Duolingo",
       "url": "https://job-boards.greenhouse.io/duolingo"
+    },
+    {
+      "name": "DXC",
+      "url": "https://dxc.com/"
     },
     {
       "name": "Dynatrace",
@@ -1259,6 +1367,10 @@
       "url": "https://careers.ebayinc.com/"
     },
     {
+      "name": "Ecom Express",
+      "url": "https://jobs.smartrecruiters.com/ecomexpress"
+    },
+    {
       "name": "Edelweiss Financial Services",
       "url": "https://jobs.lever.co/edelweiss"
     },
@@ -1277,6 +1389,10 @@
     {
       "name": "Eka Software",
       "url": "https://jobs.lever.co/eka"
+    },
+    {
+      "name": "Ekart",
+      "url": "https://jobs.smartrecruiters.com/ekart"
     },
     {
       "name": "Elastic",
@@ -1331,6 +1447,10 @@
       "url": "https://job-boards.greenhouse.io/epicgames"
     },
     {
+      "name": "Equinor",
+      "url": "https://www.equinor.com/"
+    },
+    {
       "name": "Ericsson",
       "url": "https://www.ericsson.com/en/careers"
     },
@@ -1355,6 +1475,10 @@
       "url": "https://careers.etisalat.ae/en/index.html"
     },
     {
+      "name": "Etsy",
+      "url": "https://careers.etsy.com/"
+    },
+    {
       "name": "Euler Motors",
       "url": "https://jobs.lever.co/eulermotors"
     },
@@ -1371,6 +1495,10 @@
       "url": "https://www.evercore.com/careers/"
     },
     {
+      "name": "Evergreen",
+      "url": "https://www.evergreen-line.com/"
+    },
+    {
       "name": "EXL Service",
       "url": "https://jobs.ashbyhq.com/exlservice"
     },
@@ -1385,6 +1513,10 @@
     {
       "name": "Expedia Group",
       "url": "https://careers.expediagroup.com/"
+    },
+    {
+      "name": "Expeditors",
+      "url": "https://jobs.smartrecruiters.com/expeditors"
     },
     {
       "name": "Experian",
@@ -1579,8 +1711,16 @@
       "url": "https://careers.g42.ai/global/en"
     },
     {
+      "name": "GAIL",
+      "url": "https://www.gailonline.com/"
+    },
+    {
       "name": "Games24x7",
       "url": "https://www.games24x7.com/careers/"
+    },
+    {
+      "name": "Gati",
+      "url": "https://www.allcargologistics.com/"
     },
     {
       "name": "GE",
@@ -1601,6 +1741,10 @@
     {
       "name": "Genpact",
       "url": "https://genpact.wd108.myworkdayjobs.com/External_Careers"
+    },
+    {
+      "name": "GEODIS",
+      "url": "https://workatgeodis.com/jobs"
     },
     {
       "name": "GitHub",
@@ -1687,6 +1831,10 @@
       "url": "https://job-boards.greenhouse.io/grammarly"
     },
     {
+      "name": "Grant Thornton",
+      "url": "https://www.grantthornton.in/"
+    },
+    {
       "name": "Great Learning",
       "url": "https://job-boards.greenhouse.io/greatlearning"
     },
@@ -1719,8 +1867,16 @@
       "url": "https://job-boards.greenhouse.io/gusto"
     },
     {
+      "name": "GXO",
+      "url": "https://jobs.gxo.com/search/"
+    },
+    {
       "name": "Halliburton",
       "url": "https://jobs.halliburton.com/search/"
+    },
+    {
+      "name": "Hapag-Lloyd",
+      "url": "https://www.hapag-lloyd.com/en/company/career/vacancies.html"
     },
     {
       "name": "Happay",
@@ -1807,6 +1963,14 @@
       "url": "https://hkex.wd3.myworkdayjobs.com/HKEXCareerPage"
     },
     {
+      "name": "HMM",
+      "url": "https://www.hmm21.com/company/contactUs/jobOpportunity.do"
+    },
+    {
+      "name": "Home Depot",
+      "url": "https://careers.homedepot.com/job-search-results/"
+    },
+    {
       "name": "Honasa",
       "url": "https://honasa.in/pages/careers"
     },
@@ -1885,6 +2049,10 @@
     {
       "name": "IIFL Finance",
       "url": "https://jobs.lever.co/iifl"
+    },
+    {
+      "name": "IKEA",
+      "url": "https://jobs.ikea.com/en"
     },
     {
       "name": "InCred",
@@ -2015,6 +2183,10 @@
       "url": "https://jobs.ashbyhq.com/jar-app"
     },
     {
+      "name": "JD.com",
+      "url": "https://zhaopin.jd.com/"
+    },
+    {
       "name": "Jefferies",
       "url": "https://hdid.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs"
     },
@@ -2087,6 +2259,10 @@
       "url": "https://jumbotail.com/careers"
     },
     {
+      "name": "Jumia",
+      "url": "https://group.jumia.com/careers"
+    },
+    {
       "name": "JumpCloud",
       "url": "https://jobs.lever.co/jumpcloud"
     },
@@ -2129,6 +2305,10 @@
     {
       "name": "Kaseya",
       "url": "https://job-boards.greenhouse.io/kaseya"
+    },
+    {
+      "name": "Kearney",
+      "url": "https://www.kearney.com/"
     },
     {
       "name": "Keka HR",
@@ -2199,8 +2379,16 @@
       "url": "https://job-boards.greenhouse.io/kredx"
     },
     {
+      "name": "Kroger",
+      "url": "https://www.krogerfamilycareers.com/en/sites/CX_2001/jobs"
+    },
+    {
       "name": "Krutrim",
       "url": "https://jobs.ashbyhq.com/krutrim"
+    },
+    {
+      "name": "Kuehne+Nagel",
+      "url": "https://jobs.kuehne-nagel.com/global/en/search-results"
     },
     {
       "name": "Kutumb",
@@ -2299,6 +2487,10 @@
       "url": "https://jobs.lever.co/licious"
     },
     {
+      "name": "Lineage",
+      "url": "https://careers.onelineage.com/us/en/search-results"
+    },
+    {
       "name": "Linear",
       "url": "https://jobs.ashbyhq.com/linear"
     },
@@ -2347,6 +2539,10 @@
       "url": "https://lbg.wd3.myworkdayjobs.com/LBG_Careers"
     },
     {
+      "name": "Loadshare",
+      "url": "https://jobs.ashbyhq.com/loadshare"
+    },
+    {
       "name": "Lockheed Martin",
       "url": "https://www.lockheedmartinjobs.com/search-jobs/DevOps"
     },
@@ -2368,7 +2564,7 @@
     },
     {
       "name": "Lowe's",
-      "url": "https://talent.lowes.com/us/en"
+      "url": "https://talent.lowes.com/us/en/search-results"
     },
     {
       "name": "LTIMindtree",
@@ -2416,7 +2612,7 @@
     },
     {
       "name": "Maersk",
-      "url": "https://www.maersk.com/careers"
+      "url": "https://maersk.wd3.myworkdayjobs.com/Maersk_Careers"
     },
     {
       "name": "Magicpin",
@@ -2425,6 +2621,14 @@
     {
       "name": "Mahindra",
       "url": "https://www.mahindra.com/careers"
+    },
+    {
+      "name": "Mahindra Logistics",
+      "url": "https://nectar.darwinbox.in/ms/candidate/careers"
+    },
+    {
+      "name": "Mainfreight",
+      "url": "https://www.mainfreight.com/"
     },
     {
       "name": "MaintainX",
@@ -2515,8 +2719,16 @@
       "url": "https://jobs.ashbyhq.com/mensabrands"
     },
     {
+      "name": "Mercado Libre",
+      "url": "https://mercadolibre.eightfold.ai/careers"
+    },
+    {
       "name": "Mercedes-Benz",
       "url": "https://jobs.mercedes-benz.com/"
+    },
+    {
+      "name": "Mercer",
+      "url": "https://www.mercer.com/"
     },
     {
       "name": "Mercor",
@@ -2659,6 +2871,10 @@
       "url": "https://www.mpl.live/careers"
     },
     {
+      "name": "MSC",
+      "url": "https://www.msc.com/"
+    },
+    {
       "name": "MSCI",
       "url": "https://careers.msci.com/job-search"
     },
@@ -2725,6 +2941,10 @@
     {
       "name": "Navi Technologies",
       "url": "https://job-boards.greenhouse.io/navi"
+    },
+    {
+      "name": "Nayara",
+      "url": "https://www.nayaraenergy.com/"
     },
     {
       "name": "Nazara",
@@ -2927,6 +3147,10 @@
       "url": "https://jobs.lever.co/offchainlabs"
     },
     {
+      "name": "Oil India",
+      "url": "https://www.oil-india.com/"
+    },
+    {
       "name": "OkCredit",
       "url": "https://jobs.ashbyhq.com/okcredit"
     },
@@ -2955,6 +3179,10 @@
       "url": "https://job-boards.greenhouse.io/omadahealth"
     },
     {
+      "name": "ONE",
+      "url": "https://www.one-line.com/en/careers"
+    },
+    {
       "name": "OneCard",
       "url": "https://www.getonecard.app/careers"
     },
@@ -2965,6 +3193,14 @@
     {
       "name": "OneTrust",
       "url": "https://job-boards.greenhouse.io/onetrust"
+    },
+    {
+      "name": "ONGC",
+      "url": "https://ongcindia.com/"
+    },
+    {
+      "name": "OOCL",
+      "url": "https://www.oocl.com/"
     },
     {
       "name": "Open Financial",
@@ -3227,6 +3463,10 @@
       "url": "https://jobs.lever.co/porter"
     },
     {
+      "name": "Poshmark",
+      "url": "https://job-boards.greenhouse.io/poshmark"
+    },
+    {
       "name": "PostHog",
       "url": "https://jobs.ashbyhq.com/posthog"
     },
@@ -3483,6 +3723,10 @@
       "url": "https://www.raise.in/careers"
     },
     {
+      "name": "Rakuten",
+      "url": "https://rakuten.wd1.myworkdayjobs.com/RakutenInc"
+    },
+    {
       "name": "Ramco Systems",
       "url": "https://www.ramco.com/careers/jobs-by-locations"
     },
@@ -3679,12 +3923,20 @@
       "url": "https://careers.ryanair.com/jobs/"
     },
     {
+      "name": "Ryder",
+      "url": "https://jobs.ryder.com/jobs/"
+    },
+    {
       "name": "S&P Global",
       "url": "https://careers.spglobal.com/jobs"
     },
     {
       "name": "Safe Superintelligence",
       "url": "https://jobs.ashbyhq.com/ssi"
+    },
+    {
+      "name": "Safexpress",
+      "url": "https://www.safexpress.com/"
     },
     {
       "name": "Sagent",
@@ -3753,6 +4005,10 @@
     {
       "name": "Scapia",
       "url": "https://scapia.freshteam.com/jobs"
+    },
+    {
+      "name": "Schneider",
+      "url": "https://schneiderjobs.com/"
     },
     {
       "name": "Schneider Electric",
@@ -4199,6 +4455,10 @@
       "url": "https://job-boards.greenhouse.io/temporal"
     },
     {
+      "name": "Temu",
+      "url": "https://www.temu.com/"
+    },
+    {
       "name": "Tenable",
       "url": "https://job-boards.greenhouse.io/tenableinc"
     },
@@ -4271,8 +4531,16 @@
       "url": "https://www.tokopedia.com/careers/jobs"
     },
     {
+      "name": "Toll Group",
+      "url": "https://jobs.smartrecruiters.com/tollgroup"
+    },
+    {
       "name": "Toplyne",
       "url": "https://jobs.ashbyhq.com/toplyne"
+    },
+    {
+      "name": "TotalEnergies",
+      "url": "https://totalenergies.com/"
     },
     {
       "name": "Toyota",
@@ -4317,6 +4585,10 @@
     {
       "name": "Turtlemint",
       "url": "https://jobs.ashbyhq.com/turtlemint"
+    },
+    {
+      "name": "TVS Supply Chain Solutions",
+      "url": "https://www.tvsscs.com/careers/"
     },
     {
       "name": "Twilio",
@@ -4367,6 +4639,10 @@
       "url": "https://jobs.ashbyhq.com/graphy"
     },
     {
+      "name": "UniCredit",
+      "url": "https://www.unicreditgroup.eu/en.html"
+    },
+    {
       "name": "Unilever",
       "url": "https://careers.unilever.com/"
     },
@@ -4391,6 +4667,10 @@
       "url": "https://job-boards.greenhouse.io/upgrad"
     },
     {
+      "name": "UPS",
+      "url": "https://www.jobs-ups.com/global/en/search-results"
+    },
+    {
       "name": "Upscale AI",
       "url": "https://jobs.lever.co/upscale-ai"
     },
@@ -4401,6 +4681,10 @@
     {
       "name": "Urban Company",
       "url": "https://careers.urbancompany.com/"
+    },
+    {
+      "name": "UST",
+      "url": "https://www.ust.com/"
     },
     {
       "name": "ValGenesis",
@@ -4507,6 +4791,10 @@
       "url": "https://careers.walmart.com/results?q=devops"
     },
     {
+      "name": "Wan Hai",
+      "url": "https://www.wanhai.com/"
+    },
+    {
       "name": "Warner Bros. Discovery",
       "url": "https://careers.wbd.com/global/en/search-results?keywords=DevOps"
     },
@@ -4517,6 +4805,10 @@
     {
       "name": "Waycool",
       "url": "https://jobs.ashbyhq.com/waycool"
+    },
+    {
+      "name": "Wayfair",
+      "url": "https://jobs.smartrecruiters.com/wayfair"
     },
     {
       "name": "Waymo",
@@ -4623,8 +4915,16 @@
       "url": "https://career.mi.com/jobs"
     },
     {
+      "name": "XPO",
+      "url": "https://jobs.xpo.com/search/"
+    },
+    {
       "name": "Xpressbees",
       "url": "https://www.xpressbees.com/career"
+    },
+    {
+      "name": "Yang Ming",
+      "url": "https://jobs.smartrecruiters.com/yangming"
     },
     {
       "name": "Yash Technologies",
@@ -4657,6 +4957,10 @@
     {
       "name": "Yulu",
       "url": "https://jobs.ashbyhq.com/yulu"
+    },
+    {
+      "name": "Zalando",
+      "url": "https://jobs.zalando.com/en/jobs"
     },
     {
       "name": "Zapier",
@@ -4705,6 +5009,10 @@
     {
       "name": "Zilingo India",
       "url": "https://jobs.lever.co/zilingo"
+    },
+    {
+      "name": "ZIM",
+      "url": "https://www.zim.com/"
     },
     {
       "name": "Zivame",
