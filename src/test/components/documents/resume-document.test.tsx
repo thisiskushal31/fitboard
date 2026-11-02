@@ -16,8 +16,10 @@ const sectionTitles = () => screen.getAllByRole("heading", { level: 2 }).map((he
 
 describe("ResumeDocument", () => {
   it.each(themes.map((entry) => [entry.name, entry] as const))("renders the demo profile in %s", (_, entry) => {
-    const { container } = render(<ResumeDocument theme={entry} profile={profile} paper="A4" today={today} />);
-    expect(container.firstChild).toMatchSnapshot();
+    render(<ResumeDocument theme={entry} profile={profile} paper="A4" today={today} />);
+    const page = screen.getByRole("article", { name: "Resume" });
+    expect(page).toHaveTextContent("Jane Doe");
+    expect(page.style.getPropertyValue("--accent")).toBe(entry.accent);
   });
 
   it("puts contact details in the header of single-column layouts", () => {

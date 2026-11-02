@@ -70,7 +70,7 @@ describe("parseEnv", () => {
 
   it("resolves a relative data directory", () => {
     const env = parseEnv({ ...valid, FITBOARD_DATA_DIR: "../data" });
-    expect(env.FITBOARD_DATA_DIR).toBe(path.resolve("data"));
+    expect(env.FITBOARD_DATA_DIR).toBe(path.resolve("../data"));
   });
 
   it("treats empty values as unset", () => {

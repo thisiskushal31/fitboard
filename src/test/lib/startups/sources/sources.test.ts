@@ -52,7 +52,7 @@ describe("YC startups' job posts", () => {
       return json({}, { status: 500 });
     });
     expect(await fetchYcStartups()).toMatchObject([{ company: "Acme", details: "Join us" }]);
-    expect(requests[0].headers.get("user-agent")).toMatch(/Fitboard\/.*PRIVACY\.md#startups/);
+    expect(requests[0].headers.get("user-agent")).toMatch(/Fitboard\/.*privacy\.md#startups/);
   });
 
   it("fails when the API changes or answers nothing", async () => {

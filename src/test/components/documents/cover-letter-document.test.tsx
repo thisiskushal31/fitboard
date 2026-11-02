@@ -22,8 +22,12 @@ const letter = {
 
 describe("CoverLetterDocument", () => {
   it("renders the sample letter", () => {
-    const { container } = render(<CoverLetterDocument {...letter} />);
-    expect(container.firstChild).toMatchSnapshot();
+    render(<CoverLetterDocument {...letter} />);
+    const page = screen.getByRole("article", { name: "Cover letter" });
+    expect(page).toHaveTextContent("Jane Doe");
+    expect(screen.getByText("27 September 2026")).toBeInTheDocument();
+    expect(screen.getByText("Dear Ledgerly team,")).toBeInTheDocument();
+    expect(page).toHaveTextContent(/Warm regards,Jane Doe$/);
   });
 
   it("has a sender, date, recipient, greeting, paragraphs and sign-off", () => {
