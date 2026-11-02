@@ -13,7 +13,6 @@ import {
   USAGE_PING_NOTICE,
   USAGE_PING_QUESTION_NOTICE,
   USAGE_PING_TEXT_VERSION,
-  USAGE_PING_URL,
   usagePingChoice,
   usagePingEnabled,
   usagePingNotice,

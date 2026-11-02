@@ -1,11 +1,11 @@
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { defineConfig, devices } from "@playwright/test";
 
 import { APP_PORT, appEnv, FAKE_AI_PORT, FAKE_GOOGLE_PORT, FAKE_JOBS_PORT, STORAGE_STATE } from "../e2e/support";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+// The test command runs from the repo root. Servers start there.
+const root = process.cwd();
 const state = path.join(root, STORAGE_STATE);
 
 // End-to-end tests: a production build (`yarn build` first) with its

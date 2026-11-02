@@ -63,9 +63,13 @@ export function AiProviderSection({ initial }: { initial: AiSettingsView }) {
     });
   };
 
-  // The list for what's saved when the page opens.
+  // The list for what's saved when the page opens. The loading state is already
+  // set, so this only asks for the models.
   useEffect(() => {
-    reloadModels();
+    const generation = ++listGeneration.current;
+    void listAiModels({}).then((result) => {
+      if (generation === listGeneration.current) setModelList(toModelList(result));
+    });
   }, []);
 
   // any change to the provider fields means the last test no longer counts.
