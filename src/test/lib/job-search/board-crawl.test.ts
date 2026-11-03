@@ -241,8 +241,8 @@ describe("crawling the public boards", () => {
     const withText = first.postings.find((item) => item.description);
     expect(withText?.description).toBeTruthy();
     if (!withText) return;
-    expect(await publicBoards.details(withText)).toBe(withText.description);
-    expect(await publicBoards.details({ ...withText, description: "" })).toBeNull();
+    expect(await publicBoards.details(withText, {})).toBe(withText.description);
+    expect(await publicBoards.details({ ...withText, description: "" }, {})).toBeNull();
     await expect(publicBoards.test({})).resolves.toBeUndefined();
 
     vi.resetModules();
