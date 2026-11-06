@@ -9,9 +9,19 @@ import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import type { CareerReport, CareerRoles } from "@/lib/career/career";
 
-type CareerLink = { name: string; url: string };
-
 import { saveCareer, scanCareer } from "./actions";
+
+type CareerLink = { name: string; url: string; sector: string };
+
+function groupsOf(links: CareerLink[]) {
+  const groups = new Map<string, CareerLink[]>();
+  for (const link of links) {
+    const list = groups.get(link.sector);
+    if (list) list.push(link);
+    else groups.set(link.sector, [link]);
+  }
+  return [...groups.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+}
 
 const join = (roles: string[]) => roles.join("\n");
 
@@ -37,6 +47,8 @@ export function CareerScreen({ roles, skillCount, links }: { roles: CareerRoles;
     toastResult(result);
     setPending(null);
   };
+
+  const groups = groupsOf(links);
 
   return (
     <>
@@ -94,17 +106,26 @@ export function CareerScreen({ roles, skillCount, links }: { roles: CareerRoles;
         )}
 
         <Card>
-          <p className="font-medium">Employers with no public JSON API</p>
-          <p className="mt-1 text-sm text-muted">Open these in a browser. Fitboard does not log in or scrape them. The Greenhouse, Lever, and Ashby companies are in the Public boards search.</p>
-          <ul className="mt-3 flex flex-col gap-1 text-sm">
-            {links.map((link) => (
-              <li key={`${link.name}\n${link.url}`}>
-                <a href={link.url} target="_blank" rel="noopener noreferrer" className="underline">
-                  {link.name}
-                </a>
-              </li>
+          <p className="font-medium">Companies by sector</p>
+          <p className="mt-1 text-sm text-muted">Sectors come from the company list. Open a page in the browser. Fitboard does not log in to it.</p>
+          <div className="mt-3 flex flex-col">
+            {groups.map(([sector, items]) => (
+              <details key={sector} className="border-b border-line py-2 last:border-b-0">
+                <summary className="cursor-pointer font-medium">
+                  {sector} <span className="text-muted">{items.length}</span>
+                </summary>
+                <ul className="mt-2 flex flex-col gap-1 pl-1 text-sm">
+                  {items.map((link) => (
+                    <li key={`${link.name}\n${link.url}`}>
+                      <a href={link.url} target="_blank" rel="noopener noreferrer" className="underline">
+                        {link.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </details>
             ))}
-          </ul>
+          </div>
         </Card>
       </div>
     </>

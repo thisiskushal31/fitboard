@@ -3,9 +3,9 @@ import "server-only";
 import catalog from "../../../config/job-boards.json";
 import { COUNTRY_REGION, detectRegions, matchesArea, matchesCountry, mentionsPlace, openInCountry, zoneByCode, zoneRegion, type Region } from "./regions";
 
-// Companies and shared boards live in config/job-boards.json. A company row is
-// the public URL you would open: Greenhouse, Lever, Ashby, Recruitee, or
-// SmartRecruiters is crawled; any other URL is only a link on Career path.
+// Companies and shared boards live in config/job-boards.json. Each company
+// row has a sector, and Career path groups the list by that field.
+// Greenhouse, Lever, Ashby, Recruitee, or SmartRecruiters is also crawled.
 // Add or remove a company there. One dead board does not fail the crawl.
 // Adzuna, JSearch, FreeHire, and the Bundesagentur stay as their own sources.
 
@@ -26,7 +26,7 @@ export type CrawledPosting = {
   description: string;
 };
 
-export type CareerLink = { name: string; url: string };
+export type CareerLink = { name: string; url: string; sector: string };
 
 type BoardKind = "greenhouse" | "lever" | "ashby" | "recruitee" | "smartrecruiters";
 
@@ -48,8 +48,12 @@ function readBoard(url: string): { kind: BoardKind; slug: string } | null {
   return null;
 }
 
+export function catalogCareers(): CareerLink[] {
+  return catalog.companies.filter((row) => row.name && row.url && row.sector);
+}
+
 export function officialCareers(): CareerLink[] {
-  return catalog.companies.filter((row) => row.name && row.url && !readBoard(row.url));
+  return catalogCareers().filter((row) => !readBoard(row.url));
 }
 
 const ROLE_HINTS = [

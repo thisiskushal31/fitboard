@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { EMPTY_CAREER_ROLES, type CareerRoles } from "@/lib/career/career";
 import { prisma } from "@/lib/core/prisma";
-import { officialCareers } from "@/lib/job-search/board-crawl";
+import { catalogCareers } from "@/lib/job-search/board-crawl";
 
 import { CareerScreen } from "./career-screen";
 
@@ -18,7 +18,7 @@ export default async function CareerPage() {
     prisma.setting.findUnique({ where: { key: CAREER_KEY } }),
     prisma.skill.count(),
   ]);
-  return <CareerScreen roles={readRoles(row?.value)} skillCount={skills} links={officialCareers()} />;
+  return <CareerScreen roles={readRoles(row?.value)} skillCount={skills} links={catalogCareers()} />;
 }
 
 function readRoles(value: string | undefined): CareerRoles {
