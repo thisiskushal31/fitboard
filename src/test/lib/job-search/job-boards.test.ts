@@ -15,6 +15,8 @@ describe("job board config", () => {
     expect(lever.length).toBeGreaterThan(10);
     expect(rawCatalog.companies.every((row) => row.sector.trim().length > 0)).toBe(true);
     expect(new Set(rawCatalog.companies.map((row) => row.sector)).size).toBeGreaterThan(1);
+    const identity = rawCatalog.companies.map((row) => `${row.name}\n${row.url}`);
+    expect(new Set(identity).size).toBe(identity.length);
     expect(catalog.companies).toContainEqual({ name: "Zomato", url: "https://jobs.ashbyhq.com/zomato" });
     expect(catalog.companies).toContainEqual({ name: "Lenskart", url: "https://lenskartcareers.recruitee.com" });
     expect(catalog.companies).toContainEqual({ name: "Swiggy", url: "https://jobs.smartrecruiters.com/SWIGGY" });
