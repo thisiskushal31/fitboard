@@ -33,12 +33,12 @@ test("searches, keeps postings, and starts an application from one", async ({ pa
   const asked = await fakeJobSearches();
   await page.getByRole("link", { name: /^Past searches/ }).click();
   const today = page.getByRole("region", { name: "Today" });
-  await expect(today.getByRole("link")).toHaveText(/Senior Product Designer · Rotterdam, 25 km.*4 postings · JSearch/);
+  await expect(today.getByRole("link")).toHaveText(/Senior Product Designer · Rotterdam, 25 km.*4 postings · Boardsearch/);
   await today.getByRole("link").click();
   await expect(list.getByRole("listitem")).toHaveCount(4);
   await page.goto("/jobs");
   await expect(list.getByRole("listitem")).toHaveCount(4);
-  await expect(page.getByText(/4 postings from JSearch · searched today at \d\d:\d\d/)).toBeVisible();
+  await expect(page.getByText(/4 postings from Boardsearch · searched today at \d\d:\d\d/)).toBeVisible();
   expect(await fakeJobSearches()).toBe(asked);
 
   // Save the first; dismiss the second, then undo it.
@@ -83,10 +83,10 @@ test("says when nothing was found", async ({ page }) => {
 
 test("tests the connection in Settings → Job search", async ({ page }) => {
   await page.goto("/settings?section=jobs");
-  await expect(page.getByRole("radio", { name: "JSearch" })).toBeChecked();
-  await expect(page.getByLabel("API key")).toHaveAttribute("placeholder", "Using FITBOARD_JSEARCH_KEY · type one to save it here");
+  await expect(page.getByRole("radio", { name: "Boardsearch" })).toBeChecked();
+  await expect(page.getByLabel("API key")).toHaveAttribute("placeholder", "Using FITBOARD_BOARDSEARCH_KEY · type one to save it here");
   await page.getByRole("button", { name: "Test connection" }).click();
-  await expect(page.getByText(/^Connected · JSearch answered in/)).toBeVisible();
+  await expect(page.getByText(/^Connected · Boardsearch answered in/)).toBeVisible();
 });
 
 test("scores a posting against the profile, and keeps the score", async ({ page }) => {
@@ -142,7 +142,7 @@ test("searches FreeHire, which needs no key and has no radius", async ({ page })
     expect.poll(async () => (await sql<{ value: string }>(`SELECT value FROM "Setting" WHERE key = 'jobSource'`))[0]?.value).toContain(source);
   await page.goto("/settings?section=jobs");
   await page.getByRole("radio", { name: "FreeHire" }).click();
-  await expect(page.getByText("No key needed. Fitboard searches FreeHire's public catalogue at freehire.me, in the country you choose, including India.")).toBeVisible();
+  await expect(page.getByText("No key needed. Fitboard searches FreeHire's public catalogue at freehire.me, in the country you choose across APAC, JAPAC, EMEA, MEA, and the Americas.")).toBeVisible();
   await chosen("FREEHIRE");
 
   await page.goto("/jobs?q=product+designer&where=Rotterdam&country=nl");
@@ -156,8 +156,8 @@ test("searches FreeHire, which needs no key and has no radius", async ({ page })
   await expect(page.getByRole("region", { name: "Posting text" })).toContainText("for its payments team");
   await expect(page.getByText("Jobs by FreeHire").last()).toBeVisible();
 
-  // Back to JSearch, as the environment sets it, for the tests after.
+  // Back to Boardsearch, as the environment sets it, for the tests after.
   await page.goto("/settings?section=jobs");
-  await page.getByRole("radio", { name: "JSearch" }).click();
-  await chosen("JSEARCH");
+  await page.getByRole("radio", { name: "Boardsearch" }).click();
+  await chosen("BOARDSEARCH");
 });

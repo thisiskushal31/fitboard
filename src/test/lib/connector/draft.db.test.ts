@@ -61,7 +61,7 @@ afterAll(() => prisma().$disconnect());
 
 describe("a draft asked for from Claude chat", () => {
   it("reads the posting, writes the documents and makes one Draft application, linked to its posting", async () => {
-    const posting = await prisma().posting.create({ data: { source: "JSEARCH", externalId: "p1", title: "Product Designer", company: "Acme" } });
+    const posting = await prisma().posting.create({ data: { source: "BOARDSEARCH", externalId: "p1", title: "Product Designer", company: "Acme" } });
     const job = await prisma().job.create({ data: { type: "connector-draft", status: "RUNNING", input: {} } });
     const context = { id: job.id, step: async () => {}, signal: new AbortController().signal };
     const input = { posting: "Product Designer at Acme, Berlin.", postingUrl: "https://jobs.example/p1", note: "Stress Figma", postingId: posting.id };

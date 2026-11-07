@@ -48,7 +48,7 @@ export const EXPORT_SCHEMA_VERSIONS: readonly number[] = [1, 2, 3, 4, 5, 6, 7];
 /** The setting that holds the encrypted API key, which only this server can read. */
 const API_KEY_SETTING = "apiKeyEnc";
 /** The settings that hold encrypted keys, which only this server can read: never exported as they are. */
-export const SECRET_SETTINGS: readonly string[] = [API_KEY_SETTING, "jsearchKeyEnc", "adzunaKeyEnc", "typesafeKeyEnc"];
+export const SECRET_SETTINGS: readonly string[] = [API_KEY_SETTING, "boardsearchKeyEnc", "adzunaKeyEnc", "typesafeKeyEnc"];
 /** The settings that belong to this install rather than its data (the usage ping's and its consent, the update check's, the Google client and the browser's time zone): never exported, and kept by an import. */
 export const INSTALL_SETTINGS: readonly string[] = [
   "usagePingId",
@@ -229,10 +229,13 @@ const application = z.object({
   facts: z.array(fact).default([]),
 });
 
+// Files saved before this source was named Boardsearch still say JSEARCH.
+const postingSource = z.preprocess((value) => (value === "JSEARCH" ? "BOARDSEARCH" : value), z.enum(PostingSource));
+
 /** A posting the job agent found. */
 const agentCandidate = z.object({
   id: text,
-  source: z.enum(PostingSource),
+  source: postingSource,
   externalId: text,
   title: text,
   company: text,
@@ -288,7 +291,7 @@ const startup = z.object({
 /** A posting kept from Find jobs. */
 const posting = z.object({
   id: text,
-  source: z.enum(PostingSource),
+  source: postingSource,
   externalId: text,
   title: text,
   company: text,
@@ -310,7 +313,7 @@ const posting = z.object({
 /** A search kept with what it found; its search and postings are checked when it's opened. */
 const postingSearch = z.object({
   id: text,
-  source: z.enum(PostingSource),
+  source: postingSource,
   query: z.unknown(),
   postings: z.unknown(),
   found: int,
@@ -344,7 +347,14 @@ export const exportSchema = z.object({
   /** The AI provider's key in plain text, only when the user asked for it. */
   apiKey: text.optional(),
   /** The job sources' keys in plain text, likewise. */
-  jobSourceKeys: z.object({ jsearch: text.optional(), adzuna: text.optional() }).optional(),
+  jobSourceKeys: z
+    .object({
+      boardsearch: text.optional(),
+      // A file from before the source was named Boardsearch.
+      jsearch: text.optional(),
+      adzuna: text.optional(),
+    })
+    .optional(),
   applications: z.array(application),
   /** Saved and dismissed postings; absent in version 1 files. */
   postings: z.array(posting).default([]),
@@ -423,7 +433,7 @@ export async function buildExport(
     const apiKey = readable(stored(API_KEY_SETTING), (value) => decryptApiKey(value));
     const jobSourceKeys = Object.fromEntries(
       Object.entries({
-        jsearch: readable(stored("jsearchKeyEnc"), (value) => decryptSecret(JOB_SOURCE_KEY, value)),
+        boardsearch: readable(stored("boardsearchKeyEnc"), (value) => decryptSecret(JOB_SOURCE_KEY, value)),
         adzuna: readable(stored("adzunaKeyEnc"), (value) => decryptSecret(JOB_SOURCE_KEY, value)),
       }).filter(([, value]) => value),
     );

@@ -12,7 +12,7 @@ import { FREEHIRE_URL } from "./sources";
 
 // FreeHire: ATS-direct catalogue over a public HTTP API (no key). Search
 // uses /agent/jobs/search so each hit already carries the full plain-text
-// description. Radius isn't supported; place goes into `q` like JSearch,
+// description. Radius isn't supported; place goes into `q` like Boardsearch,
 // which puts postings there first rather than leaving the rest out. Its
 // `cities` filter only knows its own spelling of a city, and with
 // `countries` it widens to the whole country. Self-host / e2e override the

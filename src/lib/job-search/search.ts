@@ -14,12 +14,12 @@ import { SOURCE_INFO } from "./sources";
 // job ad is a "posting".
 
 /** The job sources Fitboard can search, in the order Settings lists them; one is chosen there. */
-export const JOB_SOURCES = [PostingSource.PUBLIC_BOARDS, PostingSource.JSEARCH, PostingSource.ADZUNA, PostingSource.FREEHIRE, PostingSource.ARBEITSAGENTUR] as const;
+export const JOB_SOURCES = [PostingSource.PUBLIC_BOARDS, PostingSource.BOARDSEARCH, PostingSource.ADZUNA, PostingSource.FREEHIRE, PostingSource.ARBEITSAGENTUR] as const;
 export type JobSource = PostingSource;
 
-/** Where a JSearch key comes from: OpenWeb Ninja directly, or the RapidAPI marketplace. */
-export const JSEARCH_HOSTS = ["openwebninja", "rapidapi"] as const;
-export type JSearchHost = (typeof JSEARCH_HOSTS)[number];
+/** Where a Boardsearch key comes from: OpenWeb Ninja directly, or the RapidAPI marketplace. */
+export const BOARDSEARCH_HOSTS = ["openwebninja", "rapidapi"] as const;
+export type BoardsearchHost = (typeof BOARDSEARCH_HOSTS)[number];
 
 /** How far from the place to look, in km. */
 export const RADII_KM = [10, 25, 50, 100, 200] as const;

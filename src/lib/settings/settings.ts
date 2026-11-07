@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { AiProvider, Creativity, DateFormat, PaperSize, Tone } from "@/generated/prisma/enums";
-import { EMPTY_QUERY, JOB_SOURCES, JSEARCH_HOSTS, searchQuerySchema } from "@/lib/job-search/search";
+import { EMPTY_QUERY, JOB_SOURCES, BOARDSEARCH_HOSTS, searchQuerySchema } from "@/lib/job-search/search";
 import { SCORERS } from "@/lib/scoring/scorers";
 import { startupsRefreshSchema } from "@/lib/startups/types";
 
@@ -149,9 +149,9 @@ export const settingsSchema = z.object({
   // decides. "OFF" is a choice. Each source keeps its own key, encrypted
   // like the AI key, so switching back and forth loses nothing.
   jobSource: z.enum([...JOB_SOURCES, "OFF"]).nullable().catch(null),
-  jsearchKeyEnc: z.string().nullable().catch(null),
-  /** Where the JSearch key is from: OpenWeb Ninja, or the RapidAPI marketplace. */
-  jsearchHost: z.enum(JSEARCH_HOSTS).catch("openwebninja"),
+  boardsearchKeyEnc: z.string().nullable().catch(null),
+  /** Where the Boardsearch key is from: OpenWeb Ninja, or the RapidAPI marketplace. */
+  boardsearchHost: z.enum(BOARDSEARCH_HOSTS).catch("openwebninja"),
   adzunaAppId: z.string().nullable().catch(null),
   adzunaKeyEnc: z.string().nullable().catch(null),
   /** When "I understand" was ticked under the Bundesagentur für Arbeit's note; its searches wait for it. */
@@ -250,6 +250,10 @@ export function settingsFromRows(rows: readonly { key: string; value: string }[]
   // Up to 1.7, the limit was "Keep resumes to one page" (onePage), and off meant no limit. Databases and export files may still have it.
   if (values.pageLimit === undefined && values.onePage === "false") values.pageLimit = "none";
   if (values.pageLimit === undefined && values.onePage === "true") values.pageLimit = "1";
+  // A key, host, or source saved under the previous name still belongs to Boardsearch.
+  if (values.boardsearchKeyEnc === undefined && values.jsearchKeyEnc !== undefined) values.boardsearchKeyEnc = values.jsearchKeyEnc;
+  if (values.boardsearchHost === undefined && values.jsearchHost !== undefined) values.boardsearchHost = values.jsearchHost;
+  if (values.jobSource === "JSEARCH") values.jobSource = "BOARDSEARCH";
   return settingsSchema.parse(values);
 }
 

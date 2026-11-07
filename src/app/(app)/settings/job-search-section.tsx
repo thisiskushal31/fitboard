@@ -11,8 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { SegmentedControl } from "@/components/ui/segmented-control";
-import { JOB_SOURCES, type JobSource, type JSearchHost } from "@/lib/job-search/search";
-import { FREEHIRE_URL, JSEARCH_KEY_URLS, SOURCE_INFO, type JobSearchSettingsView } from "@/lib/job-search/sources";
+import { JOB_SOURCES, type JobSource, type BoardsearchHost } from "@/lib/job-search/search";
+import { FREEHIRE_URL, BOARDSEARCH_KEY_URLS, SOURCE_INFO, type JobSearchSettingsView } from "@/lib/job-search/sources";
 import { cn } from "@/lib/core/cn";
 
 import { saveJobSearchDetails, saveJobSource, saveJobSourceKey, testJobSource } from "./actions";
@@ -64,10 +64,10 @@ export function JobSearchSection({ initial }: { initial: JobSearchSettingsView }
   // The BA can't be tested, or searched, before its note is accepted.
   const testable = source !== "ARBEITSAGENTUR" || Boolean(view.arbeitsagentur.acceptedAt);
 
-  const chooseHost = async (host: JSearchHost) => {
-    setView((current) => ({ ...current, jsearch: { ...current.jsearch, host } }));
+  const chooseHost = async (host: BoardsearchHost) => {
+    setView((current) => ({ ...current, boardsearch: { ...current.boardsearch, host } }));
     changed();
-    apply(toastResult(await track(saveJobSearchDetails({ jsearchHost: host }))));
+    apply(toastResult(await track(saveJobSearchDetails({ boardsearchHost: host }))));
   };
 
   const saveAppId = async () => {
@@ -76,7 +76,7 @@ export function JobSearchSection({ initial }: { initial: JobSearchSettingsView }
     apply(toastResult(await track(saveJobSearchDetails({ adzunaAppId: appId }))));
   };
 
-  const saveKey = async (keySource: "JSEARCH" | "ADZUNA", change: { action: "set"; value: string } | { action: "clear" }) => {
+  const saveKey = async (keySource: "BOARDSEARCH" | "ADZUNA", change: { action: "set"; value: string } | { action: "clear" }) => {
     changed();
     return apply(toastResult(await track(saveJobSourceKey({ source: keySource, change }))));
   };
@@ -134,18 +134,18 @@ export function JobSearchSection({ initial }: { initial: JobSearchSettingsView }
           </p>
 
           <Card className="flex flex-col gap-5">
-            {source === "JSEARCH" && (
+            {source === "BOARDSEARCH" && (
               <>
-                <HostChoice host={view.jsearch.host} onChange={(host) => void chooseHost(host)} />
+                <HostChoice host={view.boardsearch.host} onChange={(host) => void chooseHost(host)} />
                 <KeyField
                   label="API key"
-                  keyState={view.jsearch.keyState}
-                  envName="FITBOARD_JSEARCH_KEY"
-                  getKey={{ href: JSEARCH_KEY_URLS[view.jsearch.host], text: view.jsearch.host === "rapidapi" ? "JSearch on RapidAPI" : "OpenWeb Ninja" }}
-                  onSave={(change) => saveKey("JSEARCH", change)}
+                  keyState={view.boardsearch.keyState}
+                  envName="FITBOARD_BOARDSEARCH_KEY"
+                  getKey={{ href: BOARDSEARCH_KEY_URLS[view.boardsearch.host], text: view.boardsearch.host === "rapidapi" ? "RapidAPI" : "OpenWeb Ninja" }}
+                  onSave={(change) => saveKey("BOARDSEARCH", change)}
                 />
                 <p className="text-sm text-muted">
-                  With a key, Find jobs and the job agent search the country you choose, including India. LinkedIn, Indeed and Glassdoor come through here. Monster only when Google for Jobs has the posting.
+                  With a key, Find jobs and the job agent search the country you choose across APAC, JAPAC, EMEA, MEA, and the Americas. LinkedIn, Indeed and Glassdoor come through here. Monster only when Google for Jobs has the posting.
                 </p>
               </>
             )}
@@ -172,19 +172,19 @@ export function JobSearchSection({ initial }: { initial: JobSearchSettingsView }
             {source === "ARBEITSAGENTUR" && (
               <>
                 <ArbeitsagenturNote accepted={Boolean(view.arbeitsagentur.acceptedAt)} onAccept={acceptArbeitsagentur} />
-                <p className="text-sm text-muted">No key needed. The job agent doesn&apos;t search this source; choose JSearch, Adzuna or FreeHire for it.</p>
+                <p className="text-sm text-muted">No key needed. The job agent doesn&apos;t search this source; choose Boardsearch, Adzuna or FreeHire for it.</p>
               </>
             )}
             {source === "PUBLIC_BOARDS" && (
               <p className="text-sm text-muted">
-                No key needed. The first search walks Greenhouse, Lever, Ashby, Recruitee and SmartRecruiters, plus the remote feeds, and can take a few minutes. Later searches in the same half hour use that crawl. The job agent uses this source when it is selected, and it follows the country on the agent search, including India. Employers with no public JSON API stay as links on Career path.
+                No key needed. The first search walks Greenhouse, Lever, Ashby, Recruitee and SmartRecruiters, plus the remote feeds, and can take a few minutes. Later searches in the same half hour use that crawl. The job agent uses this source when it is selected, and it follows the zone on the agent search: Remote, APAC, JAPAC, EMEA, MEA, Nordics, or the Americas. Employers with no public JSON API stay as links on Career path.
               </p>
             )}
             {source === "FREEHIRE" && (
               <p className="text-sm text-muted">
                 {view.freehire.host === new URL(FREEHIRE_URL).host
-                  ? `No key needed. Fitboard searches FreeHire's public catalogue at ${view.freehire.host}, in the country you choose, including India.`
-                  : `No key needed. Fitboard searches your own FreeHire at ${view.freehire.host}, in the country you choose, including India.`}
+                  ? `No key needed. Fitboard searches FreeHire's public catalogue at ${view.freehire.host}, in the country you choose across APAC, JAPAC, EMEA, MEA, and the Americas.`
+                  : `No key needed. Fitboard searches your own FreeHire at ${view.freehire.host}, in the country you choose across APAC, JAPAC, EMEA, MEA, and the Americas.`}
               </p>
             )}
 
@@ -203,14 +203,14 @@ export function JobSearchSection({ initial }: { initial: JobSearchSettingsView }
   );
 }
 
-function HostChoice({ host, onChange }: { host: JSearchHost; onChange: (host: JSearchHost) => void }) {
+function HostChoice({ host, onChange }: { host: BoardsearchHost; onChange: (host: BoardsearchHost) => void }) {
   const labelId = useId();
   return (
     <div className="flex flex-col gap-[7px]">
       <span id={labelId} className="text-label text-muted">
         Key from
       </span>
-      <SegmentedControl<JSearchHost>
+      <SegmentedControl<BoardsearchHost>
         aria-labelledby={labelId}
         size="sm"
         options={[
@@ -232,7 +232,7 @@ function ConnectionStatus({ connection, source }: { connection: Connection; sour
         ? ["bg-error", "text-error", connection.message]
         : connection.status === "testing"
           ? ["bg-status-offer", "text-muted", "Sending a small search…"]
-          : ["bg-faint", "text-muted", source === "JSEARCH" ? "Not tested since your last change · a test uses one search from your plan" : "Not tested since your last change"];
+          : ["bg-faint", "text-muted", source === "BOARDSEARCH" ? "Not tested since your last change · a test uses one search from your plan" : "Not tested since your last change"];
   return (
     <p role="status" className={cn("flex items-center gap-2 text-control", text)}>
       <span aria-hidden className={cn("size-2 flex-none rounded-full", dot)} />

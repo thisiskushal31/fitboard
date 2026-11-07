@@ -45,7 +45,7 @@ const query = { ...EMPTY_QUERY, keywords: "product designer", place: "Hamburg", 
 const state: PostingState = { postingId: null, saved: false, dismissed: false, applicationId: null, score: null };
 
 const posting = (id: string, extra: Partial<ShownPosting> = {}): ShownPosting => ({
-  source: "JSEARCH",
+  source: "BOARDSEARCH",
   externalId: id,
   title: `Designer ${id}`,
   company: `Company ${id}`,
@@ -61,10 +61,10 @@ const posting = (id: string, extra: Partial<ShownPosting> = {}): ShownPosting =>
   ...extra,
 });
 
-const stored = (postings: ShownPosting[], next: string | null = null): StoredSearch => ({ id: "run-1", source: "JSEARCH", query, ranAt: "today at 14:32", postings, next });
+const stored = (postings: ShownPosting[], next: string | null = null): StoredSearch => ({ id: "run-1", source: "BOARDSEARCH", query, ranAt: "today at 14:32", postings, next });
 
 const screenProps: ComponentProps<typeof JobsScreen> = {
-  source: "JSEARCH",
+  source: "BOARDSEARCH",
   countries,
   view: "search",
   query,
@@ -97,7 +97,7 @@ describe("the search form", () => {
 
   it("starts from the search it's given, and says which source it searches", () => {
     renderScreen();
-    expect(screen.getByText("Search JSearch for postings near you, then start an application from the one you like.")).toBeInTheDocument();
+    expect(screen.getByText("Search Boardsearch for postings near you, then start an application from the one you like.")).toBeInTheDocument();
     const form = screen.getByRole("search", { name: "Search postings" });
     expect(within(form).getByLabelText("What")).toHaveValue("product designer");
     expect(within(form).getByLabelText("Where")).toHaveValue("Hamburg");
@@ -116,10 +116,10 @@ describe("the search form", () => {
   });
 
   it("shows what went wrong, with Try again when the source isn't answering", async () => {
-    vi.mocked(runJobSearch).mockResolvedValue({ ok: true, data: { ok: false, problem: "unavailable", message: "JSearch isn't answering right now." } });
+    vi.mocked(runJobSearch).mockResolvedValue({ ok: true, data: { ok: false, problem: "unavailable", message: "Boardsearch isn't answering right now." } });
     renderScreen();
     await userEvent.click(screen.getByRole("button", { name: "Search" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent("JSearch isn't answering right now.");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Boardsearch isn't answering right now.");
     expect(router.push).not.toHaveBeenCalled();
 
     vi.mocked(runJobSearch).mockResolvedValue({ ok: true, data: { ok: true, id: "run-3" } });
@@ -180,7 +180,7 @@ describe("the search form", () => {
 describe("the results", () => {
   it("lists the postings and shows the first one's whole text", () => {
     renderScreen({ search: stored([posting("a", { salary: "EUR 70,000 a year", remote: true }), posting("b")], "cursor:2") });
-    expect(screen.getByText("2 postings from JSearch, more to come · searched today at 14:32")).toBeInTheDocument();
+    expect(screen.getByText("2 postings from Boardsearch, more to come · searched today at 14:32")).toBeInTheDocument();
     const list = screen.getByRole("list", { name: "Postings" });
     const items = within(list).getAllByRole("button", { name: /^Designer/ });
     expect(items.map((item) => item.getAttribute("aria-pressed"))).toEqual(["true", "false"]);
@@ -213,7 +213,7 @@ describe("the results", () => {
     expect(within(screen.getByRole("list", { name: "Postings" })).getByText("Saved")).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: "Saved" }));
-    expect(unsavePosting).toHaveBeenCalledWith({ source: "JSEARCH", externalId: "a" });
+    expect(unsavePosting).toHaveBeenCalledWith({ source: "BOARDSEARCH", externalId: "a" });
     expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
   });
 
@@ -229,7 +229,7 @@ describe("the results", () => {
     expect(screen.getByRole("button", { name: /^Designer a/ })).toHaveTextContent("Dismissed");
 
     vi.mocked(toast).mock.calls[0][1]!.action!.onClick();
-    await waitFor(() => expect(restorePosting).toHaveBeenCalledWith({ source: "JSEARCH", externalId: "a", saved: true }));
+    await waitFor(() => expect(restorePosting).toHaveBeenCalledWith({ source: "BOARDSEARCH", externalId: "a", saved: true }));
     expect(await screen.findByRole("heading", { level: 2, name: "Designer a" })).toBeInTheDocument();
   });
 
@@ -238,7 +238,7 @@ describe("the results", () => {
     expect(screen.getByText("You've dismissed every posting here.")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "1 dismissed posting hidden · Show" }));
     await userEvent.click(screen.getByRole("button", { name: "Bring back" }));
-    expect(restorePosting).toHaveBeenCalledWith({ source: "JSEARCH", externalId: "a", saved: false });
+    expect(restorePosting).toHaveBeenCalledWith({ source: "BOARDSEARCH", externalId: "a", saved: false });
   });
 
   it("says when a dismiss didn't work", async () => {
@@ -350,7 +350,7 @@ describe("problems", () => {
   };
 
   it("sends key problems to Settings, in place of the results", async () => {
-    expect(await failWith("key", "JSearch didn't accept your key.")).toHaveTextContent("JSearch didn't accept your key.");
+    expect(await failWith("key", "Boardsearch didn't accept your key.")).toHaveTextContent("Boardsearch didn't accept your key.");
     expect(screen.getByRole("link", { name: "Open Settings → Job search" })).toHaveAttribute("href", "/settings?section=jobs");
     expect(screen.queryByRole("list", { name: "Postings" })).not.toBeInTheDocument();
   });
@@ -397,8 +397,8 @@ describe("past searches", () => {
     {
       day: "Today",
       searches: [
-        { id: "s1", source: "JSEARCH" as const, query: { ...query, radiusKm: 50 as const, remoteOnly: true, postedWithin: "week" as const }, found: 16, time: "14:32" },
-        { id: "s2", source: "JSEARCH" as const, query: { ...query, keywords: "researcher", place: "" }, found: 1, time: "09:05" },
+        { id: "s1", source: "BOARDSEARCH" as const, query: { ...query, radiusKm: 50 as const, remoteOnly: true, postedWithin: "week" as const }, found: 16, time: "14:32" },
+        { id: "s2", source: "BOARDSEARCH" as const, query: { ...query, keywords: "researcher", place: "" }, found: 1, time: "09:05" },
       ],
     },
     { day: "Mon 28 Sep", searches: [{ id: "s3", source: "ADZUNA" as const, query: { ...query, keywords: "writer" }, found: 0, time: "10:00" }] },
@@ -409,8 +409,8 @@ describe("past searches", () => {
     expect(screen.queryByRole("search")).not.toBeInTheDocument();
     const today = screen.getByRole("region", { name: "Today" });
     expect(within(today).getAllByRole("link").map((link) => [link.textContent, link.getAttribute("href")])).toEqual([
-      ["product designer · Hamburg, 50 km · Remote only · Past week14:32 · 16 postings · JSearch", "/jobs?search=s1"],
-      ["researcher · Germany09:05 · 1 posting · JSearch", "/jobs?search=s2"],
+      ["product designer · Hamburg, 50 km · Remote only · Past week14:32 · 16 postings · Boardsearch", "/jobs?search=s1"],
+      ["researcher · Germany09:05 · 1 posting · Boardsearch", "/jobs?search=s2"],
     ]);
     expect(within(screen.getByRole("region", { name: "Mon 28 Sep" })).getByRole("link")).toHaveTextContent("writer · Hamburg, 25 km10:00 · 0 postings · Adzuna");
   });
@@ -461,7 +461,7 @@ describe("the Saved and Dismissed views", () => {
   it("takes an unsaved posting out of Saved, with Undo", async () => {
     renderScreen({ view: "saved", kept: [posting("a", { state: { ...state, saved: true } }), posting("b", { state: { ...state, saved: true } })] });
     await userEvent.click(screen.getByRole("button", { name: "Saved" }));
-    expect(unsavePosting).toHaveBeenCalledWith({ source: "JSEARCH", externalId: "a" });
+    expect(unsavePosting).toHaveBeenCalledWith({ source: "BOARDSEARCH", externalId: "a" });
     expect(screen.queryByRole("button", { name: /^Designer a/ })).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "Designer b" })).toBeInTheDocument();
     expect(toast).toHaveBeenCalledWith("Removed from Saved.", { action: { label: "Undo", onClick: expect.any(Function) } });
@@ -484,7 +484,7 @@ describe("the Saved and Dismissed views", () => {
     expect(screen.getByText("1 dismissed posting, kept out of your searches")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Start application →" })).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Bring back" }));
-    expect(restorePosting).toHaveBeenCalledWith({ source: "JSEARCH", externalId: "a", saved: false });
+    expect(restorePosting).toHaveBeenCalledWith({ source: "BOARDSEARCH", externalId: "a", saved: false });
     expect(toast).toHaveBeenCalledWith("Brought back. It'll show in your searches again.");
     expect(screen.queryByRole("button", { name: /^Designer a/ })).not.toBeInTheDocument();
   });

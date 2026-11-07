@@ -15,7 +15,7 @@ vi.mock("@/lib/core/prisma", async () => {
 const prisma = () => db.client!;
 
 const found: FoundPosting = {
-  source: "JSEARCH",
+  source: "BOARDSEARCH",
   externalId: "job-1",
   title: "UX Researcher",
   company: "Northwind Studio",
@@ -40,7 +40,7 @@ describe("postings", () => {
 
   it("saves a posting with everything the screen needs, and reads it back in the same shape", async () => {
     const saved = await savePosting(found);
-    expect(saved).toMatchObject({ source: "JSEARCH", externalId: "job-1", title: "UX Researcher", savedAt: expect.any(Date), dismissedAt: null });
+    expect(saved).toMatchObject({ source: "BOARDSEARCH", externalId: "job-1", title: "UX Researcher", savedAt: expect.any(Date), dismissedAt: null });
     expect(foundFromPosting(saved)).toEqual(found);
   });
 
@@ -93,7 +93,7 @@ describe("the Saved and Dismissed views", () => {
   it("lists saved and dismissed postings, newest first, and counts them", async () => {
     const application = await prisma().application.create({ data: { title: "From Find jobs" } });
     await savePosting({ ...found, externalId: "older", title: "Older" });
-    await prisma().posting.update({ where: { source_externalId: { source: "JSEARCH", externalId: "older" } }, data: { savedAt: new Date("2026-09-01"), applicationId: application.id } });
+    await prisma().posting.update({ where: { source_externalId: { source: "BOARDSEARCH", externalId: "older" } }, data: { savedAt: new Date("2026-09-01"), applicationId: application.id } });
     await savePosting({ ...found, externalId: "newer", title: "Newer" });
     await dismissPosting({ ...found, externalId: "gone", title: "Not for me" });
 
@@ -118,9 +118,9 @@ describe("postingStates", () => {
     await prisma().posting.update({ where: { source_externalId: ref }, data: { applicationId: application.id } });
 
     const states = await postingStates([found, other, third]);
-    expect(states.get("JSEARCH:job-1")).toEqual({ postingId: expect.any(String), saved: true, dismissed: false, applicationId: application.id, score: null });
-    expect(states.get("JSEARCH:job-2")).toEqual({ postingId: expect.any(String), saved: false, dismissed: true, applicationId: null, score: null });
-    expect(states.get("JSEARCH:job-3")).toEqual({ postingId: null, saved: false, dismissed: false, applicationId: null, score: null });
+    expect(states.get("BOARDSEARCH:job-1")).toEqual({ postingId: expect.any(String), saved: true, dismissed: false, applicationId: application.id, score: null });
+    expect(states.get("BOARDSEARCH:job-2")).toEqual({ postingId: expect.any(String), saved: false, dismissed: true, applicationId: null, score: null });
+    expect(states.get("BOARDSEARCH:job-3")).toEqual({ postingId: null, saved: false, dismissed: false, applicationId: null, score: null });
   });
 
   it("counts applications made from the same link before Find jobs, ignoring tracking", async () => {
@@ -129,14 +129,14 @@ describe("postingStates", () => {
     });
     await prisma().application.create({ data: { title: "No link" } });
     const states = await postingStates([found]);
-    expect(states.get("JSEARCH:job-1")).toMatchObject({ postingId: null, applicationId: earlier.id });
+    expect(states.get("BOARDSEARCH:job-1")).toMatchObject({ postingId: null, applicationId: earlier.id });
   });
 
   it("has each result's score, scored or not", async () => {
-    await prisma().postingScore.create({ data: { source: "JSEARCH", externalId: "job-1", score: 82, reasons: ["Research"], redFlags: [], scoredWith: "score-posting@1" } });
+    await prisma().postingScore.create({ data: { source: "BOARDSEARCH", externalId: "job-1", score: 82, reasons: ["Research"], redFlags: [], scoredWith: "score-posting@1" } });
     const states = await postingStates([found, { ...found, externalId: "job-2" }]);
-    expect(states.get("JSEARCH:job-1")?.score).toEqual({ score: 82, reasons: ["Research"], redFlags: [] });
-    expect(states.get("JSEARCH:job-2")?.score).toBeNull();
+    expect(states.get("BOARDSEARCH:job-1")?.score).toEqual({ score: 82, reasons: ["Research"], redFlags: [] });
+    expect(states.get("BOARDSEARCH:job-2")?.score).toBeNull();
   });
 
   it("asks nothing for no results", async () => {

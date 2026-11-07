@@ -58,6 +58,7 @@ describe("search in the URL", () => {
     expect(searchQuerySchema.safeParse({ ...EMPTY_QUERY, radiusKm: 30 }).success).toBe(false);
     expect(searchQuerySchema.safeParse({ ...EMPTY_QUERY, country: "deu" }).success).toBe(false);
     expect(searchQuerySchema.parse({ ...EMPTY_QUERY, country: "APAC" })).toMatchObject({ country: "apac" });
+    expect(searchQuerySchema.parse({ ...EMPTY_QUERY, country: "JAPAC" })).toMatchObject({ country: "japac" });
     expect(queryFromParams({ q: "designer", country: "remote" })?.country).toBe("remote");
   });
 });
@@ -74,7 +75,7 @@ describe("a search in a line", () => {
 
 describe("postings", () => {
   const posting = {
-    source: "JSEARCH" as const,
+    source: "BOARDSEARCH" as const,
     externalId: "abc",
     title: "UX Researcher",
     company: "Northwind Studio",
@@ -94,7 +95,7 @@ describe("postings", () => {
   });
 
   it("keys postings by source and id", () => {
-    expect(postingKey(posting)).toBe("JSEARCH:abc");
+    expect(postingKey(posting)).toBe("BOARDSEARCH:abc");
   });
 
   it("checks postings sent back from the screen", () => {
@@ -188,14 +189,14 @@ describe("countries", () => {
 describe("errors", () => {
   it("words each problem for the screen", () => {
     expect(jobSearchError("no-key", "ADZUNA").message).toBe("Add your Adzuna app ID and key in Settings → Job search first.");
-    expect(jobSearchError("no-key", "JSEARCH").message).toBe("Add your JSearch key in Settings → Job search first.");
-    expect(jobSearchError("quota", "JSEARCH").message).toBe("You've used up your JSearch searches for this month. Try again then, or move to a bigger plan.");
+    expect(jobSearchError("no-key", "BOARDSEARCH").message).toBe("Add your Boardsearch key in Settings → Job search first.");
+    expect(jobSearchError("quota", "BOARDSEARCH").message).toBe("You've used up your Boardsearch searches for this month. Try again then, or move to a bigger plan.");
     expect(jobSearchError("quota", "ARBEITSAGENTUR").message).toBe("Bundesagentur für Arbeit is limiting searches right now. Wait a minute and try again.");
     expect(jobSearchError("country", "ADZUNA", { country: "jp" }).message).toBe(
       "Adzuna doesn't list jobs in Japan. Choose another country, or another source in Settings → Job search.",
     );
     expect(jobSearchError("changed", "ARBEITSAGENTUR").message).toMatch(/^The Arbeitsagentur's job search has changed/);
-    expect(jobSearchError("key", "JSEARCH", { detail: "HTTP 401" }).detail).toBe("JSEARCH: HTTP 401");
+    expect(jobSearchError("key", "BOARDSEARCH", { detail: "HTTP 401" }).detail).toBe("BOARDSEARCH: HTTP 401");
   });
 });
 

@@ -141,7 +141,7 @@ describe("createApplication", () => {
 
   it("links the Find jobs posting it was started from", async () => {
     await finishedJobs();
-    const posting = await prisma().posting.create({ data: { source: "JSEARCH", externalId: "job-1", title: "Senior Product Designer" } });
+    const posting = await prisma().posting.create({ data: { source: "BOARDSEARCH", externalId: "job-1", title: "Senior Product Designer" } });
     const result = await createApplication({ writeJobId: "write-job", details, postingUrl: "", postingId: posting.id });
     expect(result.ok).toBe(true);
     expect(await prisma().posting.findUniqueOrThrow({ where: { id: posting.id } })).toMatchObject({ applicationId: result.ok ? result.data : "" });
@@ -158,7 +158,7 @@ describe("createApplication", () => {
   it("leaves a posting that already has an application, and one that's gone, alone", async () => {
     await finishedJobs();
     const earlier = await prisma().application.create({ data: { title: "Applied before" } });
-    const posting = await prisma().posting.create({ data: { source: "JSEARCH", externalId: "job-1", applicationId: earlier.id } });
+    const posting = await prisma().posting.create({ data: { source: "BOARDSEARCH", externalId: "job-1", applicationId: earlier.id } });
     expect(await createApplication({ writeJobId: "write-job", details, postingUrl: "", postingId: posting.id })).toMatchObject({ ok: true });
     expect(await prisma().posting.findUniqueOrThrow({ where: { id: posting.id } })).toMatchObject({ applicationId: earlier.id });
   });

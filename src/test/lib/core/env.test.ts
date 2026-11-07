@@ -139,17 +139,17 @@ describe("job search variables", () => {
     expect(
       parseEnv({
         ...valid,
-        FITBOARD_JOBS_SOURCE: "jsearch",
-        FITBOARD_JSEARCH_KEY: "ak_test",
-        FITBOARD_JSEARCH_HOST: "rapidapi",
+        FITBOARD_JOBS_SOURCE: "boardsearch",
+        FITBOARD_BOARDSEARCH_KEY: "ak_test",
+        FITBOARD_BOARDSEARCH_HOST: "rapidapi",
         FITBOARD_ADZUNA_APP_ID: "app",
         FITBOARD_ADZUNA_KEY: "adz",
         FITBOARD_FREEHIRE_URL: "https://jobs.example/",
       }),
     ).toMatchObject({
-      FITBOARD_JOBS_SOURCE: "jsearch",
-      FITBOARD_JSEARCH_KEY: "ak_test",
-      FITBOARD_JSEARCH_HOST: "rapidapi",
+      FITBOARD_JOBS_SOURCE: "boardsearch",
+      FITBOARD_BOARDSEARCH_KEY: "ak_test",
+      FITBOARD_BOARDSEARCH_HOST: "rapidapi",
       FITBOARD_ADZUNA_APP_ID: "app",
       FITBOARD_ADZUNA_KEY: "adz",
       FITBOARD_FREEHIRE_URL: "https://jobs.example",
@@ -167,9 +167,9 @@ describe("job search variables", () => {
   });
 
   it("rejects sources and hosts it doesn't know, without echoing keys", () => {
-    expect(problems({ ...valid, FITBOARD_JOBS_SOURCE: "linkedin", FITBOARD_JSEARCH_HOST: "google", FITBOARD_JSEARCH_KEY: "ak_secret" })).toEqual([
-      'FITBOARD_JOBS_SOURCE must be one of jsearch, adzuna, arbeitsagentur, freehire, off (got "linkedin").',
-      'FITBOARD_JSEARCH_HOST must be openwebninja or rapidapi (got "google").',
+    expect(problems({ ...valid, FITBOARD_JOBS_SOURCE: "linkedin", FITBOARD_BOARDSEARCH_HOST: "google", FITBOARD_BOARDSEARCH_KEY: "ak_secret" })).toEqual([
+      'FITBOARD_JOBS_SOURCE must be one of boardsearch, adzuna, arbeitsagentur, freehire, off (got "linkedin").',
+      'FITBOARD_BOARDSEARCH_HOST must be openwebninja or rapidapi (got "google").',
     ]);
   });
 });

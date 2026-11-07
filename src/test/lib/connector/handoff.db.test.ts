@@ -32,7 +32,7 @@ describe("handing work to Claude chat", () => {
 
   it("names a Find jobs posting by its id, kept with its whole text, for the connector's tools", async () => {
     const posting = {
-      source: "JSEARCH",
+      source: "BOARDSEARCH",
       externalId: "j1",
       title: "Product Designer",
       company: "Acme",

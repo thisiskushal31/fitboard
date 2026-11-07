@@ -145,7 +145,7 @@ describe("importExport", () => {
 
   it("restores Find jobs' postings with their applications, and leaves a missing one unlinked", async () => {
     const ledgerly = await prisma().application.findFirstOrThrow({ where: { documents: { some: {} } } });
-    await prisma().posting.create({ data: { source: "JSEARCH", externalId: "job-1", title: "Designer", savedAt: now, applicationId: ledgerly.id } });
+    await prisma().posting.create({ data: { source: "BOARDSEARCH", externalId: "job-1", title: "Designer", savedAt: now, applicationId: ledgerly.id } });
     await prisma().posting.create({ data: { source: "ADZUNA", externalId: "job-2", dismissedAt: now } });
     const file = await asFile();
     expect(file.postings).toHaveLength(2);
@@ -163,7 +163,7 @@ describe("importExport", () => {
 
   it("restores past searches with what they found", async () => {
     await prisma().postingSearch.create({
-      data: { source: "JSEARCH", query: { keywords: "designer" }, postings: [{ externalId: "job-1" }], found: 1, next: "cursor:2", createdAt: now },
+      data: { source: "BOARDSEARCH", query: { keywords: "designer" }, postings: [{ externalId: "job-1" }], found: 1, next: "cursor:2", createdAt: now },
     });
     const file = await asFile();
     expect(file.searches).toHaveLength(1);
@@ -181,7 +181,7 @@ describe("importExport", () => {
   it("restores the job agent's candidates and drafts, so what it saw stays seen", async () => {
     const draft = await prisma().application.create({ data: { title: "Agent draft", origin: "AGENT", agentScore: 88, awaitingReview: true } });
     await prisma().agentCandidate.create({
-      data: { source: "JSEARCH", externalId: "job-1", title: "Data Scientist", score: 88, reasons: ["Python"], status: "DRAFTED", applicationId: draft.id, dedupeKey: "key-1" },
+      data: { source: "BOARDSEARCH", externalId: "job-1", title: "Data Scientist", score: 88, reasons: ["Python"], status: "DRAFTED", applicationId: draft.id, dedupeKey: "key-1" },
     });
     await prisma().agentCandidate.create({ data: { source: "ADZUNA", externalId: "az-1", title: "Gone", status: "DISMISSED", dedupeKey: "key-2" } });
     const file = await asFile();
@@ -190,7 +190,7 @@ describe("importExport", () => {
 
     await prisma().agentCandidate.deleteMany();
     // A score is made again from the profile, so it's neither exported nor kept by an import.
-    await prisma().postingScore.create({ data: { source: "JSEARCH", externalId: "job-1", score: 80, reasons: [], redFlags: [], scoredWith: "score-posting@1" } });
+    await prisma().postingScore.create({ data: { source: "BOARDSEARCH", externalId: "job-1", score: 80, reasons: [], redFlags: [], scoredWith: "score-posting@1" } });
     expect(JSON.stringify(file)).not.toContain("scoredWith");
     await importExport(prisma(), file);
     expect(await prisma().postingScore.count()).toBe(0);
@@ -335,16 +335,16 @@ describe("importExport", () => {
   it("keeps saved job source keys the file doesn't carry, and saves the ones it does, encrypted", async () => {
     await prisma().setting.createMany({
       data: [
-        { key: "jsearchKeyEnc", value: encryptSecret(JOB_SOURCE_KEY, "ak-current", secret) },
+        { key: "boardsearchKeyEnc", value: encryptSecret(JOB_SOURCE_KEY, "ak-current", secret) },
         { key: "adzunaKeyEnc", value: encryptSecret(JOB_SOURCE_KEY, "adz-current", secret) },
       ],
     });
     const file = await asFile();
-    expect(file.settings.map((setting) => setting.key)).not.toContain("jsearchKeyEnc");
+    expect(file.settings.map((setting) => setting.key)).not.toContain("boardsearchKeyEnc");
 
-    await importExport(prisma(), { ...file, jobSourceKeys: { jsearch: "ak-from-file" } });
+    await importExport(prisma(), { ...file, jobSourceKeys: { boardsearch: "ak-from-file" } });
     const value = async (key: string) => decryptSecret(JOB_SOURCE_KEY, (await prisma().setting.findUniqueOrThrow({ where: { key } })).value, secret);
-    expect(await value("jsearchKeyEnc")).toBe("ak-from-file");
+    expect(await value("boardsearchKeyEnc")).toBe("ak-from-file");
     expect(await value("adzunaKeyEnc")).toBe("adz-current");
     expect(decryptApiKey((await prisma().setting.findUniqueOrThrow({ where: { key: "apiKeyEnc" } })).value, secret)).toBe("sk-current");
   });

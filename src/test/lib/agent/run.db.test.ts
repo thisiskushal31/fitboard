@@ -38,7 +38,7 @@ vi.mock("@/lib/profile/profile-data", async () => {
 const fake = vi.hoisted(() => ({
   postings: [] as FoundPosting[],
   searches: 0,
-  source: "JSEARCH" as "JSEARCH" | "ADZUNA" | "ARBEITSAGENTUR" | null,
+  source: "BOARDSEARCH" as "BOARDSEARCH" | "ADZUNA" | "ARBEITSAGENTUR" | null,
   ai: true,
   failOn: null as string | null,
   onScore: (() => {}) as (title: string) => void,
@@ -53,10 +53,10 @@ vi.mock("@/lib/job-search/config", () => ({
   loadJobSearchConfig: async () => ({
     source: fake.source,
     saved: true,
-    jsearch: { key: "jsearch-key", host: "openwebninja", keyState: "set" },
+    boardsearch: { key: "boardsearch-key", host: "openwebninja", keyState: "set" },
     adzuna: { appId: "app", key: "adzuna-key", keyState: "set" },
   }),
-  credentialsFor: () => ({ key: "jsearch-key", host: "openwebninja" }),
+  credentialsFor: () => ({ key: "boardsearch-key", host: "openwebninja" }),
   requestContext: () => ({}),
 }));
 vi.mock("@/lib/ai/config", () => ({ isAiConfigured: async () => fake.ai }));
@@ -79,7 +79,7 @@ const now = new Date("2026-10-20T08:00:00Z");
 const hour = 60 * 60 * 1000;
 
 const posting = (id: string, title: string, posted: string, extra: Partial<FoundPosting> = {}): FoundPosting => ({
-  source: "JSEARCH",
+  source: "BOARDSEARCH",
   externalId: id,
   title,
   company: `Company ${id}`,
@@ -107,7 +107,7 @@ const context = (abort?: AbortController): JobContext & { steps: string[] } => {
 
 beforeEach(async () => {
   await resetDatabase(prisma());
-  Object.assign(fake, { postings: page, searches: 0, source: "JSEARCH", ai: true, failOn: null, onScore: () => {} });
+  Object.assign(fake, { postings: page, searches: 0, source: "BOARDSEARCH", ai: true, failOn: null, onScore: () => {} });
   await saveSettings({ agentEnabled: true, agentQuery: query });
 });
 afterAll(() => prisma().$disconnect());
@@ -189,9 +189,9 @@ describe("runAgentScan", () => {
 
   it("leaves out postings saved, dismissed or applied for in Find jobs", async () => {
     const application = await prisma().application.create({ data: {} });
-    await prisma().posting.create({ data: { source: "JSEARCH", externalId: "a", savedAt: now } });
-    await prisma().posting.create({ data: { source: "JSEARCH", externalId: "b", dismissedAt: now } });
-    await prisma().posting.create({ data: { source: "JSEARCH", externalId: "c", applicationId: application.id } });
+    await prisma().posting.create({ data: { source: "BOARDSEARCH", externalId: "a", savedAt: now } });
+    await prisma().posting.create({ data: { source: "BOARDSEARCH", externalId: "b", dismissedAt: now } });
+    await prisma().posting.create({ data: { source: "BOARDSEARCH", externalId: "c", applicationId: application.id } });
     const result = await runAgentScan({ manual: false }, context(), now);
     expect(result).toMatchObject({ found: 3, fresh: 0, skipped: 3 });
     expect(await prisma().agentCandidate.count()).toBe(0);
@@ -213,8 +213,8 @@ describe("runAgentScan", () => {
     expect(await stop()).toBe("Choose a job source in Settings → Job search first.");
     // It never searches the Bundesagentur für Arbeit on its own.
     fake.source = "ARBEITSAGENTUR";
-    expect(await stop()).toBe("The job agent doesn't search the Bundesagentur für Arbeit. Choose JSearch, Adzuna or FreeHire in Settings → Job search for it.");
-    fake.source = "JSEARCH";
+    expect(await stop()).toBe("The job agent doesn't search the Bundesagentur für Arbeit. Choose Boardsearch, Adzuna or FreeHire in Settings → Job search for it.");
+    fake.source = "BOARDSEARCH";
     expect(fake.searches).toBe(0);
     expect((await loadSettings()).agentRuns).toEqual([]);
   });

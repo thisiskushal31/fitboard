@@ -18,7 +18,7 @@ const ledgerly = {
   job_is_remote: false,
   job_posted_at_datetime_utc: "2026-09-30T08:00:00.000Z",
   job_posted_at_timestamp: 1790755200,
-  // As JSearch writes it: in the country's language, with the publisher.
+  // As Boardsearch writes it: in the country's language, with the publisher.
   job_location: "Hamburg     •  über LinkedIn",
   job_city: null,
   job_state: null,
@@ -54,7 +54,7 @@ const northwind = {
 };
 
 /** OpenWeb Ninja's search-v2: jobs and the next page's cursor under `data`. */
-export const jsearchV2Page = {
+export const boardsearchV2Page = {
   status: "OK",
   request_id: "c8f1b2a4-0000-4000-8000-000000000001",
   parameters: { query: "product designer in Hamburg", country: "de" },
@@ -72,10 +72,10 @@ export const jsearchV2Page = {
 };
 
 /** The last search-v2 page: no cursor. */
-export const jsearchV2LastPage = { status: "OK", request_id: "r2", parameters: {}, data: { jobs: [northwind], cursor: null } };
+export const boardsearchV2LastPage = { status: "OK", request_id: "r2", parameters: {}, data: { jobs: [northwind], cursor: null } };
 
-/** What JSearch says to a key it doesn't know. */
-export const jsearchKeyError = { status: "ERROR", request_id: "r4", error: { message: "Invalid API key", code: 401 } };
+/** What Boardsearch says to a key it doesn't know. */
+export const boardsearchKeyError = { status: "ERROR", request_id: "r4", error: { message: "Invalid API key", code: 401 } };
 
 /** Adzuna's search, as its docs describe it: a snippet with HTML, the company and place as objects. */
 export const adzunaPage = {

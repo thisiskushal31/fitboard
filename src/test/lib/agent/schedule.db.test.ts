@@ -104,8 +104,8 @@ describe("the schedule", () => {
   });
 
   it("sends drafts a restart interrupted back to the queue, saying so", async () => {
-    await prisma().agentCandidate.create({ data: { source: "JSEARCH", externalId: "job-1", dedupeKey: "k1", status: "DRAFTING" } });
-    await prisma().agentCandidate.create({ data: { source: "JSEARCH", externalId: "job-2", dedupeKey: "k2", status: "DRAFTED" } });
+    await prisma().agentCandidate.create({ data: { source: "BOARDSEARCH", externalId: "job-1", dedupeKey: "k1", status: "DRAFTING" } });
+    await prisma().agentCandidate.create({ data: { source: "BOARDSEARCH", externalId: "job-2", dedupeKey: "k2", status: "DRAFTED" } });
     expect(await resetInterruptedDrafts()).toBe(1);
     expect(await prisma().agentCandidate.findMany({ orderBy: { externalId: "asc" }, select: { status: true, error: true } })).toEqual([
       { status: "SCORED", error: "Drafting was interrupted. Try again." },

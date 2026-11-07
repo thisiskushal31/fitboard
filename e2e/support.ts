@@ -45,8 +45,8 @@ export function appEnv(): Record<string, string> {
     FITBOARD_AI_MODEL: "fake-model",
     FITBOARD_AI_KEY: "e2e-fake-key",
     // Find jobs searches the fake job sources.
-    FITBOARD_JOBS_SOURCE: "jsearch",
-    FITBOARD_JSEARCH_KEY: "e2e-jsearch-key",
+    FITBOARD_JOBS_SOURCE: "boardsearch",
+    FITBOARD_BOARDSEARCH_KEY: "e2e-boardsearch-key",
     FITBOARD_JOBS_TEST_BASE_URL: `http://localhost:${FAKE_JOBS_PORT}`,
     // Google's sign-in, Gmail and Calendar are the fake Google's. It's
     // only used once a spec enters an OAuth client in Settings → Google.
@@ -108,7 +108,7 @@ export async function fakeStartupRequests(): Promise<{ url: string; userAgent: s
   return ((await response.json()) as { requests: { url: string; userAgent: string }[] }).requests;
 }
 
-/** How many searches the fake JSearch has answered so far. */
+/** How many searches the fake Boardsearch has answered so far. */
 export async function fakeJobSearches(): Promise<number> {
   const response = await fetch(`http://localhost:${FAKE_JOBS_PORT}/searches`);
   return ((await response.json()) as { searches: number }).searches;

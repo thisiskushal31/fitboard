@@ -35,7 +35,7 @@ const finish = (job: Partial<JobView<PostingFit>>) =>
 
 const fit: PostingFit = { score: 78, reasons: ["Built a design system at Northwind."], redFlags: ["Dutch is required."] };
 const posting = (id: string, score: PostingFit | null = null): ShownPosting => ({
-  source: "JSEARCH",
+  source: "BOARDSEARCH",
   externalId: id,
   title: `Designer ${id}`,
   company: "Ledgerly",

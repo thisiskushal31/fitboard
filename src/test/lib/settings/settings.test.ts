@@ -57,8 +57,8 @@ describe("stored settings", () => {
       educationOrder: "date",
       backupProblem: null,
       jobSource: null,
-      jsearchKeyEnc: null,
-      jsearchHost: "openwebninja",
+      boardsearchKeyEnc: null,
+      boardsearchHost: "openwebninja",
       adzunaAppId: null,
       adzunaKeyEnc: null,
       arbeitsagenturAcceptedAt: null,
@@ -144,6 +144,23 @@ describe("stored settings", () => {
     // Unknown, or not chosen: up to two pages.
     expect(settingsFromRows([{ key: "pageLimit", value: "3" }]).pageLimit).toBe("2");
     expect(settingsFromRows([]).pageLimit).toBe("2");
+  });
+
+  it("reads a Boardsearch key saved under the previous source name", () => {
+    expect(
+      settingsFromRows([
+        { key: "jobSource", value: "JSEARCH" },
+        { key: "jsearchKeyEnc", value: "sealed-key" },
+        { key: "jsearchHost", value: "rapidapi" },
+      ]),
+    ).toMatchObject({ jobSource: "BOARDSEARCH", boardsearchKeyEnc: "sealed-key", boardsearchHost: "rapidapi" });
+    expect(
+      settingsFromRows([
+        { key: "jobSource", value: "BOARDSEARCH" },
+        { key: "boardsearchKeyEnc", value: "current-key" },
+        { key: "jsearchKeyEnc", value: "sealed-key" },
+      ]).boardsearchKeyEnc,
+    ).toBe("current-key");
   });
 });
 

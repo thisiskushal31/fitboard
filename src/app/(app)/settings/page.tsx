@@ -105,7 +105,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
         />
       ) : section === "data" ? (
         <DataSection
-          hasApiKey={[settings.apiKeyEnc, settings.jsearchKeyEnc, settings.adzunaKeyEnc].some((key) => key !== null)}
+          hasApiKey={[settings.apiKeyEnc, settings.boardsearchKeyEnc, settings.adzunaKeyEnc].some((key) => key !== null)}
           exportName={exportFileName()}
           backups={{
             on: settings.nightlyBackup,

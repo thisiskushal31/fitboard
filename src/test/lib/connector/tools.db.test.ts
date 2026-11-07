@@ -24,7 +24,7 @@ vi.mock("@/lib/ai/config", () => ({ isAiUsable: async () => fake.aiUsable }));
 vi.mock("@/lib/postings/posting-fetch", () => ({ fetchPosting: vi.fn(async () => fake.fetched) }));
 vi.mock("@/lib/job-search/find", () => ({
   fullText: vi.fn(async () => "The whole posting from its source"),
-  askSource: vi.fn(async () => ({ ok: true, source: "JSEARCH", postings: [found("p3", "Page two posting")], next: null })),
+  askSource: vi.fn(async () => ({ ok: true, source: "BOARDSEARCH", postings: [found("p3", "Page two posting")], next: null })),
 }));
 vi.mock("@/lib/jobs/runner", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/jobs/runner")>()),
@@ -43,7 +43,7 @@ const CLAUDE = "https://claude.ai/api/mcp/auth_callback";
 
 function found(id: string, title: string, complete = true) {
   return {
-    source: "JSEARCH" as const,
+    source: "BOARDSEARCH" as const,
     externalId: id,
     title,
     company: "Acme",
@@ -95,7 +95,7 @@ async function tool(name: string, args: Record<string, unknown> = {}): Promise<{
 }
 
 const storeSearch = (postings: unknown[]) =>
-  prisma().postingSearch.create({ data: { source: "JSEARCH", query: { keywords: "designer", place: "Berlin", country: "de", radiusKm: 25, remoteOnly: false, postedWithin: "any" }, postings: postings as object[], found: postings.length, next: "page:2" } });
+  prisma().postingSearch.create({ data: { source: "BOARDSEARCH", query: { keywords: "designer", place: "Berlin", country: "de", radiusKm: 25, remoteOnly: false, postedWithin: "any" }, postings: postings as object[], found: postings.length, next: "page:2" } });
 
 describe("the Claude connector's tools", () => {
   it("lists the applications, newest first, by status, and reads one without notes, sender or signature", async () => {
@@ -119,7 +119,7 @@ describe("the Claude connector's tools", () => {
   it("moves an application along, approving a job agent draft first", async () => {
     const ledgerly = await prisma().application.findFirstOrThrow({ where: { company: "Ledgerly" } });
     await prisma().application.update({ where: { id: ledgerly.id }, data: { status: "DRAFT", awaitingReview: true } });
-    await prisma().agentCandidate.create({ data: { source: "JSEARCH", externalId: "agent-1", dedupeKey: "agent-1", status: "DRAFTED", applicationId: ledgerly.id } });
+    await prisma().agentCandidate.create({ data: { source: "BOARDSEARCH", externalId: "agent-1", dedupeKey: "agent-1", status: "DRAFTED", applicationId: ledgerly.id } });
     expect((await tool("set_application_status", { id: ledgerly.id, status: "SENT" })).json).toEqual({ id: ledgerly.id, status: "Sent", changed: true });
     expect(await prisma().application.findUniqueOrThrow({ where: { id: ledgerly.id } })).toMatchObject({ status: "SENT", awaitingReview: false });
     expect((await tool("set_application_status", { id: ledgerly.id, status: "SENT" })).json).toMatchObject({ changed: false });
@@ -132,7 +132,7 @@ describe("the Claude connector's tools", () => {
     expect((await tool("get_posting", { search_id: search.id, number: 2 })).json.text).toContain("The whole posting from its source");
     expect(await tool("get_posting", { search_id: search.id, number: 9 })).toMatchObject({ isError: true });
 
-    const row = await prisma().posting.create({ data: { source: "JSEARCH", externalId: "p9", title: "UX Writer", company: "Acme", description: "The start", complete: false } });
+    const row = await prisma().posting.create({ data: { source: "BOARDSEARCH", externalId: "p9", title: "UX Writer", company: "Acme", description: "The start", complete: false } });
     expect((await tool("get_posting", { posting_id: row.id })).json).toMatchObject({ title: "UX Writer", text: expect.stringContaining("The whole posting from its source") });
     expect(await tool("get_posting", { posting_id: "gone" })).toMatchObject({ isError: true, text: "That posting is no longer in Fitboard. Open it again from Find jobs." });
 
@@ -189,7 +189,7 @@ describe("the Claude connector's tools", () => {
     expect((await tool("more_jobs", { search_id: search.id })).json).toMatchObject({ added: 1, postings: [{ number: 3, title: "Page two posting" }] });
     expect(await tool("more_jobs", { search_id: "gone" })).toMatchObject({ isError: true, text: "That search is no longer kept. Search again." });
 
-    const row = await prisma().posting.create({ data: { source: "JSEARCH", externalId: "p7", title: "Design Lead", company: "Acme" } });
+    const row = await prisma().posting.create({ data: { source: "BOARDSEARCH", externalId: "p7", title: "Design Lead", company: "Acme" } });
     expect((await tool("save_job_scores", { scores: [{ posting_id: row.id, score: 91, reasons: ["Led a design system"] }] })).json).toMatchObject({
       saved: [{ posting_id: row.id, score: 91 }],
       link: "https://fitboard.example/jobs?view=saved",

@@ -7,7 +7,7 @@ import { loadSettings } from "@/lib/settings/settings-data";
 
 import type { RequestContext, SourceCredentials } from "./adapter";
 import { JobSearchError, jobSearchError } from "./errors";
-import type { JobSource, JSearchHost } from "./search";
+import type { JobSource, BoardsearchHost } from "./search";
 import { ARBEITSAGENTUR_NOTE, FREEHIRE_URL, SOURCE_INFO, type JobKeyState, type JobSearchSettingsView } from "./sources";
 
 // Which job source to search, and with which key: what's saved in
@@ -19,7 +19,7 @@ export type JobSearchConfig = {
   source: JobSource | null;
   /** Whether the choice is saved in Settings, rather than coming from FITBOARD_JOBS_SOURCE. */
   saved: boolean;
-  jsearch: { key: string | null; host: JSearchHost; keyState: JobKeyState };
+  boardsearch: { key: string | null; host: BoardsearchHost; keyState: JobKeyState };
   adzuna: { appId: string; key: string | null; keyState: JobKeyState };
   /**
  * The Bundesagentur für Arbeit: whether this server offers it, and
@@ -30,12 +30,12 @@ export type JobSearchConfig = {
   freehire: { url: string };
 };
 
-type SavedJobSettings = Pick<SettingsData, "jobSource" | "jsearchKeyEnc" | "jsearchHost" | "adzunaAppId" | "adzunaKeyEnc" | "arbeitsagenturAcceptedAt">;
+type SavedJobSettings = Pick<SettingsData, "jobSource" | "boardsearchKeyEnc" | "boardsearchHost" | "adzunaAppId" | "adzunaKeyEnc" | "arbeitsagenturAcceptedAt">;
 type JobEnv = Pick<
   Env,
   | "FITBOARD_JOBS_SOURCE"
-  | "FITBOARD_JSEARCH_KEY"
-  | "FITBOARD_JSEARCH_HOST"
+  | "FITBOARD_BOARDSEARCH_KEY"
+  | "FITBOARD_BOARDSEARCH_HOST"
   | "FITBOARD_ADZUNA_APP_ID"
   | "FITBOARD_ADZUNA_KEY"
   | "FITBOARD_FREEHIRE_URL"
@@ -43,7 +43,7 @@ type JobEnv = Pick<
 >;
 
 const FROM_ENV: Record<NonNullable<Env["FITBOARD_JOBS_SOURCE"]>, JobSource | null> = {
-  jsearch: "JSEARCH",
+  boardsearch: "BOARDSEARCH",
   adzuna: "ADZUNA",
   arbeitsagentur: "ARBEITSAGENTUR",
   freehire: "FREEHIRE",
@@ -64,17 +64,17 @@ function keyOf(stored: string | null, fromEnv: string | undefined, secret?: stri
 }
 
 export function resolveJobSearchConfig(saved: SavedJobSettings, source: JobEnv, secret?: string): JobSearchConfig {
-  const jsearchKey = keyOf(saved.jsearchKeyEnc, source.FITBOARD_JSEARCH_KEY, secret);
+  const boardsearchKey = keyOf(saved.boardsearchKeyEnc, source.FITBOARD_BOARDSEARCH_KEY, secret);
   const offered = source.FITBOARD_JOBS_ARBEITSAGENTUR !== "off";
   const chosen = saved.jobSource ? (saved.jobSource === "OFF" ? null : saved.jobSource) : source.FITBOARD_JOBS_SOURCE ? FROM_ENV[source.FITBOARD_JOBS_SOURCE] : null;
   return {
     // A BA choice saved before the server turned it off counts as Off.
     source: chosen === "ARBEITSAGENTUR" && !offered ? null : chosen,
     saved: saved.jobSource !== null,
-    jsearch: {
-      ...jsearchKey,
+    boardsearch: {
+      ...boardsearchKey,
       // An environment key goes with the environment's host, when it names one.
-      host: jsearchKey.keyState === "env" && source.FITBOARD_JSEARCH_HOST ? source.FITBOARD_JSEARCH_HOST : saved.jsearchHost,
+      host: boardsearchKey.keyState === "env" && source.FITBOARD_BOARDSEARCH_HOST ? source.FITBOARD_BOARDSEARCH_HOST : saved.boardsearchHost,
     },
     adzuna: {
       appId: saved.adzunaAppId ?? source.FITBOARD_ADZUNA_APP_ID ?? "",
@@ -104,7 +104,7 @@ export function arbeitsagenturStartupNotice(config: JobSearchConfig): string | n
 export function jobSearchView(config: JobSearchConfig): JobSearchSettingsView {
   return {
     source: config.source ?? "OFF",
-    jsearch: { host: config.jsearch.host, keyState: config.jsearch.keyState },
+    boardsearch: { host: config.boardsearch.host, keyState: config.boardsearch.keyState },
     adzuna: { appId: config.adzuna.appId, keyState: config.adzuna.keyState },
     arbeitsagentur: config.arbeitsagentur,
     freehire: { host: new URL(config.freehire.url).host },
@@ -137,8 +137,8 @@ export function credentialsFor<S extends JobSource>(config: JobSearchConfig, sou
       ? new JobSearchError("no-key", `Your saved ${SOURCE_INFO[source].name} key can't be read. Enter it again in Settings → Job search.`)
       : jobSearchError("no-key", source);
   switch (source) {
-    case "JSEARCH": {
-      const { key, host, keyState } = config.jsearch;
+    case "BOARDSEARCH": {
+      const { key, host, keyState } = config.boardsearch;
       if (!key) throw missing(keyState);
       return { key, host } as SourceCredentials[S];
     }

@@ -98,7 +98,7 @@ describe("an application written in Claude chat", () => {
   });
 
   it("shows the posting from Find jobs as applied for", async () => {
-    const posting = await prisma().posting.create({ data: { source: "JSEARCH", externalId: "acme-1", title: "Designer", company: "Acme", url: "https://jobs.example/acme-design" } });
+    const posting = await prisma().posting.create({ data: { source: "BOARDSEARCH", externalId: "acme-1", title: "Designer", company: "Acme", url: "https://jobs.example/acme-design" } });
     const { applicationId } = await saveWrittenApplication(written({ postingId: posting.id }));
     expect((await prisma().posting.findUniqueOrThrow({ where: { id: posting.id } })).applicationId).toBe(applicationId);
   });

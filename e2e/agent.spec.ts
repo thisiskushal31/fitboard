@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import { fakeJobSearches, resetData, sql } from "./support";
 
 // The job agent end to end: turned on in Settings, run now against the
-// fake JSearch and the fake AI, a draft prepared and approved, a posting
+// fake Boardsearch and the fake AI, a draft prepared and approved, a posting
 // dismissed, and a second run that brings none of them back.
 test.beforeAll(resetData);
 // Off again, so its timer leaves the other specs alone.

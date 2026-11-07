@@ -4,10 +4,10 @@ Fitboard is a job search you run yourself. One profile in Postgres, a resume and
 
 The parts that are specific to this repo:
 
-- **Public boards.** Greenhouse, Lever, Ashby, Recruitee, SmartRecruiters, plus Remotive, RemoteOK, Arbeitnow, We Work Remotely, Berlin Startup Jobs, MyCareersFuture, Hacker News, and Codeforces. The company list includes the Indian boards. Employers with no public API are links on the Career path screen.
-- **Other sources, kept separate.** JSearch, Adzuna, FreeHire, and the German federal board. Pick one source at a time in Settings.
+- **Public boards.** Greenhouse, Lever, Ashby, Recruitee, SmartRecruiters, plus Remotive, RemoteOK, Arbeitnow, We Work Remotely, Berlin Startup Jobs, MyCareersFuture, Hacker News, and Codeforces. The company list covers APAC, JAPAC, EMEA, MEA, and the Americas. Employers with no public API are links on the Career path screen.
+- **Other sources, kept separate.** Boardsearch, Adzuna, FreeHire, and the German federal board. Pick one source at a time in Settings.
 - **A read next to the fit score.** Suited, stretch, or not suited, and the skills to add. Those skills stay off the resume until you have them. A generic Software Engineer title can still qualify when the skills match.
-- **Region rank.** Remote, then India, Singapore, UK, Middle East, Germany, Nordics, EMEA, APAC, US, Americas.
+- **Region rank.** Remote, then APAC, JAPAC, EMEA, MEA, Nordics, and the Americas.
 - **Career path.** Current, next, destination, and trending titles, scored against the live crawl.
 
 The starting profile is the demo person, Jane Doe. That is sample data for the screens and the tests. Your own profile is what you type in the app after you sign in. Nothing is loaded from a YAML file.

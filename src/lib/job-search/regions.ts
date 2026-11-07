@@ -1,6 +1,6 @@
-// Region tags and rank. Remote first, then India, then the rest of the map.
-// A listing can carry more than one tag. The rank used for sorting is the
-// best (highest) weight among the tags it has.
+// Region tags and rank. Remote ranks first. Zones are APAC, JAPAC, EMEA, MEA,
+// Nordics, and the Americas. A listing can carry more than one tag. The rank
+// used for sorting is the best (highest) weight among the tags it has.
 
 export const REGION_ORDER = [
   "Remote",
@@ -22,6 +22,7 @@ export type Region = (typeof REGION_ORDER)[number];
 export const ZONES = [
   { code: "remote", name: "Remote", area: "Remote" },
   { code: "apac", name: "APAC", area: "APAC" },
+  { code: "japac", name: "JAPAC", area: "APAC" },
   { code: "emea", name: "EMEA", area: "EMEA" },
   { code: "mea", name: "MEA", area: "MEA" },
   { code: "americas", name: "Americas", area: "Americas" },
@@ -63,7 +64,7 @@ const HINTS: Record<Region, readonly string[]> = {
   Germany: ["germany", "berlin", "munich", "münchen", "hamburg", "frankfurt", "cologne", "köln", "stuttgart", "deutschland"],
   Nordics: ["sweden", "stockholm", "norway", "oslo", "denmark", "copenhagen", "finland", "helsinki", "iceland", "reykjavik", "nordics"],
   EMEA: ["europe", "emea", "netherlands", "amsterdam", "ireland", "dublin", "france", "paris", "spain", "madrid", "barcelona", "italy", "milan", "zurich", "switzerland", "poland", "warsaw", "austria", "vienna", "belgium", "brussels", "portugal", "lisbon"],
-  APAC: ["apac", "asia pacific", "asia-pacific", "sydney", "melbourne", "australia", "tokyo", "japan", "osaka", "seoul", "korea", "hong kong", "jakarta", "indonesia", "bangkok", "thailand", "manila", "philippines", "kuala lumpur", "malaysia", "taipei", "taiwan", "vietnam", "ho chi minh", "hanoi", "auckland", "new zealand"],
+  APAC: ["apac", "japac", "asia pacific", "asia-pacific", "sydney", "melbourne", "australia", "tokyo", "japan", "osaka", "seoul", "korea", "hong kong", "jakarta", "indonesia", "bangkok", "thailand", "manila", "philippines", "kuala lumpur", "malaysia", "taipei", "taiwan", "vietnam", "ho chi minh", "hanoi", "auckland", "new zealand"],
   US: ["united states", "usa", "u.s.", "new york", "san francisco", "seattle", "austin", "boston", "chicago", "california", "texas", "remote us"],
   Americas: ["canada", "toronto", "vancouver", "montreal", "brazil", "são paulo", "sao paulo", "mexico", "mexico city", "argentina", "buenos aires", "latam", "latin america"],
 };
@@ -102,8 +103,8 @@ export function mentionsPlace(text: string, place: string): boolean {
 const BROAD_REGIONS = new Set<Region>(["Remote", "EMEA", "APAC", "Americas"]);
 
 /**
- * A city search also keeps a posting open across that country, such as
- * "India" or "Remote - India". A posting pinned to another city or country
+ * A city search also keeps a posting open across that country, including a
+ * remote posting in that country. A posting pinned to another city or country
  * does not qualify.
  */
 export function openInCountry(placeText: string, city: string, region: Region | undefined): boolean {
@@ -127,9 +128,9 @@ function pinnedToAnotherCity(text: string, city: string, region: Region): boolea
 const AFRICA = ["africa", "nigeria", "lagos", "kenya", "nairobi", "south africa", "johannesburg", "cape town", "egypt", "cairo", "morocco", "casablanca", "ghana", "accra", "ethiopia", "addis ababa"];
 
 /**
- * A zone search. Remote keeps every remote role. APAC, EMEA, MEA, Americas
- * and Nordics keep a role in that part of the world, not a remote role that
- * never names it.
+ * A zone search. Remote keeps every remote role. APAC, JAPAC, EMEA, MEA,
+ * Americas and Nordics keep a role in that part of the world, not a remote
+ * role that never names it. JAPAC searches the same map as APAC.
  */
 export function matchesArea(text: string, remote: boolean | null, area: ZoneArea): boolean {
   const regions = detectRegions(text, remote);

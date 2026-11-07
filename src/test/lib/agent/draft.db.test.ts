@@ -68,7 +68,7 @@ vi.mock("@/lib/ai", async (importOriginal) => ({
 
 const prisma = () => db.client!;
 const posting: FoundPosting = {
-  source: "JSEARCH",
+  source: "BOARDSEARCH",
   externalId: "ledgerly-1",
   title: "Senior Product Designer, Payments",
   company: "Ledgerly",
@@ -158,13 +158,13 @@ describe("drafts waiting for review", () => {
     const applicationId = await draftCandidate(id, context());
     expect(await loadApplicationRows({ archived: true, sort: DEFAULT_SORT })).toEqual([]);
     expect((await loadDashboard()).total).toBe(0);
-    expect((await postingStates([posting])).get("JSEARCH:ledgerly-1")).toMatchObject({ applicationId: null });
+    expect((await postingStates([posting])).get("BOARDSEARCH:ledgerly-1")).toMatchObject({ applicationId: null });
 
     expect(await approveCandidate(id)).toBe(applicationId);
     expect(await prisma().agentCandidate.findUniqueOrThrow({ where: { id } })).toMatchObject({ status: "APPROVED" });
     expect(await prisma().application.findUniqueOrThrow({ where: { id: applicationId } })).toMatchObject({ awaitingReview: false, status: "DRAFT" });
     expect((await loadApplicationRows({ archived: false, sort: DEFAULT_SORT })).map((row) => row.id)).toEqual([applicationId]);
-    expect((await postingStates([posting])).get("JSEARCH:ledgerly-1")).toMatchObject({ applicationId });
+    expect((await postingStates([posting])).get("BOARDSEARCH:ledgerly-1")).toMatchObject({ applicationId });
     await expect(approveCandidate(id)).rejects.toThrow("That draft isn't ready to approve.");
   });
 });

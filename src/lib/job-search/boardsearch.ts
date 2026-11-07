@@ -2,13 +2,13 @@ import "server-only";
 
 import { z } from "zod";
 
-import type { JobSourceAdapter, JSearchHost, RequestContext, SourceCredentials } from "./adapter";
+import type { JobSourceAdapter, BoardsearchHost, RequestContext, SourceCredentials } from "./adapter";
 import { countryName } from "./countries";
 import { jobSearchError } from "./errors";
 import { requestJson } from "./http";
 import { safeLink, type FoundPosting, type PostedWithin, type SearchPage, type SearchQuery } from "./search";
 
-// JSearch: Google for Jobs through OpenWeb Ninja, or the same API on
+// Boardsearch: Google for Jobs through OpenWeb Ninja, or the same API on
 // RapidAPI. One search page is one request from the plan (200 a month free).
 // Both hosts answer search-v2, which nests the jobs under `data` and pages
 // with a cursor. RapidAPI's old /search, which paged by number, now answers
@@ -16,11 +16,11 @@ import { safeLink, type FoundPosting, type PostedWithin, type SearchPage, type S
 
 const SEARCH_PATH = "/search-v2";
 
-// JSearch searches Google for Jobs while it answers, which can take far longer
+// Boardsearch searches Google for Jobs while it answers, which can take far longer
 // than other sources, outside the US especially.
-export const JSEARCH_TIMEOUT_MS = 45_000;
+export const BOARDSEARCH_TIMEOUT_MS = 45_000;
 
-const HOSTS: Record<JSearchHost, { base: string; headers: (key: string) => Record<string, string> }> = {
+const HOSTS: Record<BoardsearchHost, { base: string; headers: (key: string) => Record<string, string> }> = {
   openwebninja: {
     base: "https://api.openwebninja.com/jsearch",
     headers: (key) => ({ "x-api-key": key }),
@@ -97,7 +97,7 @@ function linkOf(job: Job): string {
 }
 
 /**
- * Where the job is. JSearch writes the location in the country's language
+ * Where the job is. Boardsearch writes the location in the country's language
  * with the publisher after a bullet ("Hamburg  •  über Stepstone"), and often
  * leaves the city fields empty.
  */
@@ -110,7 +110,7 @@ function placeOf(job: Job): string {
 export function postingFromJob(job: Job): FoundPosting {
   const description = (job.job_description ?? "").trim().slice(0, 100_000);
   return {
-    source: "JSEARCH",
+    source: "BOARDSEARCH",
     externalId: job.job_id.slice(0, 500),
     title: (job.job_title ?? "").trim().slice(0, 500),
     company: (job.employer_name ?? "").trim().slice(0, 300),
@@ -136,15 +136,15 @@ function keysOf(answer: unknown): string {
   return keys.length > 0 ? ` (keys: ${keys.join(", ")})` : "";
 }
 
-/** "designer in Hamburg": JSearch reads the place from the query text, as Google does. */
+/** "designer in Hamburg": Boardsearch reads the place from the query text, as Google does. */
 function queryText({ keywords, place }: SearchQuery): string {
   return place ? `${keywords} in ${place}` : keywords;
 }
 
-function searchUrl(query: SearchQuery, host: JSearchHost, next: string | null, baseUrl?: string): URL {
+function searchUrl(query: SearchQuery, host: BoardsearchHost, next: string | null, baseUrl?: string): URL {
   const url = new URL(`${baseUrl ?? HOSTS[host].base}${SEARCH_PATH}`);
   url.searchParams.set("query", queryText(query));
-  // Without a country, JSearch searches the US.
+  // Without a country, Boardsearch searches the US.
   url.searchParams.set("country", query.country || "us");
   url.searchParams.set("date_posted", DATE_POSTED[query.postedWithin]);
   if (query.place) url.searchParams.set("radius", String(query.radiusKm));
@@ -157,14 +157,14 @@ function searchUrl(query: SearchQuery, host: JSearchHost, next: string | null, b
 
 async function searchPage(
   query: SearchQuery,
-  { key, host }: SourceCredentials["JSEARCH"],
+  { key, host }: SourceCredentials["BOARDSEARCH"],
   next: string | null,
   context: RequestContext = {},
 ): Promise<SearchPage> {
   const url = searchUrl(query, host, next, context.baseUrl);
-  const raw = await requestJson("JSEARCH", url, { headers: HOSTS[host].headers(key), signal: context.signal, timeoutMs: JSEARCH_TIMEOUT_MS });
+  const raw = await requestJson("BOARDSEARCH", url, { headers: HOSTS[host].headers(key), signal: context.signal, timeoutMs: BOARDSEARCH_TIMEOUT_MS });
   const answer = responseSchema.safeParse(raw);
-  if (!answer.success) throw jobSearchError("changed", "JSEARCH", { detail: `${url.pathname}: unexpected answer${keysOf(raw)}` });
+  if (!answer.success) throw jobSearchError("changed", "BOARDSEARCH", { detail: `${url.pathname}: unexpected answer${keysOf(raw)}` });
 
   const { jobs, cursor } = answer.data.data;
   const seen = new Set<string>();
@@ -179,8 +179,8 @@ async function searchPage(
   return { postings, next: cursor ? `cursor:${cursor}` : null };
 }
 
-export const jsearch: JobSourceAdapter<"JSEARCH"> = {
-  source: "JSEARCH",
+export const boardsearch: JobSourceAdapter<"BOARDSEARCH"> = {
+  source: "BOARDSEARCH",
   search: searchPage,
   // Search results carry the whole description.
   details: async (posting) => (posting.description ? posting.description : null),

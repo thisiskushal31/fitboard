@@ -37,7 +37,7 @@ const REGIONS: { name: string; words?: RegExp; caps?: RegExp; codes: string[] }[
   { name: "North America", words: /\bnorth\s+american?\b/i, codes: NORTH_AMERICA },
   { name: "the Americas", words: /\bamericas\b/i, codes: [...NORTH_AMERICA, ...LATAM] },
   { name: "Latin America", words: /\b(?:latin|south|central)\s+american?\b|\blatam\b/i, codes: LATAM },
-  { name: "Asia-Pacific", words: /\basia[-\s]?pacific\b/i, caps: /\bAPAC\b/, codes: [...ASIA, ...OCEANIA] },
+  { name: "Asia-Pacific", words: /\basia[-\s]?pacific\b/i, caps: /\b(?:APAC|JAPAC)\b/, codes: [...ASIA, ...OCEANIA] },
   { name: "Southeast Asia", words: /\bsouth[-\s]?east\s+asia\b/i, codes: SOUTHEAST_ASIA },
   { name: "South Asia", words: /\bsouth\s+asia\b/i, codes: SOUTH_ASIA },
   { name: "East Asia", words: /\beast\s+asia\b/i, codes: EAST_ASIA },

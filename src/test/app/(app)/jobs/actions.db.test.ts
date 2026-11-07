@@ -6,7 +6,7 @@ import { EMPTY_QUERY, type FoundPosting } from "@/lib/job-search/search";
 import { encryptSecret, JOB_SOURCE_KEY, TYPESAFE_KEY } from "@/lib/core/secrets";
 import { saveSettings } from "@/lib/settings/settings-data";
 import { createTestClient, resetDatabase } from "@/test/db";
-import { jsearchV2LastPage } from "@/test/job-search-fixtures";
+import { boardsearchV2LastPage } from "@/test/job-search-fixtures";
 
 import {
   dismissFoundPosting,
@@ -41,7 +41,7 @@ vi.mock("@/lib/jobs/runner", async (importOriginal) => ({
 const prisma = () => db.client!;
 
 const posting: FoundPosting = {
-  source: "JSEARCH",
+  source: "BOARDSEARCH",
   externalId: "job-1",
   title: "UX Researcher",
   company: "Northwind Studio",
@@ -60,19 +60,19 @@ beforeEach(async () => {
   ai.ready = true;
   await resetDatabase(prisma());
   clearJobSearchCache();
-  await saveSettings({ jobSource: "JSEARCH", jsearchKeyEnc: encryptSecret(JOB_SOURCE_KEY, "ak_test") });
+  await saveSettings({ jobSource: "BOARDSEARCH", boardsearchKeyEnc: encryptSecret(JOB_SOURCE_KEY, "ak_test") });
 });
 afterEach(() => vi.unstubAllGlobals());
 afterAll(() => prisma().$disconnect());
 
 describe("Find jobs actions", () => {
   it("runs a search and keeps it, adds its next page, and removes it", async () => {
-    stubFetch(() => json({ ...jsearchV2LastPage, data: { ...jsearchV2LastPage.data, cursor: "MORE" } }));
+    stubFetch(() => json({ ...boardsearchV2LastPage, data: { ...boardsearchV2LastPage.data, cursor: "MORE" } }));
     const run = await runJobSearch({ query });
     expect(run).toEqual({ ok: true, data: { ok: true, id: expect.any(String) } });
     const id = run.ok && run.data.ok ? run.data.id : "";
 
-    stubFetch(() => json(jsearchV2LastPage));
+    stubFetch(() => json(boardsearchV2LastPage));
     expect(await showMorePostings({ searchId: id })).toEqual({ ok: true, data: { ok: true, postings: [], next: null } });
 
     expect(await removeJobSearch({ id })).toEqual({ ok: true, data: null, toast: "Search removed. Saved postings from it stay in Saved." });
@@ -87,9 +87,9 @@ describe("Find jobs actions", () => {
   it("saves, dismisses and brings back a posting, with a toast where one helps", async () => {
     expect(await savePostingForLater({ posting })).toEqual({ ok: true, data: { postingId: expect.any(String) }, toast: "Saved for later." });
     expect(await dismissFoundPosting({ posting })).toEqual({ ok: true, data: { wasSaved: true } });
-    expect(await restorePosting({ source: "JSEARCH", externalId: "job-1", saved: true })).toEqual({ ok: true, data: null });
+    expect(await restorePosting({ source: "BOARDSEARCH", externalId: "job-1", saved: true })).toEqual({ ok: true, data: null });
     expect(await prisma().posting.findFirstOrThrow()).toMatchObject({ savedAt: expect.any(Date), dismissedAt: null });
-    expect(await unsavePosting({ source: "JSEARCH", externalId: "job-1" })).toEqual({ ok: true, data: null, toast: "Removed from Saved." });
+    expect(await unsavePosting({ source: "BOARDSEARCH", externalId: "job-1" })).toEqual({ ok: true, data: null, toast: "Removed from Saved." });
     expect(await prisma().posting.count()).toBe(0);
   });
 
@@ -113,7 +113,7 @@ describe("Find jobs actions", () => {
 
     // Only the start, and no way to get the rest: kept as it is.
     const partial = { ...posting, externalId: "job-2", description: "The start…", complete: false };
-    await saveSettings({ jsearchKeyEnc: null });
+    await saveSettings({ boardsearchKeyEnc: null });
     const second = await startApplicationFrom({ posting: partial });
     expect(await prisma().posting.findUniqueOrThrow({ where: { id: second.ok ? second.data.postingId : "" } })).toMatchObject({
       description: "The start…",
@@ -126,8 +126,8 @@ describe("Score", () => {
   it("scores a posting in the background, and follows a scoring already under way", async () => {
     const { startJob } = await import("@/lib/jobs/runner");
     expect(await startScoringPosting({ posting })).toEqual({ ok: true, data: { jobId: "score-job" } });
-    expect(startJob).toHaveBeenLastCalledWith(expect.objectContaining({ type: "posting-score" }), { posting }, { key: "posting-score:JSEARCH:job-1" });
-    const running = await prisma().job.create({ data: { type: "posting-score", key: "posting-score:JSEARCH:job-1", status: "RUNNING", input: { posting } } });
+    expect(startJob).toHaveBeenLastCalledWith(expect.objectContaining({ type: "posting-score" }), { posting }, { key: "posting-score:BOARDSEARCH:job-1" });
+    const running = await prisma().job.create({ data: { type: "posting-score", key: "posting-score:BOARDSEARCH:job-1", status: "RUNNING", input: { posting } } });
     expect(await startScoringPosting({ posting })).toEqual({ ok: true, data: { jobId: running.id } });
   });
 
@@ -153,6 +153,6 @@ describe("Score", () => {
 
     await saveSettings({ typesafeKeyEnc: encryptSecret(TYPESAFE_KEY, "ts_secret") });
     expect(await startScoringPosting({ posting })).toEqual({ ok: true, data: { jobId: "score-job" } });
-    expect(startJob).toHaveBeenLastCalledWith(expect.objectContaining({ type: "posting-score" }), { posting }, { key: "posting-score:JSEARCH:job-1" });
+    expect(startJob).toHaveBeenLastCalledWith(expect.objectContaining({ type: "posting-score" }), { posting }, { key: "posting-score:BOARDSEARCH:job-1" });
   });
 });

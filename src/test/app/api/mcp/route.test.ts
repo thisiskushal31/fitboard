@@ -128,7 +128,7 @@ describe("the Claude connector at /api/mcp", () => {
   });
 
   it("saves the fit scores Claude gives postings, so Find jobs shows them", async () => {
-    const posting = { source: "JSEARCH", externalId: "j1", title: "Product Designer", company: "Acme", place: "Berlin", remote: null, salary: "", postedAt: null, url: "", via: "", description: "Figma", complete: true };
+    const posting = { source: "BOARDSEARCH", externalId: "j1", title: "Product Designer", company: "Acme", place: "Berlin", remote: null, salary: "", postedAt: null, url: "", via: "", description: "Figma", complete: true };
     db.postingSearch.findUnique.mockResolvedValue({ postings: [posting] });
     const { text } = await tool("save_job_scores", {
       search_id: "s1",

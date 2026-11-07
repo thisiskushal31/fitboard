@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { json, refused, stubFetch } from "@/lib/ai/test-http";
-import { jsearchKeyError, jsearchV2LastPage, jsearchV2Page } from "@/test/job-search-fixtures";
+import { boardsearchKeyError, boardsearchV2LastPage, boardsearchV2Page } from "@/test/job-search-fixtures";
 
 import { JobSearchError } from "@/lib/job-search/errors";
-import { jsearch } from "@/lib/job-search/jsearch";
+import { boardsearch } from "@/lib/job-search/boardsearch";
 import { EMPTY_QUERY, type SearchQuery } from "@/lib/job-search/search";
 
 const query: SearchQuery = { ...EMPTY_QUERY, keywords: "product designer", place: "Hamburg", country: "de", radiusKm: 50, postedWithin: "week" };
@@ -17,10 +17,10 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("JSearch search", () => {
+describe("Boardsearch search", () => {
   it("asks OpenWeb Ninja's search-v2 with the key, place, country, radius and recency", async () => {
-    const requests = stubFetch(() => json(jsearchV2Page));
-    await jsearch.search(query, ninja, null);
+    const requests = stubFetch(() => json(boardsearchV2Page));
+    await boardsearch.search(query, ninja, null);
     const [{ url, headers }] = requests;
     expect(`${url.origin}${url.pathname}`).toBe("https://api.openwebninja.com/jsearch/search-v2");
     expect(headers.get("x-api-key")).toBe("ak_test");
@@ -33,8 +33,8 @@ describe("JSearch search", () => {
   });
 
   it("asks RapidAPI's search-v2 with its own headers, and pages by cursor", async () => {
-    const requests = stubFetch(() => json(jsearchV2Page));
-    const page = await jsearch.search({ ...query, place: "", remoteOnly: true, postedWithin: "any" }, rapid, null);
+    const requests = stubFetch(() => json(boardsearchV2Page));
+    const page = await boardsearch.search({ ...query, place: "", remoteOnly: true, postedWithin: "any" }, rapid, null);
     const [{ url, headers }] = requests;
     expect(`${url.origin}${url.pathname}`).toBe("https://jsearch.p.rapidapi.com/search-v2");
     expect(headers.get("x-rapidapi-key")).toBe("rapid-test");
@@ -49,19 +49,19 @@ describe("JSearch search", () => {
     expect(page.postings).toHaveLength(2);
   });
 
-  it("searches the US when no country is chosen, as JSearch would anyway", async () => {
-    const requests = stubFetch(() => json(jsearchV2LastPage));
-    await jsearch.search({ ...query, country: "" }, ninja, null);
+  it("searches the US when no country is chosen, as Boardsearch would anyway", async () => {
+    const requests = stubFetch(() => json(boardsearchV2LastPage));
+    await boardsearch.search({ ...query, country: "" }, ninja, null);
     expect(requests[0].url.searchParams.get("country")).toBe("us");
   });
 
   it("maps postings to the shared shape, once each, preferring the employer's own link", async () => {
-    stubFetch(() => json(jsearchV2Page));
-    const page = await jsearch.search(query, ninja, null);
+    stubFetch(() => json(boardsearchV2Page));
+    const page = await boardsearch.search(query, ninja, null);
     expect(page.next).toBe("cursor:CURSOR-PAGE-2");
     expect(page.postings).toEqual([
       {
-        source: "JSEARCH",
+        source: "BOARDSEARCH",
         externalId: "aG9tZWQtZGVzaWduZXItbGVkZ2VybHk=",
         title: "Senior Product Designer, Payments",
         company: "Ledgerly",
@@ -75,7 +75,7 @@ describe("JSearch search", () => {
         complete: true,
       },
       {
-        source: "JSEARCH",
+        source: "BOARDSEARCH",
         externalId: "bm9ydGh3aW5kLXV4LXJlc2VhcmNo",
         title: "UX Researcher",
         company: "Northwind Studio",
@@ -92,32 +92,32 @@ describe("JSearch search", () => {
   });
 
   it("sends the cursor for the next page and stops when there's none", async () => {
-    const requests = stubFetch(() => json(jsearchV2LastPage));
-    const page = await jsearch.search(query, ninja, "cursor:CURSOR-PAGE-2");
+    const requests = stubFetch(() => json(boardsearchV2LastPage));
+    const page = await boardsearch.search(query, ninja, "cursor:CURSOR-PAGE-2");
     expect(requests[0].url.searchParams.get("cursor")).toBe("CURSOR-PAGE-2");
     expect(requests[0].url.searchParams.has("page")).toBe(false);
     expect(page.next).toBeNull();
   });
 
   it("starts over on a page number from RapidAPI's old search", async () => {
-    const requests = stubFetch(() => json(jsearchV2Page));
-    const page = await jsearch.search(query, rapid, "page:3");
+    const requests = stubFetch(() => json(boardsearchV2Page));
+    const page = await boardsearch.search(query, rapid, "page:3");
     expect(["page", "num_pages", "cursor"].filter((name) => requests[0].url.searchParams.has(name))).toEqual([]);
     expect(page.next).toBe("cursor:CURSOR-PAGE-2");
   });
 
   it("says the source changed when it answers with a list, as the old search did", async () => {
-    stubFetch(() => json({ data: [jsearchV2LastPage.data.jobs[0]] }));
-    await expect(jsearch.search(query, rapid, null)).rejects.toMatchObject({
+    stubFetch(() => json({ data: [boardsearchV2LastPage.data.jobs[0]] }));
+    await expect(boardsearch.search(query, rapid, null)).rejects.toMatchObject({
       problem: "changed",
-      detail: "JSEARCH: /search-v2: unexpected answer (keys: data)",
+      detail: "BOARDSEARCH: /search-v2: unexpected answer (keys: data)",
     });
   });
 
   it("goes to the fake source's address when one is given", async () => {
-    const requests = stubFetch(() => json(jsearchV2LastPage));
-    await jsearch.search(query, ninja, null, { baseUrl: "http://127.0.0.1:3998/jsearch" });
-    expect(requests[0].url.href).toMatch(/^http:\/\/127\.0\.0\.1:3998\/jsearch\/search-v2\?/);
+    const requests = stubFetch(() => json(boardsearchV2LastPage));
+    await boardsearch.search(query, ninja, null, { baseUrl: "http://127.0.0.1:3998/boardsearch" });
+    expect(requests[0].url.href).toMatch(/^http:\/\/127\.0\.0\.1:3998\/boardsearch\/search-v2\?/);
   });
 
   it("drops links that aren't web addresses, and reads salaries written as text", async () => {
@@ -140,7 +140,7 @@ describe("JSearch search", () => {
         },
       }),
     );
-    const [first, second, third] = (await jsearch.search(query, ninja, null)).postings;
+    const [first, second, third] = (await boardsearch.search(query, ninja, null)).postings;
     expect(third).toMatchObject({ salary: "40.000–50.000 € im Jahr", place: "Beliebiger Ort" });
     expect(first).toMatchObject({ url: "", salary: "€60K–€70K a year", remote: null, postedAt: null, via: "", complete: false });
     expect(second).toMatchObject({ salary: "USD 50 an hour", title: "", company: "", place: "" });
@@ -153,61 +153,61 @@ describe("JSearch search", () => {
     [503, "unavailable"],
     [404, "changed"],
   ] as const)("turns HTTP %i into a %s problem", async (status, problem) => {
-    stubFetch(() => json(jsearchKeyError, { status }));
-    await expect(jsearch.search(query, ninja, null)).rejects.toMatchObject({ name: "JobSearchError", problem });
+    stubFetch(() => json(boardsearchKeyError, { status }));
+    await expect(boardsearch.search(query, ninja, null)).rejects.toMatchObject({ name: "JobSearchError", problem });
   });
 
   it("says the source changed when the answer has an unknown shape", async () => {
     stubFetch(() => json({ data: { results: [] } }));
-    const error = await jsearch.search(query, ninja, null).catch((caught: unknown) => caught);
+    const error = await boardsearch.search(query, ninja, null).catch((caught: unknown) => caught);
     expect(error).toBeInstanceOf(JobSearchError);
-    expect(error).toMatchObject({ problem: "changed", detail: "JSEARCH: /jsearch/search-v2: unexpected answer (keys: data)" });
+    expect(error).toMatchObject({ problem: "changed", detail: "BOARDSEARCH: /jsearch/search-v2: unexpected answer (keys: data)" });
   });
 
   it("names the keys of an answer it can't read, never their values", async () => {
     stubFetch(() => json({ status: "ERROR", message: "Invalid query: product designer in Hamburg" }));
-    await expect(jsearch.search(query, ninja, null)).rejects.toMatchObject({
+    await expect(boardsearch.search(query, ninja, null)).rejects.toMatchObject({
       problem: "changed",
-      detail: "JSEARCH: /jsearch/search-v2: unexpected answer (keys: status, message)",
+      detail: "BOARDSEARCH: /jsearch/search-v2: unexpected answer (keys: status, message)",
     });
     stubFetch(() => json(["product designer in Hamburg"]));
-    await expect(jsearch.search(query, ninja, null)).rejects.toMatchObject({ detail: "JSEARCH: /jsearch/search-v2: unexpected answer" });
+    await expect(boardsearch.search(query, ninja, null)).rejects.toMatchObject({ detail: "BOARDSEARCH: /jsearch/search-v2: unexpected answer" });
   });
 
   it("gives a search 45 seconds, then says it isn't answering, as before", async () => {
     const timeout = vi.spyOn(AbortSignal, "timeout").mockReturnValue(AbortSignal.abort());
     stubFetch((_, signal) => Promise.reject(signal?.reason ?? new Error("aborted")));
-    await expect(jsearch.search(query, ninja, null)).rejects.toMatchObject({
+    await expect(boardsearch.search(query, ninja, null)).rejects.toMatchObject({
       problem: "unavailable",
-      message: "JSearch isn't answering right now. Try again in a minute.",
-      detail: "JSEARCH: /jsearch/search-v2: timed out",
+      message: "Boardsearch isn't answering right now. Try again in a minute.",
+      detail: "BOARDSEARCH: /jsearch/search-v2: timed out",
     });
     expect(timeout).toHaveBeenCalledWith(45_000);
   });
 
   it("says the source isn't answering when it can't be reached", async () => {
     stubFetch(refused);
-    await expect(jsearch.search(query, ninja, null)).rejects.toMatchObject({
+    await expect(boardsearch.search(query, ninja, null)).rejects.toMatchObject({
       problem: "unavailable",
-      message: "JSearch isn't answering right now. Try again in a minute.",
-      detail: "JSEARCH: /jsearch/search-v2: ECONNREFUSED",
+      message: "Boardsearch isn't answering right now. Try again in a minute.",
+      detail: "BOARDSEARCH: /jsearch/search-v2: ECONNREFUSED",
     });
   });
 });
 
-describe("JSearch details and test", () => {
+describe("Boardsearch details and test", () => {
   it("has the whole description already, so details never asks again", async () => {
-    const requests = stubFetch(() => json(jsearchV2Page));
-    const [posting] = (await jsearch.search(query, ninja, null)).postings;
-    expect(await jsearch.details(posting, ninja)).toBe(posting.description);
-    expect(await jsearch.details({ ...posting, description: "" }, ninja)).toBeNull();
+    const requests = stubFetch(() => json(boardsearchV2Page));
+    const [posting] = (await boardsearch.search(query, ninja, null)).postings;
+    expect(await boardsearch.details(posting, ninja)).toBe(posting.description);
+    expect(await boardsearch.details({ ...posting, description: "" }, ninja)).toBeNull();
     expect(requests).toHaveLength(1);
   });
 
   it("tests the key with one small search, as patient as a search", async () => {
     const timeout = vi.spyOn(AbortSignal, "timeout");
-    const requests = stubFetch(() => json(jsearchV2LastPage));
-    await jsearch.test(ninja);
+    const requests = stubFetch(() => json(boardsearchV2LastPage));
+    await boardsearch.test(ninja);
     expect(requests).toHaveLength(1);
     expect(requests[0].url.searchParams.get("query")).toBe("developer");
     expect(timeout).toHaveBeenCalledWith(45_000);

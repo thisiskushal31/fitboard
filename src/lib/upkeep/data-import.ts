@@ -81,7 +81,9 @@ export async function importExport(db: PrismaClient, data: FitboardExport): Prom
   const { profile, themes, settings, applications, postings, searches, agentCandidates, startups, startupBlocks, apiKey, jobSourceKeys } = data;
   const fromFile: Record<string, string | null> = {
     apiKeyEnc: apiKey ? encryptApiKey(apiKey) : null,
-    jsearchKeyEnc: jobSourceKeys?.jsearch ? encryptSecret(JOB_SOURCE_KEY, jobSourceKeys.jsearch) : null,
+    boardsearchKeyEnc: jobSourceKeys?.boardsearch || jobSourceKeys?.jsearch
+      ? encryptSecret(JOB_SOURCE_KEY, jobSourceKeys.boardsearch ?? jobSourceKeys.jsearch ?? "")
+      : null,
     adzunaKeyEnc: jobSourceKeys?.adzuna ? encryptSecret(JOB_SOURCE_KEY, jobSourceKeys.adzuna) : null,
   };
   const keptKeys = [...SECRET_SETTINGS.filter((key) => !fromFile[key]), ...INSTALL_SETTINGS];

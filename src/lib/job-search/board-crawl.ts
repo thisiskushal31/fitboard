@@ -7,7 +7,7 @@ import { COUNTRY_REGION, detectRegions, matchesArea, matchesCountry, mentionsPla
 // row has a sector, and Career path groups the list by that field.
 // Greenhouse, Lever, Ashby, Recruitee, or SmartRecruiters is also crawled.
 // Add or remove a company there. One dead board does not fail the crawl.
-// Adzuna, JSearch, FreeHire, and the Bundesagentur stay as their own sources.
+// Adzuna, Boardsearch, FreeHire, and the Bundesagentur stay as their own sources.
 
 const USER_AGENT = "Fitboard/1.0 (public ATS job search)";
 const TIMEOUT_MS = 20_000;

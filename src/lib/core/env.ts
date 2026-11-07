@@ -11,7 +11,7 @@ const GENERATE_SECRET = "for example the output of `openssl rand -base64 32`";
 const HASH_PASSWORD = "Make one with `docker run --rm -it ghcr.io/thisiskushal31/fitboard hash-password`";
 
 export const AI_PROVIDERS = ["local", "openai", "anthropic", "mistral", "lmstudio", "cursor"] as const;
-export const JOB_SOURCE_NAMES = ["jsearch", "adzuna", "arbeitsagentur", "freehire", "off"] as const;
+export const JOB_SOURCE_NAMES = ["boardsearch", "adzuna", "arbeitsagentur", "freehire", "off"] as const;
 export const SCORER_NAMES = ["ai", "jev"] as const;
 
 // An empty value (`FITBOARD_AI_KEY=` in .env) counts as unset.
@@ -115,10 +115,10 @@ const schema = z.object({
     }),
   ),
   // Never echo the values: they're API keys.
-  FITBOARD_JSEARCH_KEY: optional(z.string()),
-  FITBOARD_JSEARCH_HOST: optional(
+  FITBOARD_BOARDSEARCH_KEY: optional(z.string()),
+  FITBOARD_BOARDSEARCH_HOST: optional(
     z.enum(["openwebninja", "rapidapi"], {
-      error: (issue) => `FITBOARD_JSEARCH_HOST must be openwebninja or rapidapi (got "${String(issue.input)}").`,
+      error: (issue) => `FITBOARD_BOARDSEARCH_HOST must be openwebninja or rapidapi (got "${String(issue.input)}").`,
     }),
   ),
   FITBOARD_ADZUNA_APP_ID: optional(z.string()),

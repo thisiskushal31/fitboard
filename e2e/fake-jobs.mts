@@ -6,8 +6,8 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 
 const port = Number(process.env.FAKE_JOBS_PORT ?? 3998);
-/** The JSearch key the app is given in e2e/support.ts. */
-const JSEARCH_KEY = "e2e-jsearch-key";
+/** The Boardsearch key the app is given in e2e/support.ts. */
+const BOARDSEARCH_KEY = "e2e-boardsearch-key";
 /** The TypeSafe key a spec saves in Settings → Scoring (#274). */
 const TYPESAFE_KEY = "e2e-typesafe-key";
 
@@ -84,7 +84,7 @@ function startups(path: string, request: IncomingMessage, response: ServerRespon
   response.writeHead(200, { "content-type": page === "/robots.txt" ? "text/plain" : "text/html; charset=utf-8" }).end(body);
 }
 
-/** How many JSearch searches were asked for, so a spec can tell a kept search came from the database. */
+/** How many Boardsearch searches were asked for, so a spec can tell a kept search came from the database. */
 let searches = 0;
 /** The usage pings the app sent here (FITBOARD_USAGE_PING_TEST_URL), so a spec can tell whether one went (#172). */
 const pings: unknown[] = [];
@@ -138,8 +138,8 @@ createServer((request, response) => {
   // what a test stores as the latest release stays as it is.
   if (url.pathname === "/github/repos/thisiskushal31/fitboard/releases/latest") return send(response, 404, { message: "Not Found" });
 
-  if (url.pathname === "/jsearch/search-v2") {
-    if (request.headers["x-api-key"] !== JSEARCH_KEY) return send(response, 401, { status: "ERROR", error: { message: "Invalid API key" } });
+  if (url.pathname === "/boardsearch/search-v2") {
+    if (request.headers["x-api-key"] !== BOARDSEARCH_KEY) return send(response, 401, { status: "ERROR", error: { message: "Invalid API key" } });
     searches += 1;
     // "nothing" finds nothing; otherwise two pages, joined by a cursor.
     if (/nothing/i.test(url.searchParams.get("query") ?? "")) return send(response, 200, { status: "OK", data: { jobs: [], cursor: null } });

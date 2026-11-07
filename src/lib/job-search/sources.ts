@@ -1,5 +1,5 @@
 import { zoneByCode } from "./regions";
-import type { JobSource, JSearchHost } from "./search";
+import type { JobSource, BoardsearchHost } from "./search";
 
 /** What Settings → Job search may know about a source's key: never the key itself. "env" means it comes from the environment. */
 export type JobKeyState = "none" | "set" | "unreadable" | "env";
@@ -7,7 +7,7 @@ export type JobKeyState = "none" | "set" | "unreadable" | "env";
 /** What the Job search section starts from. */
 export type JobSearchSettingsView = {
   source: JobSource | "OFF";
-  jsearch: { host: JSearchHost; keyState: JobKeyState };
+  boardsearch: { host: BoardsearchHost; keyState: JobKeyState };
   adzuna: { appId: string; keyState: JobKeyState };
   /** Whether this server offers the Bundesagentur für Arbeit, and when its note was accepted. */
   arbeitsagentur: { offered: boolean; acceptedAt: string | null };
@@ -15,8 +15,8 @@ export type JobSearchSettingsView = {
   freehire: { host: string };
 };
 
-/** Where to get a JSearch key, by where it's from. */
-export const JSEARCH_KEY_URLS: Record<JSearchHost, string> = {
+/** Where to get a Boardsearch key, by where it's from. */
+export const BOARDSEARCH_KEY_URLS: Record<BoardsearchHost, string> = {
   openwebninja: "https://www.openwebninja.com/api/jsearch",
   rapidapi: "https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch",
 };
@@ -47,9 +47,9 @@ export type SourceInfo = {
 };
 
 export const SOURCE_INFO: Record<JobSource, SourceInfo> = {
-  JSEARCH: {
-    name: "JSearch",
-    description: "LinkedIn, Indeed and Glassdoor through Google for Jobs, in the country you choose, including India. Monster shows up when Google lists it.",
+  BOARDSEARCH: {
+    name: "Boardsearch",
+    description: "LinkedIn, Indeed and Glassdoor through Google for Jobs, in the country you choose across APAC, JAPAC, EMEA, MEA, and the Americas. Monster shows up when Google lists it.",
     tag: "Most countries · free key with 200 searches a month",
     keyUrl: "https://www.openwebninja.com/api/jsearch",
     quotaPeriod: "this month",
@@ -83,7 +83,7 @@ export const SOURCE_INFO: Record<JobSource, SourceInfo> = {
   },
   PUBLIC_BOARDS: {
     name: "Public boards",
-    description: "Login-free crawl of Greenhouse, Lever, Ashby, Recruitee, SmartRecruiters, Remotive, RemoteOK, Arbeitnow, We Work Remotely, Berlin Startup Jobs, MyCareersFuture, Hacker News and Codeforces. Indian employers on those five boards are included. Other career sites stay as links on Career path.",
+    description: "Login-free crawl of Greenhouse, Lever, Ashby, Recruitee, SmartRecruiters, Remotive, RemoteOK, Arbeitnow, We Work Remotely, Berlin Startup Jobs, MyCareersFuture, Hacker News and Codeforces. The crawl covers Remote, APAC, JAPAC, EMEA, MEA, Nordics, and the Americas. Other career sites stay as links on Career path.",
     tag: "Most countries · free, no key · company list included",
     keyUrl: null,
     quotaPeriod: null,

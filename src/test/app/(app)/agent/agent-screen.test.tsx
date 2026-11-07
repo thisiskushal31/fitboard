@@ -25,8 +25,8 @@ const card = (id: string, score: number, extra: Partial<AgentCandidateView> = {}
   title: `Posting ${id}`,
   company: `Company ${id}`,
   facts: "Rotterdam · €70k",
-  origin: "Posted 2 days ago · via LinkedIn on JSearch",
-  source: "JSEARCH",
+  origin: "Posted 2 days ago · via LinkedIn on Boardsearch",
+  source: "BOARDSEARCH",
   url: `https://jobs.example/${id}`,
   score,
   reasons: [`Reason for ${id}`],
@@ -42,7 +42,7 @@ const view: AgentView = {
   minScore: 70,
   maxScores: 15,
   maxDrafts: 3,
-  search: "Product designer · Rotterdam, 25 km · via JSearch",
+  search: "Product designer · Rotterdam, 25 km · via Boardsearch",
   setupProblem: null,
   setupSection: null,
   limitReached: false,
@@ -61,7 +61,7 @@ describe("AgentScreen", () => {
   it("says what it searches, when it ran and when it runs next", () => {
     open();
     expect(screen.getByRole("heading", { level: 1, name: "Job agent" })).toBeInTheDocument();
-    expect(screen.getByText("Searches for").nextElementSibling).toHaveTextContent("Product designer · Rotterdam, 25 km · via JSearch");
+    expect(screen.getByText("Searches for").nextElementSibling).toHaveTextContent("Product designer · Rotterdam, 25 km · via Boardsearch");
     expect(screen.getByText("Last run").nextElementSibling).toHaveTextContent("Tue 20 Oct, 07:002 new postings are waiting for a look.");
     expect(screen.getByText("Next run").nextElementSibling).toHaveTextContent("Wed 21 Oct, 07:00");
   });

@@ -1,16 +1,16 @@
 import "server-only";
 
-import type { FoundPosting, JobSource, JSearchHost, SearchPage, SearchQuery } from "./search";
+import type { FoundPosting, JobSource, BoardsearchHost, SearchPage, SearchQuery } from "./search";
 
 // What every job source implements. Adapters turn a source's own
 // request and answer into the shared query and posting shapes, and every
 // failure into a JobSearchError.
 
-export type { JSearchHost };
+export type { BoardsearchHost };
 
 /** What each source needs to be asked. */
 export type SourceCredentials = {
-  JSEARCH: { key: string; host: JSearchHost };
+  BOARDSEARCH: { key: string; host: BoardsearchHost };
   ADZUNA: { appId: string; key: string };
   ARBEITSAGENTUR: Record<string, never>;
   FREEHIRE: Record<string, never>;

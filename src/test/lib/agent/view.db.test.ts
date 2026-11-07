@@ -16,14 +16,14 @@ vi.mock("@/lib/core/env", () => ({ env: { FITBOARD_SECRET: "a".repeat(32) } }));
 vi.mock("@/lib/settings/time-zone", () => ({ lastKnownTimeZone: async () => "Europe/Berlin" }));
 vi.mock("@/lib/ai/config", () => ({ isAiConfigured: async () => true }));
 vi.mock("@/lib/job-search/config", () => ({
-  loadJobSearchConfig: async () => ({ source: "JSEARCH", saved: true, jsearch: { key: "k", host: "openwebninja", keyState: "set" }, adzuna: { appId: "", key: null, keyState: "none" } }),
+  loadJobSearchConfig: async () => ({ source: "BOARDSEARCH", saved: true, boardsearch: { key: "k", host: "openwebninja", keyState: "set" }, adzuna: { appId: "", key: null, keyState: "none" } }),
   credentialsFor: () => ({ key: "k", host: "openwebninja" }),
 }));
 
 const prisma = () => db.client!;
 const now = new Date("2026-10-20T10:00:00Z");
 const candidate = (externalId: string, score: number, data: Record<string, unknown> = {}) =>
-  prisma().agentCandidate.create({ data: { source: "JSEARCH", externalId, dedupeKey: externalId, title: `Posting ${externalId}`, company: "Ledgerly", place: "Berlin", remote: true, score, via: "LinkedIn", postedAt: new Date("2026-10-18T00:00:00Z"), ...data } });
+  prisma().agentCandidate.create({ data: { source: "BOARDSEARCH", externalId, dedupeKey: externalId, title: `Posting ${externalId}`, company: "Ledgerly", place: "Berlin", remote: true, score, via: "LinkedIn", postedAt: new Date("2026-10-18T00:00:00Z"), ...data } });
 
 beforeEach(async () => {
   await resetDatabase(prisma());
@@ -50,9 +50,9 @@ describe("the Agent screen's data", () => {
     expect(view.drafts.map((entry) => entry.title)).toEqual(["Posting draft"]);
     expect(view.scored.map((entry) => entry.title)).toEqual(["Posting better", "Posting good"]);
     expect(view.belowMinimum.map((entry) => entry.title)).toEqual(["Posting low"]);
-    expect(view.scored[1]).toMatchObject({ facts: "Berlin · Remote", origin: "Posted 2 days ago · via LinkedIn on JSearch", draftJobId: job.id });
+    expect(view.scored[1]).toMatchObject({ facts: "Berlin · Remote", origin: "Posted 2 days ago · via LinkedIn on Boardsearch", draftJobId: job.id });
     expect(view).toMatchObject({
-      search: "Data scientist · Berlin, 25 km · via JSearch",
+      search: "Data scientist · Berlin, 25 km · via Boardsearch",
       setupProblem: null,
       limitReached: false,
       lastRun: { at: "Tue 20 Oct, 07:00", message: "2 new postings are waiting for a look." },

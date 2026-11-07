@@ -11,7 +11,7 @@ beforeEach(() => resetDatabase(db));
 afterAll(() => db.$disconnect());
 
 const posting: FoundPosting = {
-  source: "JSEARCH",
+  source: "BOARDSEARCH",
   externalId: "job-1",
   title: "Data Scientist",
   company: "Ledgerly",
@@ -64,7 +64,7 @@ describe("agent candidates", () => {
     const candidate = await db.agentCandidate.create({ data: candidateData(posting, { ...score, redFlags: ["German required"] }) });
     expect(stringsOf(candidate.reasons)).toEqual(["Python matches"]);
     const trimmed = await db.agentCandidate.update({ where: { id: candidate.id }, data: { status: "DISMISSED", ...DISMISSED_TRIM } });
-    expect(trimmed).toMatchObject({ source: "JSEARCH", externalId: "job-1", title: "Data Scientist", company: "Ledgerly", dedupeKey: candidate.dedupeKey });
+    expect(trimmed).toMatchObject({ source: "BOARDSEARCH", externalId: "job-1", title: "Data Scientist", company: "Ledgerly", dedupeKey: candidate.dedupeKey });
     expect(trimmed).toMatchObject({ description: "", url: "", place: "", salary: "", via: "", postedAt: null });
     expect([stringsOf(trimmed.reasons), stringsOf(trimmed.redFlags)]).toEqual([[], []]);
   });

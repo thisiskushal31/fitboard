@@ -82,20 +82,20 @@ describe("buildExport", () => {
   it("treats the job sources' keys like the API key, and has the postings", async () => {
     await prisma().setting.createMany({
       data: [
-        { key: "jsearchKeyEnc", value: encryptSecret(JOB_SOURCE_KEY, "ak-test", "s".repeat(32)) },
+        { key: "boardsearchKeyEnc", value: encryptSecret(JOB_SOURCE_KEY, "ak-test", "s".repeat(32)) },
         // Unreadable here: left out rather than exported broken.
         { key: "adzunaKeyEnc", value: encryptSecret(JOB_SOURCE_KEY, "adz-test", "x".repeat(32)) },
       ],
     });
-    await prisma().posting.create({ data: { source: "JSEARCH", externalId: "job-1", title: "Designer", savedAt: now } });
+    await prisma().posting.create({ data: { source: "BOARDSEARCH", externalId: "job-1", title: "Designer", savedAt: now } });
 
     const without = await buildExport(prisma(), { now });
     expect(without).not.toHaveProperty("jobSourceKeys");
-    expect(JSON.stringify(without)).not.toMatch(/jsearchKeyEnc|adzunaKeyEnc/);
+    expect(JSON.stringify(without)).not.toMatch(/boardsearchKeyEnc|adzunaKeyEnc/);
     expect(without.postings).toEqual([expect.objectContaining({ externalId: "job-1", title: "Designer", savedAt: now })]);
 
     const withKeys = await buildExport(prisma(), { now, includeApiKey: true });
-    expect(withKeys.jobSourceKeys).toEqual({ jsearch: "ak-test" });
+    expect(withKeys.jobSourceKeys).toEqual({ boardsearch: "ak-test" });
   });
 
   it("names the file after the day", () => {

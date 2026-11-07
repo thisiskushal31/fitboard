@@ -583,7 +583,7 @@ model Note {
 
 // The job sources Find jobs can search.
 enum PostingSource {
-  JSEARCH
+  BOARDSEARCH
   ADZUNA
   ARBEITSAGENTUR
   FREEHIRE

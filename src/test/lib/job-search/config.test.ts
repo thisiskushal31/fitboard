@@ -8,8 +8,8 @@ vi.mock("@/lib/core/env", () => ({ env: { FITBOARD_SECRET: "a".repeat(32) } }));
 
 const nothingSaved = {
   jobSource: null,
-  jsearchKeyEnc: null,
-  jsearchHost: "openwebninja" as const,
+  boardsearchKeyEnc: null,
+  boardsearchHost: "openwebninja" as const,
   adzunaAppId: null,
   adzunaKeyEnc: null,
   arbeitsagenturAcceptedAt: null,
@@ -20,10 +20,10 @@ const noEnv = {};
 describe("resolveJobSearchConfig", () => {
   it("is off until a source is chosen", () => {
     const config = resolveJobSearchConfig(nothingSaved, noEnv);
-    expect(config).toMatchObject({ source: null, saved: false, jsearch: { key: null, keyState: "none" }, adzuna: { appId: "", key: null } });
+    expect(config).toMatchObject({ source: null, saved: false, boardsearch: { key: null, keyState: "none" }, adzuna: { appId: "", key: null } });
     expect(jobSearchView(config)).toEqual({
       source: "OFF",
-      jsearch: { host: "openwebninja", keyState: "none" },
+      boardsearch: { host: "openwebninja", keyState: "none" },
       adzuna: { appId: "", keyState: "none" },
       arbeitsagentur: { offered: true, acceptedAt: null },
       freehire: { host: "freehire.me" },
@@ -32,16 +32,16 @@ describe("resolveJobSearchConfig", () => {
 
   it("uses the environment until something is saved", () => {
     const config = resolveJobSearchConfig(nothingSaved, {
-      FITBOARD_JOBS_SOURCE: "jsearch",
-      FITBOARD_JSEARCH_KEY: "ak_env",
-      FITBOARD_JSEARCH_HOST: "rapidapi",
+      FITBOARD_JOBS_SOURCE: "boardsearch",
+      FITBOARD_BOARDSEARCH_KEY: "ak_env",
+      FITBOARD_BOARDSEARCH_HOST: "rapidapi",
       FITBOARD_ADZUNA_APP_ID: "app-env",
       FITBOARD_ADZUNA_KEY: "adz-env",
     });
     expect(config).toMatchObject({
-      source: "JSEARCH",
+      source: "BOARDSEARCH",
       saved: false,
-      jsearch: { key: "ak_env", host: "rapidapi", keyState: "env" },
+      boardsearch: { key: "ak_env", host: "rapidapi", keyState: "env" },
       adzuna: { appId: "app-env", key: "adz-env", keyState: "env" },
     });
     expect(resolveJobSearchConfig(nothingSaved, { FITBOARD_JOBS_SOURCE: "off" }).source).toBeNull();
@@ -50,47 +50,47 @@ describe("resolveJobSearchConfig", () => {
   it("prefers what's saved, Off included, and decrypts saved keys", () => {
     const saved = {
       jobSource: "ADZUNA" as const,
-      jsearchKeyEnc: encryptSecret(JOB_SOURCE_KEY, "ak_saved"),
-      jsearchHost: "openwebninja" as const,
+      boardsearchKeyEnc: encryptSecret(JOB_SOURCE_KEY, "ak_saved"),
+      boardsearchHost: "openwebninja" as const,
       adzunaAppId: "app-saved",
       adzunaKeyEnc: encryptSecret(JOB_SOURCE_KEY, "adz-saved"),
       arbeitsagenturAcceptedAt: null,
     };
-    const config = resolveJobSearchConfig(saved, { FITBOARD_JOBS_SOURCE: "jsearch", FITBOARD_JSEARCH_KEY: "ak_env", FITBOARD_JSEARCH_HOST: "rapidapi" });
+    const config = resolveJobSearchConfig(saved, { FITBOARD_JOBS_SOURCE: "boardsearch", FITBOARD_BOARDSEARCH_KEY: "ak_env", FITBOARD_BOARDSEARCH_HOST: "rapidapi" });
     expect(config).toMatchObject({
       source: "ADZUNA",
       saved: true,
-      jsearch: { key: "ak_saved", host: "openwebninja", keyState: "set" },
+      boardsearch: { key: "ak_saved", host: "openwebninja", keyState: "set" },
       adzuna: { appId: "app-saved", key: "adz-saved", keyState: "set" },
     });
-    expect(resolveJobSearchConfig({ ...saved, jobSource: "OFF" }, { FITBOARD_JOBS_SOURCE: "jsearch" })).toMatchObject({ source: null, saved: true });
+    expect(resolveJobSearchConfig({ ...saved, jobSource: "OFF" }, { FITBOARD_JOBS_SOURCE: "boardsearch" })).toMatchObject({ source: null, saved: true });
   });
 
   it("says when a saved key can't be read, rather than using another", () => {
     const config = resolveJobSearchConfig(
-      { ...nothingSaved, jobSource: "JSEARCH", jsearchKeyEnc: encryptSecret(JOB_SOURCE_KEY, "ak", "b".repeat(32)) },
-      { FITBOARD_JSEARCH_KEY: "ak_env" },
+      { ...nothingSaved, jobSource: "BOARDSEARCH", boardsearchKeyEnc: encryptSecret(JOB_SOURCE_KEY, "ak", "b".repeat(32)) },
+      { FITBOARD_BOARDSEARCH_KEY: "ak_env" },
     );
-    expect(config.jsearch).toEqual({ key: null, host: "openwebninja", keyState: "unreadable" });
-    expect(() => credentialsFor(config, "JSEARCH")).toThrow("Your saved JSearch key can't be read. Enter it again in Settings → Job search.");
+    expect(config.boardsearch).toEqual({ key: null, host: "openwebninja", keyState: "unreadable" });
+    expect(() => credentialsFor(config, "BOARDSEARCH")).toThrow("Your saved Boardsearch key can't be read. Enter it again in Settings → Job search.");
   });
 });
 
 describe("credentialsFor", () => {
   const config = resolveJobSearchConfig(
-    { ...nothingSaved, jobSource: "JSEARCH", jsearchKeyEnc: encryptSecret(JOB_SOURCE_KEY, "ak_saved"), jsearchHost: "rapidapi" },
+    { ...nothingSaved, jobSource: "BOARDSEARCH", boardsearchKeyEnc: encryptSecret(JOB_SOURCE_KEY, "ak_saved"), boardsearchHost: "rapidapi" },
     noEnv,
   );
 
   it("gives each source its own key", () => {
-    expect(credentialsFor(config, "JSEARCH")).toEqual({ key: "ak_saved", host: "rapidapi" });
+    expect(credentialsFor(config, "BOARDSEARCH")).toEqual({ key: "ak_saved", host: "rapidapi" });
     expect(credentialsFor({ ...config, arbeitsagentur: { offered: true, acceptedAt: ACCEPTED } }, "ARBEITSAGENTUR")).toEqual({});
     expect(credentialsFor(config, "FREEHIRE")).toEqual({});
   });
 
   it("says what's missing", () => {
     expect(() => credentialsFor(config, "ADZUNA")).toThrow("Add your Adzuna app ID and key in Settings → Job search first.");
-    expect(() => credentialsFor(resolveJobSearchConfig(nothingSaved, noEnv), "JSEARCH")).toThrow("Add your JSearch key in Settings → Job search first.");
+    expect(() => credentialsFor(resolveJobSearchConfig(nothingSaved, noEnv), "BOARDSEARCH")).toThrow("Add your Boardsearch key in Settings → Job search first.");
     const keyOnly = resolveJobSearchConfig({ ...nothingSaved, adzunaKeyEnc: encryptSecret(JOB_SOURCE_KEY, "adz") }, noEnv);
     expect(() => credentialsFor(keyOnly, "ADZUNA")).toThrow(/app ID and key/);
   });
@@ -116,7 +116,7 @@ describe("the Bundesagentur für Arbeit", () => {
     // A saved BA posting doesn't fetch its text either.
     expect(() => credentialsFor(off, "ARBEITSAGENTUR")).toThrow(expect.objectContaining({ problem: "off" }));
     // Other sources aren't touched.
-    expect(resolveJobSearchConfig({ ...chosen, jobSource: "JSEARCH" }, { FITBOARD_JOBS_ARBEITSAGENTUR: "off" }).source).toBe("JSEARCH");
+    expect(resolveJobSearchConfig({ ...chosen, jobSource: "BOARDSEARCH" }, { FITBOARD_JOBS_ARBEITSAGENTUR: "off" }).source).toBe("BOARDSEARCH");
   });
 
   it("logs its note at start when FITBOARD_JOBS_SOURCE chooses it", () => {
@@ -128,13 +128,13 @@ describe("the Bundesagentur für Arbeit", () => {
     expect(arbeitsagenturStartupNotice(acceptedFromEnv)).not.toMatch(/isn't searched/);
     // Chosen in Settings, or another source: nothing to log.
     expect(arbeitsagenturStartupNotice(resolveJobSearchConfig(chosen, noEnv))).toBeNull();
-    expect(arbeitsagenturStartupNotice(resolveJobSearchConfig(nothingSaved, { FITBOARD_JOBS_SOURCE: "jsearch" }))).toBeNull();
+    expect(arbeitsagenturStartupNotice(resolveJobSearchConfig(nothingSaved, { FITBOARD_JOBS_SOURCE: "boardsearch" }))).toBeNull();
   });
 });
 
 describe("requestContext", () => {
   it("leaves sources at their own address, unless the end-to-end tests point them at a fake", () => {
-    expect(requestContext("JSEARCH", undefined)).toEqual({});
+    expect(requestContext("BOARDSEARCH", undefined)).toEqual({});
     expect(requestContext("ADZUNA", "http://127.0.0.1:3998/")).toEqual({ baseUrl: "http://127.0.0.1:3998/adzuna" });
     expect(requestContext("FREEHIRE", undefined, "https://jobs.example")).toEqual({ baseUrl: "https://jobs.example" });
     expect(requestContext("FREEHIRE", "http://127.0.0.1:3998/", "https://jobs.example")).toEqual({

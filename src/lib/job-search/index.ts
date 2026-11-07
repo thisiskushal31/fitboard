@@ -8,7 +8,7 @@ import { JobSearchError, jobSearchError } from "./errors";
 import { adzuna } from "./adzuna";
 import { arbeitsagentur } from "./arbeitsagentur";
 import { freehire } from "./freehire";
-import { jsearch } from "./jsearch";
+import { boardsearch } from "./boardsearch";
 import { publicBoards } from "./public-boards";
 import { postingKey, type FoundPosting, type JobSource, type SearchPage, type SearchQuery } from "./search";
 import { sourceCovers } from "./sources";
@@ -18,11 +18,11 @@ import { sourceCovers } from "./sources";
 // message for the screen, and the ones that point at a problem with the
 // source are logged, without the search.
 
-export type { JSearchHost, RequestContext, SourceCredentials } from "./adapter";
+export type { BoardsearchHost, RequestContext, SourceCredentials } from "./adapter";
 export { JobSearchError } from "./errors";
 
 const ADAPTERS: { [S in JobSource]: JobSourceAdapter<S> } = {
-  JSEARCH: jsearch,
+  BOARDSEARCH: boardsearch,
   ADZUNA: adzuna,
   ARBEITSAGENTUR: arbeitsagentur,
   FREEHIRE: freehire,

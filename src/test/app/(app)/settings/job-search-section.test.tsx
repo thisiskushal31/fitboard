@@ -17,7 +17,7 @@ vi.mock("@/components/toast", () => ({ toast: vi.fn(), toastResult: (result: unk
 
 const off: JobSearchSettingsView = {
   source: "OFF",
-  jsearch: { host: "openwebninja", keyState: "none" },
+  boardsearch: { host: "openwebninja", keyState: "none" },
   adzuna: { appId: "", keyState: "none" },
   arbeitsagentur: { offered: true, acceptedAt: null },
   freehire: { host: "freehire.me" },
@@ -27,11 +27,11 @@ const withSource = (view: Partial<JobSearchSettingsView>): JobSearchSettingsView
 
 beforeEach(() => {
   vi.mocked(saveJobSource).mockReset().mockImplementation(async ({ source }) => ({ ok: true, data: withSource({ source }) }));
-  vi.mocked(saveJobSearchDetails).mockReset().mockImplementation(async ({ jsearchHost = "openwebninja", adzunaAppId = "" }) => ({
+  vi.mocked(saveJobSearchDetails).mockReset().mockImplementation(async ({ boardsearchHost = "openwebninja", adzunaAppId = "" }) => ({
     ok: true,
-    data: withSource({ source: "JSEARCH", jsearch: { host: jsearchHost, keyState: "none" }, adzuna: { appId: adzunaAppId, keyState: "none" } }),
+    data: withSource({ source: "BOARDSEARCH", boardsearch: { host: boardsearchHost, keyState: "none" }, adzuna: { appId: adzunaAppId, keyState: "none" } }),
   }));
-  vi.mocked(saveJobSourceKey).mockReset().mockResolvedValue({ ok: true, data: withSource({ source: "JSEARCH", jsearch: { host: "openwebninja", keyState: "set" } }) });
+  vi.mocked(saveJobSourceKey).mockReset().mockResolvedValue({ ok: true, data: withSource({ source: "BOARDSEARCH", boardsearch: { host: "openwebninja", keyState: "set" } }) });
   vi.mocked(testJobSource).mockReset().mockResolvedValue({ ok: true, data: { connected: true, seconds: 0.8 } });
 });
 
@@ -41,7 +41,7 @@ describe("JobSearchSection", () => {
     expect(screen.getByRole("heading", { name: "Job search" })).toBeInTheDocument();
     expect(screen.getAllByRole("radio").map((radio) => radio.getAttribute("aria-label"))).toEqual([
       "Public boards",
-      "JSearch",
+      "Boardsearch",
       "Adzuna",
       "FreeHire",
       "Bundesagentur für Arbeit",
@@ -54,34 +54,34 @@ describe("JobSearchSection", () => {
 
   it("saves a source at once and says what's sent to it", async () => {
     render(<JobSearchSection initial={off} />);
-    await userEvent.click(screen.getByRole("radio", { name: "JSearch" }));
-    expect(saveJobSource).toHaveBeenCalledWith({ source: "JSEARCH" });
-    expect(screen.getByRole("note")).toHaveTextContent("Your searches (keywords, place and filters) go to JSearch. Nothing from your profile does.");
+    await userEvent.click(screen.getByRole("radio", { name: "Boardsearch" }));
+    expect(saveJobSource).toHaveBeenCalledWith({ source: "BOARDSEARCH" });
+    expect(screen.getByRole("note")).toHaveTextContent("Your searches (keywords, place and filters) go to Boardsearch. Nothing from your profile does.");
     expect(screen.getByRole("link", { name: "OpenWeb Ninja" })).toHaveAttribute("href", "https://www.openwebninja.com/api/jsearch");
   });
 
   it("saves a key when you leave the field, then forgets it in the browser", async () => {
-    render(<JobSearchSection initial={withSource({ source: "JSEARCH" })} />);
+    render(<JobSearchSection initial={withSource({ source: "BOARDSEARCH" })} />);
     await userEvent.type(screen.getByLabelText("API key"), "ak_secret");
     await userEvent.tab();
-    expect(saveJobSourceKey).toHaveBeenCalledWith({ source: "JSEARCH", change: { action: "set", value: "ak_secret" } });
+    expect(saveJobSourceKey).toHaveBeenCalledWith({ source: "BOARDSEARCH", change: { action: "set", value: "ak_secret" } });
     await waitFor(() => expect(screen.getByLabelText("API key")).toHaveValue(""));
     expect(screen.getByLabelText("API key")).toHaveAttribute("placeholder", "Saved · type a new key to replace it");
     await userEvent.click(screen.getByRole("button", { name: "Remove saved key" }));
-    expect(saveJobSourceKey).toHaveBeenLastCalledWith({ source: "JSEARCH", change: { action: "clear" } });
+    expect(saveJobSourceKey).toHaveBeenLastCalledWith({ source: "BOARDSEARCH", change: { action: "clear" } });
   });
 
   it("saves a key on Enter too", async () => {
-    render(<JobSearchSection initial={withSource({ source: "JSEARCH" })} />);
+    render(<JobSearchSection initial={withSource({ source: "BOARDSEARCH" })} />);
     await userEvent.type(screen.getByLabelText("API key"), "ak_secret{Enter}");
     expect(saveJobSourceKey).toHaveBeenCalledTimes(1);
   });
 
-  it("switches where the JSearch key is from", async () => {
-    render(<JobSearchSection initial={withSource({ source: "JSEARCH" })} />);
+  it("switches where the Boardsearch key is from", async () => {
+    render(<JobSearchSection initial={withSource({ source: "BOARDSEARCH" })} />);
     await userEvent.click(screen.getByRole("radio", { name: "RapidAPI" }));
-    expect(saveJobSearchDetails).toHaveBeenCalledWith({ jsearchHost: "rapidapi" });
-    expect(await screen.findByRole("link", { name: "JSearch on RapidAPI" })).toBeInTheDocument();
+    expect(saveJobSearchDetails).toHaveBeenCalledWith({ boardsearchHost: "rapidapi" });
+    expect(await screen.findByRole("link", { name: "RapidAPI" })).toBeInTheDocument();
   });
 
   it("asks Adzuna for an app ID and key, saving the ID when you leave it", async () => {
@@ -120,7 +120,7 @@ describe("JobSearchSection", () => {
   });
 
   it("doesn't save another source's choice as the Arbeitsagentur's", async () => {
-    render(<JobSearchSection initial={withSource({ source: "JSEARCH" })} />);
+    render(<JobSearchSection initial={withSource({ source: "BOARDSEARCH" })} />);
     await userEvent.click(screen.getByRole("radio", { name: "Bundesagentur für Arbeit" }));
     await userEvent.click(screen.getByRole("radio", { name: "Adzuna" }));
     expect(saveJobSource).toHaveBeenCalledTimes(1);
@@ -129,36 +129,36 @@ describe("JobSearchSection", () => {
 
   it("leaves the Arbeitsagentur out when the server doesn't offer it", () => {
     render(<JobSearchSection initial={withSource({ arbeitsagentur: { offered: false, acceptedAt: null } })} />);
-    expect(screen.getAllByRole("radio").map((radio) => radio.getAttribute("aria-label"))).toEqual(["Public boards", "JSearch", "Adzuna", "FreeHire", "Off"]);
+    expect(screen.getAllByRole("radio").map((radio) => radio.getAttribute("aria-label"))).toEqual(["Public boards", "Boardsearch", "Adzuna", "FreeHire", "Off"]);
   });
 
   it("says which FreeHire it searches, with no key to ask for", () => {
     const { unmount } = render(<JobSearchSection initial={withSource({ source: "FREEHIRE" })} />);
-    expect(screen.getByText("No key needed. Fitboard searches FreeHire's public catalogue at freehire.me, in the country you choose, including India.")).toBeInTheDocument();
+    expect(screen.getByText("No key needed. Fitboard searches FreeHire's public catalogue at freehire.me, in the country you choose across APAC, JAPAC, EMEA, MEA, and the Americas.")).toBeInTheDocument();
     expect(screen.queryByLabelText(/key/i)).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Test connection" })).toBeInTheDocument();
     unmount();
     render(<JobSearchSection initial={withSource({ source: "FREEHIRE", freehire: { host: "jobs.example" } })} />);
-    expect(screen.getByText("No key needed. Fitboard searches your own FreeHire at jobs.example, in the country you choose, including India.")).toBeInTheDocument();
+    expect(screen.getByText("No key needed. Fitboard searches your own FreeHire at jobs.example, in the country you choose across APAC, JAPAC, EMEA, MEA, and the Americas.")).toBeInTheDocument();
   });
 
   it("shows keys from the environment and keys that can't be read", () => {
-    const { unmount } = render(<JobSearchSection initial={withSource({ source: "JSEARCH", jsearch: { host: "openwebninja", keyState: "env" } })} />);
-    expect(screen.getByLabelText("API key")).toHaveAttribute("placeholder", "Using FITBOARD_JSEARCH_KEY · type one to save it here");
+    const { unmount } = render(<JobSearchSection initial={withSource({ source: "BOARDSEARCH", boardsearch: { host: "openwebninja", keyState: "env" } })} />);
+    expect(screen.getByLabelText("API key")).toHaveAttribute("placeholder", "Using FITBOARD_BOARDSEARCH_KEY · type one to save it here");
     unmount();
-    render(<JobSearchSection initial={withSource({ source: "JSEARCH", jsearch: { host: "openwebninja", keyState: "unreadable" } })} />);
+    render(<JobSearchSection initial={withSource({ source: "BOARDSEARCH", boardsearch: { host: "openwebninja", keyState: "unreadable" } })} />);
     expect(screen.getByText("Your saved key can't be read. Please enter it again.")).toBeInTheDocument();
   });
 
   it("tests the connection and says how it went", async () => {
-    render(<JobSearchSection initial={withSource({ source: "JSEARCH", jsearch: { host: "openwebninja", keyState: "set" } })} />);
+    render(<JobSearchSection initial={withSource({ source: "BOARDSEARCH", boardsearch: { host: "openwebninja", keyState: "set" } })} />);
     expect(screen.getByRole("status")).toHaveTextContent("a test uses one search from your plan");
     await userEvent.click(screen.getByRole("button", { name: "Test connection" }));
-    expect(await screen.findByText("Connected · JSearch answered in 0.8 s")).toBeInTheDocument();
+    expect(await screen.findByText("Connected · Boardsearch answered in 0.8 s")).toBeInTheDocument();
 
-    vi.mocked(testJobSource).mockResolvedValue({ ok: true, data: { connected: false, message: "JSearch didn't accept your key." } });
+    vi.mocked(testJobSource).mockResolvedValue({ ok: true, data: { connected: false, message: "Boardsearch didn't accept your key." } });
     await userEvent.click(screen.getByRole("button", { name: "Test connection" }));
-    expect(await screen.findByText("JSearch didn't accept your key.")).toBeInTheDocument();
+    expect(await screen.findByText("Boardsearch didn't accept your key.")).toBeInTheDocument();
 
     vi.mocked(testJobSource).mockResolvedValue({ ok: false, error: "Something went wrong on the server. Please try again." });
     await userEvent.click(screen.getByRole("button", { name: "Test connection" }));

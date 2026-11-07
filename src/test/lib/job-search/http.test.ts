@@ -14,7 +14,7 @@ afterEach(() => {
 describe("requestJson", () => {
   it("returns the parsed answer and asks for JSON", async () => {
     const requests = stubFetch(() => json({ ok: true }));
-    expect(await requestJson("JSEARCH", url, { headers: { "x-api-key": "k" } })).toEqual({ ok: true });
+    expect(await requestJson("BOARDSEARCH", url, { headers: { "x-api-key": "k" } })).toEqual({ ok: true });
     expect(requests[0].headers.get("accept")).toBe("application/json");
     expect(requests[0].headers.get("x-api-key")).toBe("k");
   });
@@ -42,25 +42,25 @@ describe("requestJson", () => {
           }),
         ),
     );
-    await expect(requestJson("JSEARCH", url)).rejects.toMatchObject({ problem: "changed", detail: expect.stringContaining("answer over") });
+    await expect(requestJson("BOARDSEARCH", url)).rejects.toMatchObject({ problem: "changed", detail: expect.stringContaining("answer over") });
   });
 
   it("reads an empty body as empty, which isn't JSON", async () => {
     stubFetch(() => new Response(null, { status: 200 }));
-    await expect(requestJson("JSEARCH", url)).rejects.toMatchObject({ problem: "changed" });
+    await expect(requestJson("BOARDSEARCH", url)).rejects.toMatchObject({ problem: "changed" });
   });
 
   it("says it timed out when the source takes too long", async () => {
     vi.spyOn(AbortSignal, "timeout").mockReturnValue(AbortSignal.abort());
     stubFetch((_, signal) => Promise.reject(signal?.reason ?? new Error("aborted")));
-    await expect(requestJson("JSEARCH", url)).rejects.toMatchObject({ problem: "unavailable", detail: "JSEARCH: /api/search: timed out" });
+    await expect(requestJson("BOARDSEARCH", url)).rejects.toMatchObject({ problem: "unavailable", detail: "BOARDSEARCH: /api/search: timed out" });
   });
 
   it("gives a source 10 seconds unless it asks for longer", async () => {
     const timeout = vi.spyOn(AbortSignal, "timeout");
     stubFetch(() => json({ ok: true }));
     await requestJson("ADZUNA", url);
-    await requestJson("JSEARCH", url, { timeoutMs: 45_000 });
+    await requestJson("BOARDSEARCH", url, { timeoutMs: 45_000 });
     expect(timeout.mock.calls).toEqual([[10_000], [45_000]]);
   });
 
@@ -68,9 +68,9 @@ describe("requestJson", () => {
     const caller = new AbortController();
     caller.abort();
     stubFetch((_, signal) => Promise.reject(signal?.reason ?? new Error("aborted")));
-    await expect(requestJson("JSEARCH", url, { signal: caller.signal, timeoutMs: 45_000 })).rejects.toMatchObject({
+    await expect(requestJson("BOARDSEARCH", url, { signal: caller.signal, timeoutMs: 45_000 })).rejects.toMatchObject({
       problem: "unavailable",
-      detail: "JSEARCH: /api/search: request failed",
+      detail: "BOARDSEARCH: /api/search: request failed",
     });
   });
 });

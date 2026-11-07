@@ -23,10 +23,10 @@ vi.mock("@/lib/jobs/runner", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/jobs/runner")>()),
   startJob: vi.fn(async () => "new-run"),
 }));
-const setup = vi.hoisted(() => ({ ai: true, source: "JSEARCH" as "JSEARCH" | null }));
+const setup = vi.hoisted(() => ({ ai: true, source: "BOARDSEARCH" as "BOARDSEARCH" | null }));
 vi.mock("@/lib/ai/config", () => ({ isAiConfigured: async () => setup.ai }));
 vi.mock("@/lib/job-search/config", () => ({
-  loadJobSearchConfig: async () => ({ source: setup.source, saved: true, jsearch: { key: "k", host: "openwebninja", keyState: "set" }, adzuna: { appId: "", key: null, keyState: "none" } }),
+  loadJobSearchConfig: async () => ({ source: setup.source, saved: true, boardsearch: { key: "k", host: "openwebninja", keyState: "set" }, adzuna: { appId: "", key: null, keyState: "none" } }),
   credentialsFor: () => ({ key: "k", host: "openwebninja" }),
   requestContext: () => ({}),
 }));
@@ -34,12 +34,12 @@ vi.mock("@/lib/job-search/config", () => ({
 const prisma = () => db.client!;
 const candidate = (data: { status?: "SCORED" | "DRAFTED" | "DRAFTING"; applicationId?: string } = {}) =>
   prisma().agentCandidate.create({
-    data: { source: "JSEARCH", externalId: `job-${Math.random()}`, dedupeKey: `key-${Math.random()}`, title: "Data Scientist", company: "Ledgerly", url: "https://jobs.example/1", score: 88, reasons: ["Python"], ...data },
+    data: { source: "BOARDSEARCH", externalId: `job-${Math.random()}`, dedupeKey: `key-${Math.random()}`, title: "Data Scientist", company: "Ledgerly", url: "https://jobs.example/1", score: 88, reasons: ["Python"], ...data },
   });
 const query: SearchQuery = { keywords: "Data scientist", place: "", country: "de", radiusKm: 25, remoteOnly: false, postedWithin: "any" };
 
 beforeEach(async () => {
-  Object.assign(setup, { ai: true, source: "JSEARCH" });
+  Object.assign(setup, { ai: true, source: "BOARDSEARCH" });
   await resetDatabase(prisma());
   await saveSettings({ agentEnabled: true, agentQuery: query });
 });

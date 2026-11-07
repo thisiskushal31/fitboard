@@ -60,11 +60,11 @@ afterAll(async () => {
 describe("deleteEverything", () => {
   it("wipes all user data and the backups, keeps the built-in themes, and lands on the dashboard", async () => {
     // A saved posting from Find jobs goes too.
-    await prisma().posting.create({ data: { source: "JSEARCH", externalId: "job-1", savedAt: new Date() } });
-    await prisma().postingSearch.create({ data: { source: "JSEARCH", query: {}, postings: [] } });
+    await prisma().posting.create({ data: { source: "BOARDSEARCH", externalId: "job-1", savedAt: new Date() } });
+    await prisma().postingSearch.create({ data: { source: "BOARDSEARCH", query: {}, postings: [] } });
     // And what the job agent found.
-    await prisma().agentCandidate.create({ data: { source: "JSEARCH", externalId: "job-1", dedupeKey: "key-1" } });
-    await prisma().postingScore.create({ data: { source: "JSEARCH", externalId: "job-1", score: 80, reasons: [], redFlags: [], scoredWith: "score-posting@1" } });
+    await prisma().agentCandidate.create({ data: { source: "BOARDSEARCH", externalId: "job-1", dedupeKey: "key-1" } });
+    await prisma().postingScore.create({ data: { source: "BOARDSEARCH", externalId: "job-1", score: 80, reasons: [], redFlags: [], scoredWith: "score-posting@1" } });
     // And Startups, with the fingerprints of ones removed for good.
     await prisma().startup.create({ data: { source: "HN", externalId: "1", company: "Acme", roles: [], emails: [], links: [], reasons: [] } });
     await prisma().startupBlock.create({ data: { hash: "a".repeat(64) } });

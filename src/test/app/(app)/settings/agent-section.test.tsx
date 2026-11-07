@@ -24,7 +24,7 @@ const countries = [
   { code: "nl", name: "Netherlands" },
 ];
 const open = (props: Partial<Parameters<typeof AgentSection>[0]> = {}) =>
-  render(<AgentSection initial={initial} source="JSEARCH" scoring={{ scorer: "AI", ready: true }} countries={countries} timeZone="Europe/Berlin" {...props} />);
+  render(<AgentSection initial={initial} source="BOARDSEARCH" scoring={{ scorer: "AI", ready: true }} countries={countries} timeZone="Europe/Berlin" {...props} />);
 
 beforeEach(() => vi.clearAllMocks());
 
@@ -99,7 +99,7 @@ describe("Settings → Job agent", () => {
 
   it("says it doesn't search the Bundesagentur für Arbeit", () => {
     open({ source: "ARBEITSAGENTUR" });
-    expect(screen.getByRole("note")).toHaveTextContent("The agent doesn't search the Bundesagentur für Arbeit. Choose JSearch, Adzuna or FreeHire in Settings → Job search for it.");
+    expect(screen.getByRole("note")).toHaveTextContent("The agent doesn't search the Bundesagentur für Arbeit. Choose Boardsearch, Adzuna or FreeHire in Settings → Job search for it.");
     expect(screen.getByRole("link", { name: "Settings → Job search" })).toHaveAttribute("href", "/settings?section=jobs");
   });
 
