@@ -173,6 +173,38 @@ describe("matchRequirements", () => {
     expect(data.items[0]).toMatchObject({ result: "gap", note: "3 roles in your profile, since Sep 2015 (about 11 years)" });
     expect(experienceMonths(profile, today)).toBe(133);
   });
+
+  it("counts a Bachelor of Technology in Computer Science and Engineering as the bachelor's degree asked for", async () => {
+    const withDegree = {
+      ...profile,
+      education: [
+        {
+          ...profile.education[0],
+          degree: "Bachelor of Technology in Computer Science and Engineering",
+          school: "Budge Budge Institute of Technology",
+          notes: "CGPA: 8.40/10.00",
+        },
+      ],
+    };
+    const requirement = {
+      text: "Bachelor’s degree in Computer Science, Information Technology, Engineering, or an equivalent technical discipline",
+      kind: "other" as const,
+      skill: null,
+      years: null,
+      language: null,
+    };
+    const provider = model({ matches: [{ requirement: 0, skill: null, language: null }] });
+    const { data } = await matchRequirements(provider, { requirements: [requirement], profile: withDegree, today }, options);
+    expect(data.items[0]).toMatchObject({
+      result: "covered",
+      skill: null,
+      note: "Bachelor of Technology in Computer Science and Engineering",
+    });
+
+    const history = { ...withDegree, education: [{ ...withDegree.education[0], degree: "Bachelor of Arts in History", notes: "" }] };
+    const missed = await matchRequirements(provider, { requirements: [requirement], profile: history, today }, options);
+    expect(missed.data.items[0]).toMatchObject({ result: "gap", note: "None of your degrees covers this" });
+  });
 });
 
 describe("tailorResume", () => {
