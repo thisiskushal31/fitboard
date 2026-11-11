@@ -153,7 +153,7 @@ describe("job board config", () => {
     listed({ name: "IKEA", url: "https://jobs.ikea.com/en" });
     listed({ name: "JD.com", url: "https://zhaopin.jd.com/" });
     listed({ name: "Jumia", url: "https://group.jumia.com/careers" });
-    listed({ name: "Kroger", url: "https://www.krogerfamilycareers.com/en/sites/CX_2001/jobs" });
+    listed({ name: "Kroger", url: "https://kroger.eightfold.ai/careers" });
     listed({ name: "Lowe's", url: "https://talent.lowes.com/us/en/search-results" });
     listed({ name: "Mercado Libre", url: "https://mercadolibre.eightfold.ai/careers" });
     listed({ name: "Poshmark", url: "https://job-boards.greenhouse.io/poshmark" });
@@ -329,11 +329,11 @@ describe("job board config", () => {
     listed({ name: "JACKS Technologies", url: "https://www.jackstechnologies.com/" });
     listed({ name: "JMR Infotech", url: "https://jmrinfotech.com/current-openings/" });
     listed({ name: "JSM Technologies", url: "https://www.jsmtechnologies.com/" });
-    listed({ name: "Kairos Technologies", url: "https://kairostech.com/careers" });
+    listed({ name: "Kairos Technologies", url: "https://kairostech.com/current-openings/" });
     listed({ name: "Klaus IT Solutions", url: "https://klausit.com/careers" });
     listed({ name: "KLoc Technologies", url: "https://kloctechnologies.com/careers" });
     listed({ name: "Knowx Innovations", url: "https://knowxindia.com" });
-    listed({ name: "KPI Partners", url: "https://www.kpipartners.com/careers" });
+    listed({ name: "KPI Partners", url: "https://kpipartners.openings.co/kpipartners/" });
     listed({ name: "KRN DIGI-TECH", url: "https://krndigitech.com" });
     listed({ name: "Kuzix Technologies", url: "https://www.kuzixtech.com" });
     listed({ name: "Kyndryl", url: "https://www.kyndryl.com/us/en/careers" });
@@ -565,7 +565,7 @@ describe("job board config", () => {
     listed({ name: "Shahid", url: "https://www.mbc.net/careers" });
     listed({ name: "Shemaroo", url: "https://www.shemarooent.com/careers" });
     listed({ name: "SonyLIV", url: "https://www.sonyliv.com/" });
-    listed({ name: "STAGE", url: "https://www.stage.in/" });
+    listed({ name: "STAGE", url: "https://stage.zohorecruit.in/jobs/Careers" });
     listed({ name: "Stan", url: "https://www.stan.com.au/" });
     listed({ name: "STARZPLAY", url: "https://www.starzplay.com/careers" });
     listed({ name: "Sun NXT", url: "https://www.sunnetwork.in/" });
@@ -700,7 +700,7 @@ describe("job board config", () => {
     listed({ name: "Key Information Technology", url: "https://kit.ae" });
     listed({ name: "King's College Hospital Dubai", url: "https://kingscollegehospitaldubai.com" });
     listed({ name: "KPTAC Technologies", url: "https://www.kptac.com/careers" });
-    listed({ name: "LALS GROUP OF COMPANIES", url: "https://www.lalsgroup.com/careers" });
+    listed({ name: "LALS GROUP OF COMPANIES", url: "https://www.lalsgroup.com/career/job-openings/" });
     listed({ name: "Lean Technologies", url: "https://leantech.me/careers" });
     listed({ name: "Levant Capital", url: "https://www.levantcapital.com" });
     listed({ name: "Life Pharmacy", url: "https://www.lifepharmacy.com" });
@@ -903,7 +903,7 @@ describe("job board config", () => {
     listed({"name":"JPMorgan","url":"https://www.jpmorganchase.com/careers"});
     listed({"name":"Kavak","url":"https://www.kavak.com/"});
     listed({"name":"Kinaxis","url":"https://www.kinaxis.com/en"});
-    listed({"name":"Kingspan","url":"https://www.kingspan.com/group/careers"});
+    listed({"name":"Kingspan","url":"https://kingspangraduate.groupgti.com/VacancyPosting/Search#!/"});
     listed({"name":"Kinney Engineering","url":"https://www.kinneyeng.com/"});
     listed({"name":"KONE","url":"https://www.kone.com/global/en/careers.html"});
     listed({"name":"LEGO","url":"https://www.lego.com/en-us/careers"});
@@ -992,7 +992,7 @@ describe("job board config", () => {
     listed({"name":"Iberdrola","url":"https://www.iberdrola.com/talent"});
     listed({"name":"Itaú","url":"https://www.itau.com.br/carreiras"});
     listed({"name":"KMS Technology","url":"https://kms-technology.com/careers"});
-    listed({"name":"Lightspeed","url":"https://www.lightspeedhq.com/careers/"});
+    listed({"name":"Lightspeed","url":"https://www.lightspeedhq.com/careers/openings/"});
     listed({"name":"Manulife","url":"https://careers.manulife.com/"});
     listed({"name":"Merck","url":"https://www.merckgroup.com/en/careers.html"});
     listed({"name":"Ozon","url":"https://job.ozon.ru/"});
@@ -1137,7 +1137,7 @@ describe("job board config", () => {
     listed({"name":"Exelon","url":"https://jobs.exeloncorp.com/careers-home/"});
     listed({"name":"Parker Hannifin","url":"https://www.parker.com/us/en/careers.html"});
     listed({"name":"Tyson","url":"https://www.tysonfoods.com/careers"});
-    listed({"name":"Kimberly-Clark","url":"https://www.kimberly-clark.com/en-us/careers"});
+    listed({"name":"Kimberly-Clark","url":"https://careers.kimberly-clark.com/en/job-search?first=0&numberOfResults=10&sort=jobposteddate"});
     listed({"name":"Southern Company","url":"https://www.southerncompany.com/"});
     listed({"name":"Air Products","url":"https://www.airproducts.com/careers"});
     listed({"name":"Phillips 66","url":"https://www.phillips66.com/careers/"});
@@ -1276,7 +1276,8 @@ describe("job board config", () => {
     listed({"name":"Builder.io","url":"https://job-boards.greenhouse.io/builder"});
     listed({"name":"Bubble","url":"https://bubble.io/careers"});
     listed({"name":"Sketch","url":"https://www.sketch.com/careers/"});
-    listed({"name":"LottieFiles","url":"https://lottiefiles.com/careers/"});
+    listed({"name":"LottieFiles","url":"https://lottiefiles.bamboohr.com/careers"});
+    listed({"name":"BambooHR","url":"https://www.bamboohr.com/careers/#open-positons"});
     listed({"name":"Spline","url":"https://spline.design/"});
     listed({"name":"Runway","url":"https://runway.com/careers"});
     listed({"name":"Webflow","url":"https://webflow.com/company/careers"});
@@ -1379,7 +1380,7 @@ describe("job board config", () => {
     listed({"name":"LogicMonitor","url":"https://www.logicmonitor.com/careers"});
     listed({"name":"FireHydrant","url":"https://firehydrant.com/careers/"});
     listed({"name":"SolarWinds","url":"https://www.solarwinds.com/"});
-    listed({"name":"Kentik","url":"https://www.kentik.com/careers/"});
+    listed({"name":"Infoblox","url":"https://efpv.fa.us6.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1"});
     listed({"name":"Boomi","url":"https://boomi.com/company/careers/"});
     listed({"name":"Mezmo","url":"https://www.mezmo.com/"});
     listed({"name":"Catchpoint","url":"https://www.catchpoint.com/"});
@@ -1484,7 +1485,7 @@ describe("job board config", () => {
     listed({"name": "Ipsen", "url": "https://www.ipsen.com/careers/"});
     listed({"name": "Kaiser Permanente", "url": "https://www.kaiserpermanentejobs.org/"});
     listed({"name": "Kasada", "url": "https://www.kasada.io/"});
-    listed({"name": "LifeLabs", "url": "https://www.lifelabs.com/careers/"});
+    listed({"name": "LifeLabs", "url": "https://jobs.dayforcehcm.com/lifelabs/CANDIDATEPORTAL"});
     listed({"name": "Lupin", "url": "https://www.lupin.com/"});
     listed({"name": "Manipal Hospitals", "url": "https://www.manipalhospitals.com/"});
     listed({"name": "Mass General Brigham", "url": "https://www.massgeneralbrigham.org/en/about/careers"});
@@ -1601,7 +1602,7 @@ describe("job board config", () => {
     listed({"name":"BlackSky","url":"https://blacksky.com/company/careers/"});
     listed({"name":"Planet","url":"https://www.planet.com/company/careers/"});
     listed({"name":"DroneDeploy","url":"https://www.dronedeploy.com/about/careers"});
-    listed({"name":"Kayak","url":"https://www.kayak.com/careers"});
+    listed({"name":"Kayak","url":"https://www.kayak.com/careers/all"});
     listed({"name":"Pix4D","url":"https://www.pix4d.com/careers"});
     listed({"name":"Capella Space","url":"https://www.capellaspace.com/careers"});
     listed({"name":"Procore","url":"https://careers.procore.com/"});
@@ -1713,7 +1714,8 @@ describe("job board config", () => {
     listed({"name":"Informa","url":"https://www.informa.com/"});
     listed({"name":"INTAGE","url":"https://www.intage.co.jp/recruit/"});
     listed({"name":"Jupiter Intelligence","url":"https://www.jupiterintel.com/careers"});
-    listed({"name":"Kayrros","url":"https://www.kayrros.com/careers/"});
+    listed({"name":"Kayrros","url":"https://kayrros1.recruitee.com/"});
+    listed({"name":"Tellent","url":"https://careers.tellent.com/open-positions"});
     listed({"name":"Kpler","url":"https://www.kpler.com/company/careers"});
     listed({"name":"LexisNexis","url":"https://www.lexisnexis.com/global/careers.page"});
     listed({"name":"LiveEO","url":"https://www.live-eo.com/"});
@@ -1924,7 +1926,8 @@ describe("job board config", () => {
     listed({"name":"Kepler Communications","url":"https://kepler.space/careers/"});
     listed({"name":"Korea Aerospace Industries","url":"https://www.koreaaero.com/"});
     listed({"name":"Korea Aerospace Research Institute","url":"https://www.kari.re.kr/"});
-    listed({"name":"Kratos","url":"https://www.kratosdefense.com/careers"});
+    listed({"name":"Kratos Analytics","url":"https://kratos.careers.adp.com/"});
+    listed({"name":"Kratos Defense","url":"https://www.kratosdefense.com/careers/open-roles"});
     listed({"name":"Kuva Space","url":"https://kuvaspace.com/en/careers"});
     listed({"name":"LandSpace","url":"https://www.landspace.com/"});
     listed({"name":"Latitude","url":"https://www.latitude.eu/careers/"});

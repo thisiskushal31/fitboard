@@ -26,6 +26,7 @@ import { SOURCE_INFO } from "@/lib/job-search/sources";
 
 import { acceptArbeitsagenturNote, runJobSearch } from "./actions";
 import { PastSearches } from "./past-searches";
+import { PayCompareSection } from "./pay-compare-section";
 import { PostingResults } from "./posting-results";
 import { RemoteOnlyField, SearchFields, uncoveredCountry } from "./search-fields";
 
@@ -149,16 +150,25 @@ export function JobsScreen({
         {failed ? (
           <SearchProblem problem={failed.problem.problem} message={failed.problem.message} onRetry={() => run(failed.query)} />
         ) : search ? (
-          <PostingResults
-            key={search.id}
-            mode="search"
-            search={search}
-            today={today}
-            scoreInClaude={scoreInClaude}
-            profileSkills={profileSkills}
-            onSearchAgain={() => run(search.query)}
-            searching={pending}
-          />
+          <>
+            <PayCompareSection
+              postings={search.postings.filter((posting) => !posting.state.dismissed)}
+              keywords={search.query.keywords}
+              place={search.query.place}
+              country={search.query.country}
+            />
+            <PostingResults
+              key={search.id}
+              mode="search"
+              search={search}
+              today={today}
+              scoreInClaude={scoreInClaude}
+              profileSkills={profileSkills}
+              country={search.query.country}
+              onSearchAgain={() => run(search.query)}
+              searching={pending}
+            />
+          </>
         ) : (
           <p className="px-10 pb-16 text-sm text-muted">
             {missingSearch

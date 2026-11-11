@@ -19,8 +19,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   // Light or dark as chosen in the sidebar; without a choice, the system's.
   const scheme = parseColorScheme((await cookies()).get(COLOR_SCHEME_COOKIE)?.value);
   return (
-    <html lang="en" data-theme={scheme} className={`${fontVariables} h-full antialiased`}>
-      <body className="min-h-full">
+    // suppressHydrationWarning: theme cookie + browser extensions (e.g. Grammarly)
+    // may alter <html>/<body> attrs before the client hydrates.
+    <html lang="en" data-theme={scheme} className={`${fontVariables} h-full antialiased`} suppressHydrationWarning>
+      <body className="min-h-full" suppressHydrationWarning>
         {children}
         <Toaster />
       </body>

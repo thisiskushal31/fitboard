@@ -902,6 +902,67 @@ model LoginThrottle {
   @@index([updatedAt])
 }
 
+// ─── Company layoff history (multi-source) ────────────────────────────
+
+// Imported layoff events for posting risk context. Feed URLs live in
+// config/layoff-sources.json. Matched by normalized company name only (no
+// company alias table); role-specific detail is rare and optional.
+model CompanyLayoff {
+  id                 String    @id @default(cuid())
+  company            String
+  normalizedCompany  String
+  laidOff            Int?
+  percentage         Float?
+  date               DateTime?
+  location           String    @default("")
+  country            String    @default("")
+  industry           String    @default("")
+  sourceUrl          String    @default("https://layoffs.fyi")
+  rawNote            String    @default("")
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([normalizedCompany, date])
+  @@index([company])
+  @@index([date])
+}
+
+// ─── Catalog career crawl diagnostics ─────────────────────────────────
+
+// Latest outcome of opening one job-boards.json careers URL (search bar /
+// portal API). Upserted per URL so Settings can show what each page returned
+// or why it failed; the user can dismiss or delete rows when fixed.
+model BoardCrawlResult {
+  id         String    @id @default(cuid())
+  // The exact catalog URL that was opened.
+  url        String    @unique
+  // Company name from job-boards.json at crawl time.
+  company    String    @default("")
+  // ok | empty | error
+  status     String
+  hitCount   Int       @default(0)
+  // Up to a few sample titles from that crawl (JSON string[]).
+  samples    Json?
+  // Why it failed or returned nothing, written for the user.
+  detail     String    @default("")
+  // The search that was typed into that portal.
+  keywords   String    @default("")
+  place      String    @default("")
+  country    String    @default("")
+  // How it was fetched: browser | api
+  method     String    @default("browser")
+  durationMs Int       @default(0)
+  crawledAt  DateTime  @default(now())
+  // Set when the user marks the problem as handled in Settings.
+  resolvedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([status, crawledAt])
+  @@index([resolvedAt])
+  @@index([crawledAt])
+}
+
 // ─── Background jobs ──────────────────────────────────────────────────
 
 // A job goes queued → running → done, or failed.

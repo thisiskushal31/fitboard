@@ -83,7 +83,7 @@ export const SOURCE_INFO: Record<JobSource, SourceInfo> = {
   },
   PUBLIC_BOARDS: {
     name: "Public boards",
-    description: "Login-free crawl of Greenhouse, Lever, Ashby, Recruitee, SmartRecruiters, Remotive, RemoteOK, Arbeitnow, We Work Remotely, Berlin Startup Jobs, MyCareersFuture, Hacker News and Codeforces. The crawl covers Remote, APAC, JAPAC, EMEA, MEA, Nordics, and the Americas. Other career sites stay as links on Career path.",
+    description: "Login-free crawl of Greenhouse, Lever, Ashby, Recruitee, SmartRecruiters, Workday, Remotive, RemoteOK, Arbeitnow, We Work Remotely, Berlin Startup Jobs, MyCareersFuture, Hacker News and Codeforces, plus opening the other company career pages from the catalog and searching them with your keywords. The crawl covers Remote, APAC, JAPAC, EMEA, MEA, Nordics, and the Americas.",
     tag: "Most countries · free, no key · company list included",
     keyUrl: null,
     quotaPeriod: null,

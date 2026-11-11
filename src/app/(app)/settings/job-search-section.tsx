@@ -177,7 +177,7 @@ export function JobSearchSection({ initial }: { initial: JobSearchSettingsView }
             )}
             {source === "PUBLIC_BOARDS" && (
               <p className="text-sm text-muted">
-                No key needed. The first search walks Greenhouse, Lever, Ashby, Recruitee and SmartRecruiters, plus the remote feeds, and can take a few minutes. Later searches in the same half hour use that crawl. The job agent uses this source when it is selected, and it follows the zone on the agent search: Remote, APAC, JAPAC, EMEA, MEA, Nordics, or the Americas. Employers with no public JSON API stay as links on Career path.
+                No key needed. The first search walks Greenhouse, Lever, Ashby, Recruitee, SmartRecruiters and Workday from the company list, plus the remote feeds, and opens the other catalog career pages in a browser to type your keywords. That first pass can take a while; later searches in the same half hour reuse the crawl. The job agent uses this source when it is selected, walks past the first page when those rows were already seen, and follows the zone on the agent search: Remote, APAC, JAPAC, EMEA, MEA, Nordics, or the Americas.
               </p>
             )}
             {source === "FREEHIRE" && (

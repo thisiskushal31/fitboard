@@ -1,0 +1,69 @@
+{
+  "sources": [
+    {
+      "id": "adzuna",
+      "label": "Adzuna",
+      "kind": "adzuna",
+      "enabled": true,
+      "attributionUrl": "https://www.adzuna.com/",
+      "baseUrl": "https://api.adzuna.com/v1/api/jobs",
+      "countries": [
+        "at", "au", "be", "br", "ca", "ch", "de", "es", "fr", "gb",
+        "in", "it", "mx", "nl", "nz", "pl", "sg", "us", "za"
+      ],
+      "currencies": {
+        "at": "EUR",
+        "au": "AUD",
+        "be": "EUR",
+        "br": "BRL",
+        "ca": "CAD",
+        "ch": "CHF",
+        "de": "EUR",
+        "es": "EUR",
+        "fr": "EUR",
+        "gb": "GBP",
+        "in": "INR",
+        "it": "EUR",
+        "mx": "MXN",
+        "nl": "EUR",
+        "nz": "NZD",
+        "pl": "PLN",
+        "sg": "SGD",
+        "us": "USD",
+        "za": "ZAR"
+      }
+    },
+    {
+      "id": "ambitionbox",
+      "label": "AmbitionBox",
+      "kind": "ambitionbox",
+      "enabled": true,
+      "attributionUrl": "https://www.ambitionbox.com/",
+      "profileUrlTemplate": "https://www.ambitionbox.com/profile/{slug}-salary",
+      "countries": ["in"],
+      "currency": "INR"
+    },
+    {
+      "id": "paycrunch",
+      "label": "PayCrunch (BLS OEWS)",
+      "kind": "paycrunch",
+      "enabled": true,
+      "attributionUrl": "https://paycrunch.co/api.html",
+      "jobsIndexUrl": "https://paycrunch.co/api/v1/jobs.json",
+      "jobUrlTemplate": "https://paycrunch.co/api/v1/jobs/{slug}.json",
+      "countries": ["us"],
+      "currency": "USD"
+    },
+    {
+      "id": "glassdoor",
+      "label": "Glassdoor",
+      "kind": "glassdoor",
+      "enabled": true,
+      "attributionUrl": "https://www.glassdoor.com/",
+      "pageUrlTemplate": "https://www.glassdoor.com/Salaries/{slug}-salary-SRCH_KO0,{length}.htm",
+      "apiUrlTemplate": "https://api.api.sh/glassdoor/v1/salaries?job_title={title}&location={place}",
+      "apiKeyEnv": "FITBOARD_GLASSDOOR_API_KEY",
+      "currency": "USD"
+    }
+  ]
+}

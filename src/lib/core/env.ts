@@ -123,6 +123,14 @@ const schema = z.object({
   ),
   FITBOARD_ADZUNA_APP_ID: optional(z.string()),
   FITBOARD_ADZUNA_KEY: optional(z.string()),
+  // Optional key for a Glassdoor salary JSON proxy (see apiKeyEnv on the
+  // glassdoor entry in config/salary-sources.json). Unset = HTML/Playwright only.
+  FITBOARD_GLASSDOOR_API_KEY: optional(z.string()),
+  // Optional extra layoff CSV URL merged on refresh. Primary sources live in
+  // config/layoff-sources.json (edit that file to add/change/disable feeds).
+  FITBOARD_LAYOFFS_URL: optional(
+    z.url({ protocol: /^https?$/, error: "FITBOARD_LAYOFFS_URL must be an http:// or https:// URL." }),
+  ),
   // FreeHire origin; unset uses https://freehire.me. Point at a self-hosted
   // FreeHire, or leave unset for the public catalogue.
   FITBOARD_FREEHIRE_URL: optional(

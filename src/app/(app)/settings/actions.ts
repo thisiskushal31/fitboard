@@ -15,6 +15,12 @@ import { deleteAllBackups } from "@/lib/upkeep/backups";
 import { env } from "@/lib/core/env";
 import { JobSearchError, testSource } from "@/lib/job-search";
 import { credentialsFor, jobSearchView, loadJobSearchConfig, requestContext } from "@/lib/job-search/config";
+import {
+  clearAllBoardCrawls,
+  clearResolvedBoardCrawls,
+  deleteBoardCrawlResult as removeBoardCrawlResult,
+  markBoardCrawlResolved as resolveBoardCrawl,
+} from "@/lib/job-search/crawl-results";
 import { JOB_SOURCES, BOARDSEARCH_HOSTS } from "@/lib/job-search/search";
 import { cancelJob, startJob } from "@/lib/jobs/runner";
 import { checkForUpdate } from "@/lib/upkeep/update-check";
@@ -294,6 +300,8 @@ export const deleteEverything = action(z.object({ confirm: z.literal("DELETE") }
     // What the job agent found.
     await tx.agentCandidate.deleteMany();
     await tx.postingScore.deleteMany();
+    // Catalog careers crawl diagnostics (Settings → Board crawl).
+    await tx.boardCrawlResult.deleteMany();
     // Startups, and the fingerprints of ones removed for good.
     await tx.startup.deleteMany();
     await tx.startupBlock.deleteMany();
@@ -367,4 +375,32 @@ export const removeConnectorRedirect = action(z.object({ uri: z.string().max(200
   const redirects = (await loadSettings()).connectorRedirects.filter((entry) => entry !== uri);
   await saveSettings({ connectorRedirects: redirects });
   return { redirects };
+});
+
+/** Settings → Board crawl: mark a catalog page problem as handled. */
+export const markBoardCrawlResolved = action(z.object({ id: z.string().min(1).max(64) }), async ({ id }) => {
+  await resolveBoardCrawl(id);
+  revalidatePath("/settings");
+  return null;
+});
+
+/** Settings → Board crawl: delete one stored crawl row. */
+export const deleteBoardCrawlResult = action(z.object({ id: z.string().min(1).max(64) }), async ({ id }) => {
+  await removeBoardCrawlResult(id);
+  revalidatePath("/settings");
+  return null;
+});
+
+/** Settings → Board crawl: drop rows the user already marked resolved. */
+export const clearResolvedBoardCrawlResults = action(z.object({}), async () => {
+  const count = await clearResolvedBoardCrawls();
+  revalidatePath("/settings");
+  return { count };
+});
+
+/** Settings → Board crawl: drop every stored crawl diagnostic. */
+export const clearAllBoardCrawlResults = action(z.object({}), async () => {
+  const count = await clearAllBoardCrawls();
+  revalidatePath("/settings");
+  return { count };
 });

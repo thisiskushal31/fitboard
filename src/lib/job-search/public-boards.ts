@@ -31,7 +31,7 @@ function toFound(posting: CrawledPosting): FoundPosting {
 async function searchPage(query: SearchQuery, _credentials: Record<string, never>, next: string | null, context?: { signal?: AbortSignal }) {
   let crawled;
   try {
-    crawled = await crawlPublicBoards(query.keywords, context?.signal);
+    crawled = await crawlPublicBoards({ keywords: query.keywords, place: query.place, country: query.country }, context?.signal);
   } catch (error) {
     throw jobSearchError("unavailable", "PUBLIC_BOARDS", { detail: error instanceof Error ? error.message : "crawl failed" });
   }

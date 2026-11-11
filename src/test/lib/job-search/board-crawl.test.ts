@@ -5,6 +5,10 @@ import { json, stubFetch } from "@/lib/ai/test-http";
 import { filterPublicBoards, officialCareers, type CrawledPosting } from "@/lib/job-search/board-crawl";
 import { EMPTY_QUERY } from "@/lib/job-search/search";
 
+vi.mock("@/lib/job-search/career-page-search", () => ({
+  searchOfficialCareers: async () => [],
+}));
+
 function posting(partial: Pick<CrawledPosting, "title" | "place"> & Partial<CrawledPosting>): CrawledPosting {
   return {
     externalId: partial.title,
@@ -57,6 +61,30 @@ describe("public board location filter", () => {
     const found = filterPublicBoards([remoteElsewhere, london, bangalore, split, indiaWide, mumbai, bombay], query).map((item) => item.place);
 
     expect(found).toEqual(["Mumbai, India", "Bombay", "Remote - India"]);
+  });
+
+  it("ranks owned career portals ahead of Greenhouse when both match the country", () => {
+    const greenhouse = posting({
+      title: "DevOps Engineer",
+      company: "Okta",
+      place: "Bengaluru, India",
+      via: "Greenhouse · Okta",
+    });
+    const accenture = posting({
+      title: "DevOps Engineer",
+      company: "Accenture",
+      place: "India",
+      via: "Careers · Accenture",
+    });
+    const ericsson = posting({
+      title: "DevOps Engineer",
+      company: "Ericsson",
+      place: "India",
+      via: "Careers · Ericsson",
+    });
+    const found = filterPublicBoards([greenhouse, accenture, ericsson], { ...query, place: "" }).map((item) => item.via);
+    expect(found.slice(0, 2)).toEqual(["Careers · Accenture", "Careers · Ericsson"]);
+    expect(found.at(-1)).toBe("Greenhouse · Okta");
   });
 
   it("treats a zone as a part of the world, and Remote as every remote role", () => {
@@ -149,6 +177,25 @@ function boardResponse(url: URL, seen: Map<string, number>): Response {
       ],
     });
   }
+  if (host.endsWith(".myworkdayjobs.com") && url.pathname.includes("/wday/cxs/")) {
+    if (nth > 1) return json({ total: 0, jobPostings: [] });
+    const site = decodeURIComponent(url.pathname.split("/").filter(Boolean).at(-2) ?? "Careers");
+    return json({
+      total: 1,
+      jobPostings: [
+        {
+          title: "DevOps Engineer",
+          externalPath: "/job/Mumbai/DevOps-Engineer_SR-1",
+          locationsText: "Mumbai, India",
+          postedOn: "Posted 2 Days Ago",
+          remoteType: "Remote",
+          bulletFields: ["SR-1"],
+        },
+        { title: "Accountant", externalPath: "/job/Mumbai/Accountant_SR-2", locationsText: "Mumbai, India", postedOn: "Posted Today", bulletFields: ["SR-2"] },
+      ],
+      site,
+    });
+  }
   if (host === "remotive.com") {
     return json({ jobs: [{ id: 9, title: "DevOps Engineer", company_name: "Remote Co", url: "https://remotive.com/job/9", candidate_required_location: "Worldwide", description: devops.description, publication_date: "2026-09-01", salary: "100k" }] });
   }
@@ -199,12 +246,14 @@ describe("crawling the public boards", () => {
     const { crawlPublicBoards, testPublicBoards } = await import("@/lib/job-search/board-crawl");
 
     const postings = await crawlPublicBoards("devops");
-    const again = await crawlPublicBoards("something else");
+    const again = await crawlPublicBoards("devops");
+    const other = await crawlPublicBoards("backend engineer");
     const vias = new Set(postings.map((item) => item.via.split(" · ")[0]));
 
     expect(again).toBe(postings);
+    expect(other).not.toBe(postings);
     expect(requests.length).toBeGreaterThan(10);
-    expect([...vias]).toEqual(expect.arrayContaining(["Greenhouse", "Lever", "Ashby", "Recruitee", "SmartRecruiters", "Remotive", "RemoteOK", "Arbeitnow", "HN Who is Hiring", "Codeforces", "MyCareersFuture (SG)", "We Work Remotely", "Berlin Startup Jobs"]));
+    expect([...vias]).toEqual(expect.arrayContaining(["Greenhouse", "Lever", "Ashby", "Recruitee", "SmartRecruiters", "Workday", "Remotive", "RemoteOK", "Arbeitnow", "HN Who is Hiring", "Codeforces", "MyCareersFuture (SG)", "We Work Remotely", "Berlin Startup Jobs"]));
     await expect(testPublicBoards()).resolves.toBeUndefined();
   });
 

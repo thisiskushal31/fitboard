@@ -7,6 +7,9 @@ import { isAiUsable } from "@/lib/ai/config";
 import { handOffFoundPosting, handsOffToClaude } from "@/lib/connector/handoff";
 import { loadJobSearchConfig } from "@/lib/job-search/config";
 import { fullText } from "@/lib/job-search/find";
+import { countLayoffRows, syncLayoffsFromUrl } from "@/lib/job-search/layoffs";
+import { loadPostingIntel as postingIntel } from "@/lib/job-search/posting-intel";
+import { marketSalaryForRole } from "@/lib/job-search/salary-market";
 import { foundPostingSchema, JOB_SOURCES, searchQuerySchema } from "@/lib/job-search/search";
 import { findUnfinishedJobs, startJob } from "@/lib/jobs/runner";
 import { scoreJobKey, scorePostingJob } from "@/lib/jobs/score-posting";
@@ -93,3 +96,52 @@ export const startScoringPosting = action(z.object({ posting: foundPostingSchema
   const [unfinished] = await findUnfinishedJobs(key);
   return { jobId: unfinished?.id ?? (await startJob(scorePostingJob, { posting }, { key })) };
 });
+
+/** Offer salary, Adzuna market band, and company layoffs for a posting. */
+export const loadPostingIntel = action(
+  z.object({
+    company: z.string().max(300),
+    title: z.string().max(500),
+    place: z.string().max(300).optional(),
+    country: z.string().max(32).optional(),
+    salary: z.string().max(200).optional(),
+    description: z.string().max(4_000).optional(),
+  }),
+  ({ company, title, place, country, salary, description }) =>
+    postingIntel({ company, title, place, country, salary, description }),
+);
+
+/** Market median for the search keywords (Pay compare reference line). */
+export const loadMarketSalary = action(
+  z.object({
+    title: z.string().min(1).max(500),
+    place: z.string().max(300).optional(),
+    country: z.string().min(2).max(8),
+  }),
+  async ({ title, place, country }) => {
+    const market = await marketSalaryForRole({ title, place, country });
+    return market
+      ? {
+          median: market.median,
+          currency: market.currency,
+          label: market.label,
+          source: market.source,
+          sourceLabel: market.sourceLabel,
+          attributionUrl: market.attributionUrl,
+        }
+      : { median: null, currency: null, label: null, source: null, sourceLabel: null, attributionUrl: null };
+  },
+);
+
+/** Pull layoff events from Layoffs.fyi + WARN + Layoff Map (skip sources that fail). */
+export const syncLayoffData = action(z.object({}), async () => {
+  try {
+    const result = await syncLayoffsFromUrl();
+    return result;
+  } catch (error) {
+    throw new ActionError(error instanceof Error ? error.message : "Could not refresh layoff data.");
+  }
+});
+
+/** How many layoff rows are stored (for empty-state hints). */
+export const layoffDataCount = action(z.object({}), async () => ({ count: await countLayoffRows() }));

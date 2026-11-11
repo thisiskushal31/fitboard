@@ -16,6 +16,8 @@ import { postedAgo, postingKey, type FoundPosting, type PostingState, type Shown
 import { arbeitsagenturPage, SOURCE_INFO } from "@/lib/job-search/sources";
 import { assessGap, type GapRead } from "@/lib/scoring/gaps";
 
+import { PostingIntelPanel } from "@/components/posting-intel";
+
 import { dismissFoundPosting, loadFullText, restorePosting, savePostingForLater, showMorePostings, startScoringPosting, unsavePosting } from "./actions";
 import { useStartApplication } from "./use-start-application";
 
@@ -28,6 +30,8 @@ export type PostingResultsProps = {
   profileSkills?: readonly string[];
   /** Score opens a Claude chat, which scores through the connector: it's on, and Fitboard has no AI model of its own. */
   scoreInClaude?: boolean;
+  /** Search country code, for Adzuna market lookup on the selected posting. */
+  country?: string;
 } & (
   | {
       mode: "search";
@@ -50,6 +54,7 @@ const plural = (count: number, one: string, many: string) => `${count} ${count =
  */
 export function PostingResults(props: PostingResultsProps) {
   const { mode, profileSkills = [] } = props;
+  const country = props.country ?? (mode === "search" ? props.search.query.country : "");
   const [postings, setPostings] = useState(mode === "search" ? props.search.postings : props.postings);
   const [next, setNext] = useState(mode === "search" ? props.search.next : null);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -233,6 +238,7 @@ export function PostingResults(props: PostingResultsProps) {
           key={postingKey(selected)}
           ref={detail}
           posting={selected}
+          country={country}
           now={now}
           onSave={() => void save(selected)}
           onUnsave={() => void unsave(selected)}
@@ -452,6 +458,7 @@ type Text = { status: "ready"; text: string } | { status: "loading" } | { status
 function PostingDetail({
   ref,
   posting,
+  country,
   now,
   onSave,
   onUnsave,
@@ -464,6 +471,7 @@ function PostingDetail({
 }: {
   ref: Ref<HTMLElement>;
   posting: ShownPosting;
+  country: string;
   now: Date;
   onSave: () => void;
   onUnsave: () => void;
@@ -557,6 +565,17 @@ function PostingDetail({
           </Button>
         )}
       </div>
+
+      <PostingIntelPanel
+        posting={{
+          company: posting.company,
+          title: posting.title,
+          place: posting.place,
+          country,
+          salary: posting.salary,
+          description: text.status === "loading" ? posting.description : text.text,
+        }}
+      />
 
       <GapReadout
         read={assessGap(

@@ -14,7 +14,6 @@ import { lastKnownTimeZone } from "@/lib/settings/time-zone";
 import { stringsOf } from "./candidates";
 import { AGENT_JOB_KEY } from "./jobs";
 import { agentSetupProblem } from "./run";
-import { AGENT_MAX_RUNS_PER_DAY, runsInPastDay } from "./runs";
 import { nextAgentRun } from "./schedule";
 
 // What the Agent screen shows.
@@ -23,6 +22,12 @@ export type AgentCandidateView = {
   id: string;
   title: string;
   company: string;
+  place: string;
+  salary: string;
+  /** Short description for pay/layoff intel (not shown as body text). */
+  description: string;
+  /** Search country from the agent query, for market salary. */
+  country: string;
   /** "Rotterdam · Remote · €70k", what's known of them. */
   facts: string;
   /** "Posted 2 days ago · via LinkedIn on Boardsearch". */
@@ -113,6 +118,10 @@ export async function loadAgentView(now = new Date()): Promise<AgentView> {
     id: candidate.id,
     title: candidate.title.trim() || "Untitled posting",
     company: candidate.company.trim(),
+    place: candidate.place.trim(),
+    salary: candidate.salary.trim(),
+    description: candidate.description.slice(0, 4_000),
+    country: query.country,
     facts: [candidate.place, candidate.remote ? "Remote" : "", candidate.salary].filter(Boolean).join(" · "),
     origin: [
       candidate.postedAt ? `Posted ${posted(postedAgo(candidate.postedAt.toISOString(), now))}` : "",
@@ -142,7 +151,8 @@ export async function loadAgentView(now = new Date()): Promise<AgentView> {
     search,
     setupProblem,
     setupSection: setupProblem ? sectionOf(setupProblem) : null,
-    limitReached: runsInPastDay(settings.agentRuns, now).length >= AGENT_MAX_RUNS_PER_DAY,
+    // TEMP: caps skipped in runs.ts — restore: runsInPastDay(...).length >= AGENT_MAX_RUNS_PER_DAY
+    limitReached: false,
     lastRun: last ? { at: formatDateTime(new Date(last.at), timeZone, now), message: last.message } : null,
     nextRun: settings.agentEnabled ? formatDateTime(nextAgentRun(now, settings.agentHour, timeZone, settings.agentRuns), timeZone, now) : null,
     runJobId: runJobs[0]?.id ?? null,

@@ -4,6 +4,7 @@ export const SETTINGS_SECTIONS = [
   { id: "jobs", label: "Job search" },
   { id: "scoring", label: "Scoring" },
   { id: "agent", label: "Job agent" },
+  { id: "crawl", label: "Board crawl" },
   { id: "documents", label: "Documents" },
   { id: "google", label: "Google" },
   { id: "connector", label: "MCP connector" },

@@ -32,11 +32,19 @@ import { DocumentsSection } from "./documents-section";
 import { GoogleSection } from "./google-section";
 import { GoogleNotice } from "./google-notice";
 import { JobSearchSection } from "./job-search-section";
+import { BoardCrawlSection } from "./board-crawl-section";
 import { ScoringSection } from "./scoring-section";
 import { AboutSection, type AboutFacts, type UsagePingView } from "./about-section";
 import { ConnectorSection } from "./connector-section";
 import { settingsSectionFromParam } from "./sections";
 import { SettingsScreen } from "./settings-screen";
+import { officialCareers } from "@/lib/job-search/board-crawl";
+import {
+  countBoardCrawlProblems,
+  countBoardCrawlResults,
+  listBoardCrawlResults,
+  syncBoardCrawlWithCatalog,
+} from "@/lib/job-search/crawl-results";
 
 export const metadata: Metadata = { title: "Settings" };
 
@@ -74,6 +82,17 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
           countries={COUNTRIES}
           timeZone={await lastKnownTimeZone()}
         />
+      ) : section === "crawl" ? (
+        await (async () => {
+          await syncBoardCrawlWithCatalog(officialCareers().map((row) => row.url));
+          return (
+            <BoardCrawlSection
+              initial={await listBoardCrawlResults("all")}
+              problemCount={await countBoardCrawlProblems()}
+              storedCount={await countBoardCrawlResults()}
+            />
+          );
+        })()
       ) : section === "google" ? (
         <>
           <GoogleNotice outcome={typeof params.google === "string" ? params.google : null} />

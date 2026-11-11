@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition, type ReactNode } from "react";
+import { useRef, useState, useTransition, type ReactNode } from "react";
 
 import { PageHeader } from "@/components/page-header";
+import { PostingIntelPanel } from "@/components/posting-intel";
 import { ScoreBadge } from "@/components/score-badge";
 import { linksAttribution, SourceAttribution } from "@/components/source-attribution";
 import { toast, toastResult } from "@/components/toast";
@@ -37,9 +38,12 @@ export function AgentScreen({ view }: { view: AgentView }) {
   const [showBelow, setShowBelow] = useState(false);
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const [confirming, setConfirming] = useState<AgentCandidateView | null>(null);
+  const settledRun = useRef<string | null>(null);
 
   const run = useJob<ScanResult>(runJobId, 0, (job) => {
     if (job.status !== "DONE" && job.status !== "FAILED") return;
+    if (settledRun.current === job.id) return;
+    settledRun.current = job.id;
     setRunJobId(null);
     toast(job.status === "DONE" ? (job.result?.message ?? "The run is done.") : (job.error ?? "The run didn't finish."));
     router.refresh();
@@ -49,7 +53,10 @@ export function AgentScreen({ view }: { view: AgentView }) {
   const runNow = () =>
     startTransition(async () => {
       const result = toastResult(await runAgentNow({}));
-      if (result.ok) setRunJobId(result.data.jobId);
+      if (result.ok) {
+        settledRun.current = null;
+        setRunJobId(result.data.jobId);
+      }
     });
 
   const hide = (id: string, gone: boolean) =>
@@ -294,6 +301,17 @@ function CandidateCard({ candidate, children }: { candidate: AgentCandidateView;
         </div>
         <ScoreBadge score={candidate.score} />
       </div>
+      <PostingIntelPanel
+        lazy
+        posting={{
+          company: candidate.company,
+          title: candidate.title,
+          place: candidate.place,
+          country: candidate.country,
+          salary: candidate.salary,
+          description: candidate.description,
+        }}
+      />
       {candidate.reasons.length > 0 && (
         <ul aria-label="Why it fits" className="flex list-disc flex-col gap-1 pl-5 text-sm text-muted">
           {candidate.reasons.map((reason, index) => (
@@ -326,16 +344,15 @@ function ScoredCard({ candidate, onDismiss }: { candidate: AgentCandidateView; o
   const router = useRouter();
   const [jobId, setJobId] = useState(candidate.draftJobId);
   const [starting, startTransition] = useTransition();
+  const settledDraft = useRef<string | null>(null);
   const job = useJob<DraftResult>(jobId, 0, (update) => {
-    if (update.status === "DONE") {
-      setJobId(null);
-      toast("The draft is ready for your review.");
-      router.refresh();
-    } else if (update.status === "FAILED") {
-      setJobId(null);
-      toast(update.error ?? "The draft couldn't be prepared.");
-      router.refresh();
-    }
+    if (update.status !== "DONE" && update.status !== "FAILED") return;
+    if (settledDraft.current === update.id) return;
+    settledDraft.current = update.id;
+    setJobId(null);
+    if (update.status === "DONE") toast("The draft is ready for your review.");
+    else toast(update.error ?? "The draft couldn't be prepared.");
+    router.refresh();
   });
   const preparing = starting || Boolean(jobId);
 
@@ -344,7 +361,10 @@ function ScoredCard({ candidate, onDismiss }: { candidate: AgentCandidateView; o
       const result = toastResult(await prepareAgentDraft({ candidateId: candidate.id }));
       if (!result.ok) return;
       if (result.data.applicationId) router.refresh();
-      else setJobId(result.data.jobId);
+      else {
+        settledDraft.current = null;
+        setJobId(result.data.jobId);
+      }
     });
 
   return (

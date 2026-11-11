@@ -28,11 +28,13 @@ export function useJob<R = unknown>(
   useEffect(() => {
     if (!id) return;
     let stopped = false;
+    let settled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const update = (job: JobView<R>) => {
       if (stopped) return;
       setState({ id, job });
       listener.current?.(job);
+      if (finished(job)) settled = true;
     };
 
     const poll = async () => {
@@ -46,7 +48,7 @@ export function useJob<R = unknown>(
       } catch {
         // Offline for a moment: try again.
       }
-      if (!stopped) timer = setTimeout(poll, POLL_MS);
+      if (!stopped && !settled) timer = setTimeout(poll, POLL_MS);
     };
 
     const source = new EventSource(`/api/jobs/${id}/events`);
@@ -56,9 +58,10 @@ export function useJob<R = unknown>(
       if (finished(job)) source.close();
     };
     // Some proxies break event streams: fall back to asking now and then.
+    // Closing a finished stream also fires onerror — don't start polling then.
     source.onerror = () => {
       source.close();
-      if (!stopped) void poll();
+      if (!stopped && !settled) void poll();
     };
 
     return () => {

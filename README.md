@@ -24,7 +24,7 @@ These parts are specific to this repository.
 
 ## Public boards
 
-Greenhouse, Lever, Ashby, Recruitee, SmartRecruiters, plus Remotive, RemoteOK, Arbeitnow, We Work Remotely, Berlin Startup Jobs, MyCareersFuture, Hacker News, and Codeforces. The company list covers APAC, JAPAC, EMEA, MEA, and the Americas. Employers with no public API are links on the Career path screen.
+Greenhouse, Lever, Ashby, Recruitee, SmartRecruiters, Workday, plus Remotive, RemoteOK, Arbeitnow, We Work Remotely, Berlin Startup Jobs, MyCareersFuture, Hacker News, and Codeforces. Other companies in the catalog are opened in a browser and searched with your keywords. The company list covers APAC, JAPAC, EMEA, MEA, and the Americas.
 
 ## Other sources
 

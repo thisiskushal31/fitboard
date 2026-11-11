@@ -19,11 +19,34 @@ vi.mock("@/app/(app)/agent/actions", () => ({
   dismissAgentCandidate: vi.fn(async () => ({ ok: true, data: { undo: null } })),
   restoreAgentCandidate: vi.fn(async () => ({ ok: true, data: null })),
 }));
+vi.mock("@/app/(app)/jobs/actions", () => ({
+  loadPostingIntel: vi.fn(async () => ({
+    ok: true,
+    data: {
+      offerLabel: "EUR 70,000 a year",
+      marketLabel: "No market data",
+      comparison: null,
+      layoffs: {
+        summary: "No layoff records found for this company.",
+        events: [],
+        attribution: "Data from Layoffs.fyi, WARN Act notices, Layoff Map",
+        attributionUrl: "https://layoffs.fyi/",
+        sources: [],
+      },
+    },
+  })),
+  syncLayoffData: vi.fn(async () => ({ ok: true, data: { imported: 0, companies: 0, url: "", sources: [] } })),
+  loadMarketSalary: vi.fn(async () => ({ ok: true, data: { median: null, currency: null, label: null } })),
+}));
 
 const card = (id: string, score: number, extra: Partial<AgentCandidateView> = {}): AgentCandidateView => ({
   id,
   title: `Posting ${id}`,
   company: `Company ${id}`,
+  place: "Rotterdam",
+  salary: "EUR 70,000 a year",
+  description: "A role.",
+  country: "nl",
   facts: "Rotterdam · €70k",
   origin: "Posted 2 days ago · via LinkedIn on Boardsearch",
   source: "BOARDSEARCH",

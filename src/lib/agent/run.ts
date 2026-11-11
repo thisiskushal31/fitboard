@@ -22,8 +22,10 @@ import { agentDedupeKey, candidateData } from "./candidates";
 import { agentDraftJob, draftJobKey } from "./draft";
 import { recordRunEnd, recordRunStart, runLimitProblem } from "./runs";
 
-// One run of the job agent: one search, the postings seen before
-// dropped, and a score for the newest of the rest. It never sends anything.
+// One run of the job agent: walk the search results in order, skip
+// postings already scored or kept in Find jobs, and score the next
+// unread batch up to agentMaxScores. Later runs continue further down
+// the list. It never sends anything.
 
 export const agentScanResultSchema = z.object({
   /** Postings the source returned. */
@@ -85,15 +87,19 @@ export async function newPostings(postings: readonly FoundPosting[]): Promise<Fo
   });
 }
 
-const newestFirst = (a: FoundPosting, b: FoundPosting) => (b.postedAt ? Date.parse(b.postedAt) : 0) - (a.postedAt ? Date.parse(a.postedAt) : 0);
+/** How many result pages one run may walk while skipping already-seen rows. */
+function agentPageMax(source: string): number {
+  // Public boards page a cached crawl in memory; paid sources cost a request each.
+  return source === "PUBLIC_BOARDS" ? 100 : 25;
+}
 
 /**
- * One run: the first page of results only (one source request), then a
- * score for the newest new postings, up to agentMaxScores. Each is kept as a
- * candidate, so it doesn't come back; one below agentMinScore stays out of
- * the queue. With auto-draft on, the best of them get a draft each, up to
- * agentMaxDrafts, each its own job. A scheduled run does nothing while the
- * agent is off.
+ * One run: walk search pages in order until there are agentMaxScores unread
+ * postings (or the list ends), then score that batch in list order. Each is
+ * kept as a candidate so it is not scored again; one below agentMinScore
+ * stays out of the queue. With auto-draft on, the best of them get a draft
+ * each, up to agentMaxDrafts. A scheduled run does nothing while the agent
+ * is off.
  */
 export async function runAgentScan({ manual }: { manual: boolean }, context: JobContext, now = new Date()): Promise<AgentScanResult> {
   const settings = await loadSettings();
@@ -112,20 +118,42 @@ export async function runAgentScan({ manual }: { manual: boolean }, context: Job
   await context.step("Searching for new postings");
   const config = await loadJobSearchConfig();
   const source = config.source!;
-  let postings: FoundPosting[];
+  const postings: FoundPosting[] = [];
+  const seen = new Set<string>();
+  let next: string | null = null;
+  let searchError: string | null = null;
+  const pageMax = agentPageMax(source);
   try {
-    // The first page only: the agent never asks for a second.
-    postings = (await searchPostings(source, credentialsFor(config, source), settings.agentQuery, null, requestContext(source))).postings;
+    for (let page = 0; page < pageMax; page++) {
+      if (context.signal.aborted) break;
+      const result = await searchPostings(source, credentialsFor(config, source), settings.agentQuery, next, requestContext(source));
+      if (result.postings.length === 0) break;
+      for (const posting of result.postings) {
+        const key = postingKey(posting);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        postings.push(posting);
+      }
+      next = result.next;
+      if ((await newPostings(postings)).length >= settings.agentMaxScores) break;
+      if (!next) break;
+    }
   } catch (error) {
-    if (error instanceof JobSearchError) return finish(stopped(error.message));
-    throw error;
+    if (!(error instanceof JobSearchError)) throw error;
+    // A later page failed: still score unread rows already collected.
+    if (postings.length === 0) return finish(stopped(error.message));
+    searchError = error.message;
   }
 
   const fresh = await newPostings(postings);
   const counts = { found: postings.length, fresh: fresh.length, skipped: postings.length - fresh.length, drafted: 0 };
-  if (fresh.length === 0) return finish({ ...counts, scored: 0, message: postings.length === 0 ? "The search found no postings this time." : "No new postings this time." });
+  if (fresh.length === 0) {
+    if (searchError) return finish(stopped(searchError));
+    return finish({ ...counts, scored: 0, message: postings.length === 0 ? "The search found no postings this time." : "No new postings this time." });
+  }
 
-  const toScore = fresh.toSorted(newestFirst).slice(0, settings.agentMaxScores);
+  // Search order: already-seen rows were skipped above, so this is the next unread batch.
+  const toScore = fresh.slice(0, settings.agentMaxScores);
   await context.step(`Scoring ${toScore.length} ${toScore.length === 1 ? "posting" : "postings"}`);
   const [score, profile] = await Promise.all([loadPostingScorer(), loadProfile()]);
   let scored = 0;

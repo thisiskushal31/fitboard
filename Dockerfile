@@ -12,7 +12,7 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 # Development image: dependencies are baked in, source is bind-mounted by compose.yml.
 FROM base AS dev
-RUN chown node:node /app
+RUN mkdir -p /data && chown node:node /app /data
 USER node
 COPY --chown=node:node package.json yarn.lock .yarnrc.yml ./
 RUN yarn install --immutable && mkdir .next
@@ -21,7 +21,8 @@ RUN yarn install --immutable && mkdir .next
 # headless shell: printing needs nothing more.
 USER root
 RUN node node_modules/playwright-core/cli.js install --with-deps --only-shell chromium \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  && chown -R node:node /data
 USER node
 EXPOSE 3000
 # The seed is idempotent: built-in themes, an empty profile and default settings.

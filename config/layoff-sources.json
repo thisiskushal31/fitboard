@@ -1,0 +1,45 @@
+{
+  "sources": [
+    {
+      "id": "layoffs.fyi",
+      "label": "Layoffs.fyi",
+      "kind": "airtable",
+      "enabled": true,
+      "attributionUrl": "https://layoffs.fyi/",
+      "embedUrl": "https://airtable.com/embed/app1PaujS9zxVGUZ4/shroKsHx3SdYYOzeh/tblleV7Pnb6AcPCYL",
+      "appId": "app1PaujS9zxVGUZ4"
+    },
+    {
+      "id": "layoffs.csv",
+      "label": "Layoffs CSV mirrors",
+      "kind": "csv",
+      "enabled": true,
+      "attributionUrl": "https://layoffs.fyi/",
+      "fallbackFor": "layoffs.fyi",
+      "urls": [
+        "https://raw.githubusercontent.com/MuhammadHassan2020/Data-Cleaning-using-MySQL/main/layoffs.csv",
+        "https://raw.githubusercontent.com/cletofreire/layoff_exploratory_analysis/main/layoffs.csv",
+        "https://raw.githubusercontent.com/neerajcodes888/Recent-Layoffs-Case-Study/main/layoffs.csv"
+      ]
+    },
+    {
+      "id": "warn",
+      "label": "WARN Act notices",
+      "kind": "warn-latest",
+      "enabled": true,
+      "attributionUrl": "https://approjects-warn-act-notices.static.hf.space/api.html",
+      "urls": [
+        "https://approjects-warn-act-notices.static.hf.space/data/latest.json",
+        "https://raw.githubusercontent.com/APVentureEngine/warn-act-notices/main/data/latest.json"
+      ]
+    },
+    {
+      "id": "layoffmap",
+      "label": "Layoff Map",
+      "kind": "layoffmap-html",
+      "enabled": true,
+      "attributionUrl": "https://layoffmap.com/",
+      "url": "https://layoffmap.com/"
+    }
+  ]
+}

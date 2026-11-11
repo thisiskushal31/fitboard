@@ -37,16 +37,22 @@ vi.mock("@/lib/profile/profile-data", async () => {
 // A fake source that counts its requests, and a fake AI that scores by title.
 const fake = vi.hoisted(() => ({
   postings: [] as FoundPosting[],
+  /** Extra pages after the first; each entry is one `searchPostings` reply. */
+  pages: null as { postings: FoundPosting[]; next: string | null }[] | null,
   searches: 0,
-  source: "BOARDSEARCH" as "BOARDSEARCH" | "ADZUNA" | "ARBEITSAGENTUR" | null,
+  source: "BOARDSEARCH" as "BOARDSEARCH" | "ADZUNA" | "ARBEITSAGENTUR" | "PUBLIC_BOARDS" | null,
   ai: true,
   failOn: null as string | null,
   onScore: (() => {}) as (title: string) => void,
 }));
 vi.mock("@/lib/job-search", () => ({
-  searchPostings: vi.fn(async () => {
+  searchPostings: vi.fn(async (_source: string, _credentials: unknown, _query: unknown, next: string | null) => {
     fake.searches += 1;
-    return { postings: fake.postings, next: "page-2" };
+    if (fake.pages) {
+      const index = next ? Number(next.replace(/^page:/, "")) || 0 : 0;
+      return fake.pages[index] ?? { postings: [], next: null };
+    }
+    return { postings: fake.postings, next: null };
   }),
 }));
 vi.mock("@/lib/job-search/config", () => ({
@@ -107,7 +113,7 @@ const context = (abort?: AbortController): JobContext & { steps: string[] } => {
 
 beforeEach(async () => {
   await resetDatabase(prisma());
-  Object.assign(fake, { postings: page, searches: 0, source: "BOARDSEARCH", ai: true, failOn: null, onScore: () => {} });
+  Object.assign(fake, { postings: page, pages: null, searches: 0, source: "BOARDSEARCH", ai: true, failOn: null, onScore: () => {} });
   await saveSettings({ agentEnabled: true, agentQuery: query });
 });
 afterAll(() => prisma().$disconnect());
@@ -163,13 +169,63 @@ describe("runAgentScan", () => {
     expect((await prisma().postingScore.findFirstOrThrow({ where: { externalId: "a" } })).scoredWith).toBe("score-posting-jev@1 (jev-1.14.0)");
   });
 
-  it("scores the newest new postings first, up to the cap", async () => {
+  it("scores unread postings in search order, up to the cap", async () => {
     await saveSettings({ agentMaxScores: 2 });
     const scoredTitles: string[] = [];
     fake.onScore = (title) => scoredTitles.push(title);
+    // Older first in the list: search order wins over postedAt.
+    fake.postings = [
+      posting("old", "Product Designer", "2026-10-10T00:00:00Z"),
+      posting("new", "Senior Product Designer", "2026-10-19T00:00:00Z"),
+      posting("c", "Office Manager", "2026-10-17T00:00:00Z", { url: "" }),
+    ];
     const result = await runAgentScan({ manual: false }, context(), now);
-    expect(scoredTitles).toEqual(["Senior Product Designer", "Product Designer"]);
+    expect(scoredTitles).toEqual(["Product Designer", "Senior Product Designer"]);
     expect(result).toMatchObject({ fresh: 3, scored: 2 });
+  });
+
+  it("pages past already-seen results to score the next unread batch", async () => {
+    await saveSettings({ agentMaxScores: 2 });
+    const seenPage = Array.from({ length: 20 }, (_, index) =>
+      posting(`seen-${index}`, `Seen Role ${index}`, "2026-10-01T00:00:00Z"),
+    );
+    for (const row of seenPage) {
+      await prisma().agentCandidate.create({
+        data: {
+          source: row.source,
+          externalId: row.externalId,
+          title: row.title,
+          company: row.company,
+          place: row.place,
+          url: row.url,
+          via: row.via,
+          description: row.description,
+          complete: false,
+          score: 50,
+          reasons: [],
+          redFlags: [],
+          dedupeKey: agentDedupeKey(row),
+        },
+      });
+    }
+    const freshPage = [
+      posting("fresh-1", "Senior Product Designer", "2026-10-19T00:00:00Z"),
+      posting("fresh-2", "Product Designer", "2026-10-18T00:00:00Z"),
+      posting("fresh-3", "Brand Designer", "2026-10-17T00:00:00Z"),
+    ];
+    fake.pages = [
+      { postings: seenPage, next: "page:1" },
+      { postings: freshPage, next: null },
+    ];
+    const scoredIds: string[] = [];
+    fake.onScore = (title) => {
+      const match = [...seenPage, ...freshPage].find((row) => row.title === title);
+      if (match) scoredIds.push(match.externalId);
+    };
+    const result = await runAgentScan({ manual: false }, context(), now);
+    expect(fake.searches).toBe(2);
+    expect(scoredIds).toEqual(["fresh-1", "fresh-2"]);
+    expect(result).toMatchObject({ found: 23, fresh: 3, scored: 2, skipped: 20 });
   });
 
   it("never brings back what it has seen, from another run or another source", async () => {
