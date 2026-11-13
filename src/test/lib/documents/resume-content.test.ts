@@ -49,7 +49,7 @@ describe("resumeContent", () => {
     expect(content.experience[2].skills).toEqual(["HTML & CSS", "Interaction design"]);
     expect(content.education[0]).toMatchObject({ dates: "2013 – 2015", notes: "Thesis on trust in automated scheduling tools" });
     expect(content.skills).toBe(
-      "Interaction design · Design systems · Prototyping · User research · Figma · HTML & CSS · Workshop facilitation",
+      "Interaction design, Design systems, Prototyping, User research, Figma, HTML & CSS, Workshop facilitation",
     );
     expect(content.languages).toBe("Dutch: Native · English: Fluent (C2) · German: Intermediate (B1)");
   });
@@ -101,7 +101,7 @@ describe("resumeContent", () => {
     );
     // Role skills still come from the profile.
     expect(content.experience[0].skills).toContain("Design systems");
-    expect(content.skills).toMatch(/^Design systems · User research · Figma · /);
+    expect(content.skills).toMatch(/^Design systems, User research, Figma, /);
     expect(content.languages).toBe("Dutch: Native · English: Fluent (C2) · German: Intermediate (B1)");
   });
 

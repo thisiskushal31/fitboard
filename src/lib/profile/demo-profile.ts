@@ -122,7 +122,7 @@ export function demoResumeUnits(
       text: resume.experience[entry.id as keyof typeof resume.experience],
     })),
     ...projects.map((entry) => ({ id: `project:${projectId(entry.id)}`, label: `${entry.name} project`, text: entry.bullets })),
-    { id: "skills", label: "Skills", text: [...asked, ...skills.filter((skill) => !asked.includes(skill))].join(" · ") },
+    { id: "skills", label: "Skills", text: [...asked, ...skills.filter((skill) => !asked.includes(skill))].join(", ") },
     ...education.map((entry) => ({
       id: `education:${educationId(entry.id)}`,
       label: entry.degree,

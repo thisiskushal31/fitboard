@@ -19,15 +19,17 @@ describe("skill groups", () => {
   });
 
   it("writes a line per group, led by its name, and one without a label for the rest", () => {
-    expect(skillsText(inEditorOrder(skills))).toBe("Figma · HTML & CSS\nAI search: GEO · AEO\nTechnical SEO: Crawl budget · Log analysis");
-    expect(skillsText([skill("Figma"), skill("Prototyping")])).toBe("Figma · Prototyping");
+    expect(skillsText(inEditorOrder(skills))).toBe("Figma, HTML & CSS\nAI search: GEO, AEO\nTechnical SEO: Crawl budget, Log analysis");
+    expect(skillsText([skill("Figma"), skill("Prototyping")])).toBe("Figma, Prototyping");
     expect(skillsText([])).toBe("");
   });
 
   it("reads a line's label, and the skill names without the labels", () => {
-    expect(skillLine("AI search: GEO · AEO")).toEqual({ label: "AI search", text: "GEO · AEO" });
-    expect(skillLine("Figma · HTML & CSS")).toEqual({ label: null, text: "Figma · HTML & CSS" });
-    expect(skillNamesIn("Figma · HTML & CSS\nAI search: GEO · AEO\n\n Technical SEO: Crawl budget ")).toEqual(["Figma", "HTML & CSS", "GEO", "AEO", "Crawl budget"]);
+    expect(skillLine("AI search: GEO, AEO")).toEqual({ label: "AI search", text: "GEO, AEO" });
+    expect(skillLine("Figma, HTML & CSS")).toEqual({ label: null, text: "Figma, HTML & CSS" });
+    expect(skillNamesIn("Figma, HTML & CSS\nAI search: GEO, AEO\n\n Technical SEO: Crawl budget ")).toEqual(["Figma", "HTML & CSS", "GEO", "AEO", "Crawl budget"]);
+    // Older tailored units used middots; still parse them.
+    expect(skillNamesIn("Tools: Figma · Prototyping\nUser research · Design systems")).toEqual(["Figma", "Prototyping", "User research", "Design systems"]);
     expect(skillNamesIn("")).toEqual([]);
   });
 });

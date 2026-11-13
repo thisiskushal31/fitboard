@@ -123,20 +123,21 @@ describe("ResumeDocument", () => {
     }
   });
 
-  it("prints a line per skill group, led by its name, those without a group first", () => {
+  it("prints a hyphened line per skill group, led by its name, those without a group first", () => {
     const grouped = {
       ...profile,
       skills: profile.skills.map((skill) => ({ ...skill, group: ["Figma", "Prototyping"].includes(skill.name) ? "Tools" : skill.name === "User research" ? "Research" : "" })),
     };
     render(<ResumeDocument theme={theme("editorial")} profile={grouped} paper="A4" today={today} />);
-    const lines = [...document.querySelectorAll('[data-unit="skills"] p')];
+    const lines = [...document.querySelectorAll('[data-unit="skills"] li')];
     expect(lines.map((line) => line.textContent)).toEqual([
-      "Interaction design · Design systems · HTML & CSS · Workshop facilitation",
-      "Tools: Prototyping · Figma",
-      "Research: User research",
+      "- Interaction design, Design systems, HTML & CSS, Workshop facilitation",
+      "- Tools: Prototyping, Figma",
+      "- Research: User research",
     ]);
     expect(within(lines[1] as HTMLElement).getByText("Tools:", { selector: "strong" })).toBeInTheDocument();
     expect(lines[0].querySelector("strong")).toBeNull();
+    expect(document.querySelector('[data-unit="skills"] ul')).toBeInTheDocument();
   });
 
   it("renders a tailored resume from its units", () => {

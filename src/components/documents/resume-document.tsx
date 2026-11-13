@@ -304,19 +304,24 @@ function EntryHead({ title, at, dates, timeline }: { title: string; at: ReactNod
   );
 }
 
-/** The Skills section: a line per group, led by the group's name. */
+/** The Skills section: a hyphened line per group, bold label then comma-separated skills. */
 function SkillLines({ text }: { text: string }) {
-  return text
+  const lines = text
     .split("\n")
     .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line, index) => {
-      const { label, text: skills } = skillLine(line);
-      return (
-        <p key={index} className={styles.skillLine}>
-          {label && <strong className={styles.skillLabel}>{label}: </strong>}
-          {skills}
-        </p>
-      );
-    });
+    .filter(Boolean);
+  return (
+    <ul className={styles.skillList}>
+      {lines.map((line, index) => {
+        const { label, text: skills } = skillLine(line);
+        return (
+          <li key={index} className={styles.skillLine}>
+            {"- "}
+            {label && <strong className={styles.skillLabel}>{label}: </strong>}
+            {skills}
+          </li>
+        );
+      })}
+    </ul>
+  );
 }

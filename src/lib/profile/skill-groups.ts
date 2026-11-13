@@ -1,9 +1,12 @@
 // Skill groups: a skill can belong to a group, and resumes print one
-// labelled line per group ("Technical SEO: Crawl budget · Log analysis").
+// labelled line per group ("Cloud & Infrastructure: GCP, AWS, Docker").
 // The Skills unit stays text, a line per group, so it can be edited like
-// any other part of a resume.
+// any other part of a resume. The document draws a leading "-" per line.
 
 export type GroupedSkill = { name: string; group: string };
+
+/** Separates skills on a Skills line: commas (current) or middots (older tailored units). */
+const SKILL_SEP = /\s*·\s*|,\s*/;
 
 /** The groups and their skills, each group where its first skill is; skills without a group are the group "". */
 export function skillGroups<T extends GroupedSkill>(skills: readonly T[]): { group: string; skills: T[] }[] {
@@ -21,10 +24,10 @@ export function inEditorOrder<T extends GroupedSkill>(skills: readonly T[]): T[]
   return [...groups.filter(({ group }) => !group), ...groups.filter(({ group }) => group)].flatMap(({ skills: members }) => members);
 }
 
-/** The Skills unit: a line per group, in the order its skills come ("Tools: Figma · Ahrefs"), and skills without a group on a line without a label. */
+/** The Skills unit: a line per group, in the order its skills come ("Tools: Figma, Ahrefs"), and skills without a group on a line without a label. */
 export function skillsText(skills: readonly GroupedSkill[]): string {
   return skillGroups(skills)
-    .map(({ group, skills: members }) => `${group ? `${group}: ` : ""}${members.map((skill) => skill.name).join(" · ")}`)
+    .map(({ group, skills: members }) => `${group ? `${group}: ` : ""}${members.map((skill) => skill.name).join(", ")}`)
     .join("\n");
 }
 
@@ -40,7 +43,7 @@ export function skillLine(line: string): { label: string | null; text: string } 
 export function skillNamesIn(text: string): string[] {
   return text
     .split("\n")
-    .flatMap((line) => skillLine(line.trim()).text.split(" · "))
+    .flatMap((line) => skillLine(line.trim()).text.split(SKILL_SEP))
     .map((name) => name.trim())
     .filter(Boolean);
 }

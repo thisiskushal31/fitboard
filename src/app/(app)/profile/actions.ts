@@ -91,7 +91,7 @@ const id = z.string().min(1);
 const skillName = z.string().trim().min(1, "Type a skill first.").max(100);
 
 /** Adds a skill. An existing one, in any case, is returned instead of a duplicate. */
-/** A skill group's name: it leads a line on resumes (Tools: Figma · Ahrefs), so no ":" or "·". */
+/** A skill group's name: it leads a line on resumes (Tools: Figma, Ahrefs), so no ":" or "·". */
 const skillGroup = z
   .string()
   .trim()

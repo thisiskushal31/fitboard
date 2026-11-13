@@ -148,7 +148,7 @@ export function resumeContent(
     projects: profile.projects.map((entry) => project(entry, entry.bullets)),
     education: profile.education.map((entry) => education(entry, entry.notes)),
     publications: resumePublications(profile.publications).map((entry) => publication(entry, entry.citation)),
-    // A line per group, as Profile → Skills shows them.
+    // A line per group (Category: a, b, c), as Profile → Skills shows them.
     skills: skillsText(inEditorOrder(profile.skills)),
     languages: languagesLine(profile.languages, labels),
     references: includeReferences

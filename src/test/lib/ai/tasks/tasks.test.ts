@@ -271,7 +271,7 @@ describe("tailorResume", () => {
     expect(data.find((unit) => unit.id === "experience:e1")?.text).toBe("Led the carrier portal redesign\nOwned the design system");
     // A role the model skipped keeps its own bullets.
     expect(data.find((unit) => unit.id === "experience:e2")?.text).toBe(profile.experience[1].bullets);
-    expect(data.find((unit) => unit.id === "skills")?.text).toBe("Design systems · Figma · User research");
+    expect(data.find((unit) => unit.id === "skills")?.text).toBe("Design systems, Figma, User research");
     expect(data.find((unit) => unit.id === "languages")?.text).toBe("Dutch: Native · English: Fluent (C2) · German: Intermediate (B1)");
   });
 
@@ -321,7 +321,7 @@ describe("resumeUnits' skills", () => {
   it("keeps the model's order, a line per group where its first skill comes, only the profile's own skills", () => {
     const grouped = { ...demoProfile(), skills: demoProfile().skills.map((skill) => ({ ...skill, group: ["Figma", "Prototyping"].includes(skill.name) ? "Tools" : "" })) };
     const units = resumeUnits(grouped, { summary: "", roles: [], projects: [], education: [], skills: ["figma", "User research", "Prototyping", "Kubernetes", "Design systems"] });
-    expect(units.find((unit) => unit.id === "skills")?.text).toBe("Tools: Figma · Prototyping\nUser research · Design systems");
+    expect(units.find((unit) => unit.id === "skills")?.text).toBe("Tools: Figma, Prototyping\nUser research, Design systems");
   });
 });
 

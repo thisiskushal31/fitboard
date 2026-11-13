@@ -56,7 +56,8 @@ export function ChipCard({
  * Skills, in groups if you like: those without a group
  * first, then each group under its name with a field of its own. Enter adds
  * a skill where you typed it, × removes it everywhere, and a skill's menu
- * moves it to another group. Resumes print a line per group.
+ * moves it to another group. Resumes print a hyphened line per group
+ * ("Cloud & Infrastructure: GCP, AWS, Docker").
  */
 function SkillsCard({ profile, update }: { profile: ProfileData; update: UpdateProfile }) {
   const track = useTrackSave();

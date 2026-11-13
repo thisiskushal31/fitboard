@@ -62,8 +62,8 @@ test("puts skills in groups and prints a line per group on the base resume", asy
   await page.reload();
   await expect(page.getByRole("list", { name: "Skills in Tools" })).toContainText("Figma");
   await page.goto("/resume");
-  const skills = page.getByRole("article", { name: "Resume" }).locator('[data-unit="skills"] p');
-  await expect(skills.last()).toHaveText("Tools: Figma · Ahrefs");
+  const skills = page.getByRole("article", { name: "Resume" }).locator('[data-unit="skills"] li');
+  await expect(skills.last()).toHaveText("- Tools: Figma, Ahrefs");
   await expect(skills.last().locator("strong")).toHaveText("Tools:");
 });
 

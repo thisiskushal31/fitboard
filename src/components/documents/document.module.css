@@ -148,7 +148,19 @@
   min-width: 0;
 }
 
-/* Skill groups (#280): a line each, the group's name first. */
+/* Skill groups: hyphened lines, bold group name, comma-separated skills. */
+.skillList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skillLine {
+  padding-left: 0.9em;
+  text-indent: -0.9em;
+  break-inside: avoid;
+}
+
 .skillLine + .skillLine {
   margin-top: calc(var(--u) * 3);
 }
