@@ -12,7 +12,46 @@ docker/bin/yarn hash-password   # set FITBOARD_PASSWORD in .env to what it print
 docker compose up
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Source is bind-mounted, so edits hot-reload.
+Open [http://localhost:3001](http://localhost:3001). Source is bind-mounted, so edits hot-reload. Production on the same machine keeps [http://localhost:3000](http://localhost:3000).
+
+## Production and development on one machine
+
+Same repo folder. Two Compose project names baked into the files — no second clone, no `-p` flag:
+
+| File | Project `name` | URL | Host Postgres | Containers | Volumes (keep) |
+| --- | --- | --- | --- | --- | --- |
+| `compose.production.yml` (+ `compose.amd64.yml` on Apple Silicon) | `fitboard` | http://localhost:3000 | not published | `fitboard-app-1`, `fitboard-db-1` | `fitboard_pgdata`, `fitboard_data` |
+| `compose.yml` | `fitboard-dev` | http://localhost:3001 | localhost:5433 | `fitboard-dev-app-1`, `fitboard-dev-db-1` | `fitboard-dev_pgdata`, `fitboard-dev_data`, `fitboard-dev_node_modules` |
+
+### Start / stop (cheat sheet)
+
+From the repository root, with `.env` already set (`POSTGRES_PASSWORD`, `FITBOARD_PASSWORD`, `FITBOARD_SECRET`):
+
+```bash
+# --- Production (GHCR image, polished) ---
+# Apple Silicon: always pass compose.amd64.yml (published image is linux/amd64).
+docker compose -f compose.production.yml -f compose.amd64.yml pull app
+docker compose -f compose.production.yml -f compose.amd64.yml up -d
+
+# Stop production only (keeps Postgres data — do not add -v)
+docker compose -f compose.production.yml down
+
+# --- Development (bind-mounted source, hot reload) ---
+docker compose -f compose.yml up --build
+# or detached:
+docker compose -f compose.yml up -d --build
+
+# Stop development only (keeps its own volumes — do not add -v)
+docker compose -f compose.yml down
+```
+
+Both can run at once. Check:
+
+```bash
+docker ps --format 'table {{.Names}}\t{{.Ports}}\t{{.Status}}'
+```
+
+Never use `down -v` on production unless you intend to wipe `fitboard_pgdata`. Orphan volumes named `fitboard_node_modules` or `fitboard_fitboard_data` (no `-dev`, unused in Docker Desktop) are leftovers from before the project rename; safe to `docker volume rm` those two only.
 
 `config/env.example` documents every variable. The server refuses to start while `FITBOARD_PASSWORD` or `FITBOARD_SECRET` is missing, `FITBOARD_PASSWORD` isn't a password hash, or the secret is shorter than 32 characters, and logs which variable to fix.
 Server code reads configuration from the validated `env` object instead of `process.env`:
@@ -22,7 +61,7 @@ import { env } from "@/lib/core/env";
 ```
 
 On every start the `app` container runs `prisma generate`, `prisma migrate deploy`, then `next dev`.
-Postgres is also exposed on `localhost:5432` for host tools, using `DATABASE_URL` from `.env`.
+Development Postgres is on `localhost:5433` for host tools (`DATABASE_URL` in `.env` / `config/env.example`).
 
 ## Yarn
 
@@ -259,13 +298,20 @@ The `Dockerfile`'s last stage is the production image (the `dev` stage is what C
 
 ```bash
 docker build -t fitboard:local .
-FITBOARD_IMAGE=fitboard:local FITBOARD_PORT=3300 docker compose -f compose.production.yml -p fitboard-local up -d
+FITBOARD_IMAGE=fitboard:local FITBOARD_PORT=3300 docker compose -p fitboard-local -f compose.production.yml up -d
 ```
+
 
 CI runs on a pull request and on a push to `main`. It lints, type-checks and tests. It does not publish an image. A semver tag (`0.0.1`, or `0.0.1-lts`) builds the production image, publishes it to `ghcr.io/<owner>/<repository>` (lower case), and publishes the GitHub release with notes generated from the commits since the previous tag. An LTS tag does not move `latest`.
 
 ## Reset
 
+`-v` deletes that stack’s named volumes (database included). Prefer stopping without `-v` unless you mean to wipe data.
+
 ```bash
-docker compose down -v   # stops everything and deletes the database and node_modules volumes
+# Development only: wipe fitboard-dev_* volumes
+docker compose -f compose.yml down -v
+
+# Production only: wipe fitboard_pgdata / fitboard_data — irreversible
+docker compose -f compose.production.yml down -v
 ```

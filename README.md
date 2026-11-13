@@ -50,7 +50,7 @@ The starting profile is the demo person, Jane Doe. That is sample data for the s
 
 Docker Compose, PostgreSQL, one password. The steps are in [docs/run.md](docs/run.md). On a VM, `compose.production.yml` pulls the image and passes `FITBOARD_PASSWORD` and `FITBOARD_SECRET`.
 
-Open http://localhost:3000 after it starts.
+Development opens at http://localhost:3001 (`compose.yml`). Production on the same machine keeps http://localhost:3000 (`compose.production.yml`). How to run both: [docs/development.md](docs/development.md#production-and-development-on-one-machine).
 
 ## Where the files are
 

@@ -1,0 +1,9 @@
+# Apple Silicon: published GHCR images are linux/amd64. Use only with
+# compose.production.yml, never as compose.override.yml (that would force
+# emulation on every local `docker compose up` of the arm64-friendly dev image).
+#
+#   docker compose -f compose.production.yml -f compose.amd64.yml up -d
+
+services:
+  app:
+    platform: linux/amd64

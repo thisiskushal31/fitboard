@@ -7,6 +7,11 @@
 #   docker compose up -d
 #
 # Add COMPOSE_PROFILES=ai to .env to run Ollama for a local model as well.
+#
+# Project name is fixed (fitboard-*) so a local compose.yml (fitboard-dev-*) in the
+# same folder can run beside this stack without sharing containers or volumes.
+
+name: fitboard
 
 services:
   db:
