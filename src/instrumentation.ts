@@ -39,17 +39,18 @@ export async function register() {
       logServerError("job search", error);
     }
 
+    // Usage ping temporarily disabled — uncomment to restore startup wiring.
     // FITBOARD_TELEMETRY, when set, is the usage ping's answer on record.
     // Then the log says what the ping sends while it's on, or how to answer
     // while nobody has.
-    const { recordEnvChoice, usagePingNotice } = await import("@/lib/upkeep/usage-ping");
-    const { loadSettings } = await import("@/lib/settings/settings-data");
-    try {
-      await recordEnvChoice();
-      const notice = usagePingNotice(await loadSettings());
-      if (notice) console.log(notice);
-    } catch (error) {
-      logServerError("usage ping", error);
-    }
+    // const { recordEnvChoice, usagePingNotice } = await import("@/lib/upkeep/usage-ping");
+    // const { loadSettings } = await import("@/lib/settings/settings-data");
+    // try {
+    //   await recordEnvChoice();
+    //   const notice = usagePingNotice(await loadSettings());
+    //   if (notice) console.log(notice);
+    // } catch (error) {
+    //   logServerError("usage ping", error);
+    // }
   }
 }

@@ -9,11 +9,12 @@ import { loadSettings } from "@/lib/settings/settings-data";
 import { COLOR_SCHEME_COOKIE, parseColorScheme, parseSidebarCollapsed, SIDEBAR_COOKIE } from "@/lib/settings/ui-preferences";
 import { rememberBrowserTimeZone, userTimeZone } from "@/lib/settings/time-zone";
 import { checkForUpdatesDaily, updateNotice } from "@/lib/upkeep/update-check";
-import { askForUsagePing, notePageLoad, USAGE_PING_HOST } from "@/lib/upkeep/usage-ping";
+// Usage ping temporarily disabled — uncomment to restore the dialog + daily send.
+// import { askForUsagePing, notePageLoad, USAGE_PING_HOST } from "@/lib/upkeep/usage-ping";
 import { appVersion } from "@/lib/upkeep/version";
 
 import { Sidebar } from "./sidebar";
-import { UsagePingDialog } from "./usage-ping-dialog";
+// import { UsagePingDialog } from "./usage-ping-dialog";
 
 /**
  * The signed-in shell: sidebar on the left, the screen on the right. Routes
@@ -24,7 +25,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   // Proxy already redirects signed-out visitors; this is the check next to the data.
   await verifySession();
   // The day's usage ping and update check, if they haven't run yet: after the page, so they never slow one down.
-  after(notePageLoad);
+  // after(notePageLoad); // usage ping temporarily disabled
   after(checkForUpdatesDaily);
   // The browser's zone, for the inbox check, which runs without a request.
   const zone = await userTimeZone();
@@ -63,8 +64,10 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
       </div>
-      {/* Asked once, until answered; nothing is sent before a yes. */}
+      {/* Asked once, until answered; nothing is sent before a yes.
+          Usage ping temporarily disabled — uncomment to restore.
       {askForUsagePing(settings) && <UsagePingDialog host={USAGE_PING_HOST} />}
+      */}
     </div>
   );
 }

@@ -9,8 +9,9 @@ import { Card } from "@/components/ui/card";
 import { Toggle } from "@/components/ui/toggle";
 import { UPGRADE_GUIDE_URL, type Release } from "@/lib/upkeep/releases";
 
-import { chooseUsagePing } from "../actions";
-import { USAGE_PING_PRIVACY_URL } from "../usage-ping-dialog";
+// Usage ping temporarily disabled — uncomment with the UI block below.
+// import { chooseUsagePing } from "../actions";
+// import { USAGE_PING_PRIVACY_URL } from "../usage-ping-dialog";
 import { checkUpdates, updateSettings } from "./actions";
 import { SettingsSectionIntro } from "./settings-screen";
 
@@ -48,33 +49,35 @@ const LINK = "font-medium text-ink underline underline-offset-2";
 export function AboutSection({ facts, usagePing, updates }: { facts: AboutFacts; usagePing: UsagePingView; updates: UpdatesView }) {
   const [check, setCheck] = useState<Check>(updates.available ? { status: "newer", ...updates.available } : { status: "idle" });
   const [daily, setDaily] = useState(updates.daily);
-  const [pinging, setPinging] = useState(usagePing.choice === "on");
-  const [answered, setAnswered] = useState(usagePing.choice !== null);
+  // Usage ping temporarily disabled — uncomment with the UI block below.
+  void usagePing;
+  // const [pinging, setPinging] = useState(usagePing.choice === "on");
+  // const [answered, setAnswered] = useState(usagePing.choice !== null);
   const track = useTrackSave();
 
   // Withdrawing is as easy as agreeing (GDPR Art. 7(3)); a no forgets the install ID.
-  const switchPing = (on: boolean) => {
-    const before = { pinging, answered };
-    setPinging(on);
-    setAnswered(true);
-    void track(chooseUsagePing({ send: on })).then((result) => {
-      if (!result.ok) {
-        setPinging(before.pinging);
-        setAnswered(before.answered);
-        toast(result.error);
-      }
-    });
-  };
-  const fromEnv = usagePing.source === "env";
-  const pingDescription = !usagePing.production
-    ? "Development servers never send it."
-    : fromEnv
-      ? `Set with FITBOARD_TELEMETRY=${usagePing.choice} on the server, which decides while it's set. Change it there.`
-      : pinging
-        ? `On. Once on each day Fitboard is used, the server sends ${usagePing.host} ${usagePing.id ? `this install's ID (${usagePing.id})` : "this install's ID, made with the first ping,"} and the version number. Nothing else.`
-        : answered
-          ? "Off. Nothing is sent, and this install's ID is forgotten."
-          : "Not answered yet, so nothing is sent.";
+  // const switchPing = (on: boolean) => {
+  //   const before = { pinging, answered };
+  //   setPinging(on);
+  //   setAnswered(true);
+  //   void track(chooseUsagePing({ send: on })).then((result) => {
+  //     if (!result.ok) {
+  //       setPinging(before.pinging);
+  //       setAnswered(before.answered);
+  //       toast(result.error);
+  //     }
+  //   });
+  // };
+  // const fromEnv = usagePing.source === "env";
+  // const pingDescription = !usagePing.production
+  //   ? "Development servers never send it."
+  //   : fromEnv
+  //     ? `Set with FITBOARD_TELEMETRY=${usagePing.choice} on the server, which decides while it's set. Change it there.`
+  //     : pinging
+  //       ? `On. Once on each day Fitboard is used, the server sends ${usagePing.host} ${usagePing.id ? `this install's ID (${usagePing.id})` : "this install's ID, made with the first ping,"} and the version number. Nothing else.`
+  //       : answered
+  //         ? "Off. Nothing is sent, and this install's ID is forgotten."
+  //         : "Not answered yet, so nothing is sent.";
 
   const run = async () => {
     setCheck({ status: "checking" });
@@ -105,6 +108,7 @@ export function AboutSection({ facts, usagePing, updates }: { facts: AboutFacts;
           ))}
         </dl>
       </Card>
+      {/* Usage ping temporarily disabled — uncomment this Card (and the helpers above) to restore.
       <Card padding="none" className="px-7 py-4">
         <Toggle
           label="Send the daily usage ping"
@@ -114,6 +118,7 @@ export function AboutSection({ facts, usagePing, updates }: { facts: AboutFacts;
           onCheckedChange={switchPing}
         />
       </Card>
+      */}
       <Card padding="none" className="px-7 py-4">
         <Toggle
           label="Check for updates daily"
@@ -150,6 +155,7 @@ export function AboutSection({ facts, usagePing, updates }: { facts: AboutFacts;
         </p>
       </div>
       <p className="text-meta text-muted">Checking asks GitHub for the latest release and sends nothing about you or this install, daily or when you press it.</p>
+      {/* Usage ping temporarily disabled — uncomment to restore the privacy copy.
       <p className="text-meta text-muted">
         The usage ping only goes once you agree. It tells the Fitboard project&apos;s maintainer, on the project&apos;s own server, how many installs are in use and how often. The ID is random and says nothing about you, and what&apos;s kept is deleted after a year. To have the rows already kept for this install removed sooner, note its ID, switch the ping off, and send the ID to{" "}
         <a href="mailto:fitboard.app@pm.me" className={LINK}>
@@ -160,6 +166,7 @@ export function AboutSection({ facts, usagePing, updates }: { facts: AboutFacts;
           More in Privacy <span className="sr-only">(opens in a new tab)</span>
         </a>
       </p>
+      */}
     </>
   );
 }
