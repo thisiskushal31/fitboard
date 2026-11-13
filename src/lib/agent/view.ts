@@ -14,6 +14,7 @@ import { lastKnownTimeZone } from "@/lib/settings/time-zone";
 import { stringsOf } from "./candidates";
 import { AGENT_JOB_KEY } from "./jobs";
 import { agentSetupProblem } from "./run";
+import { AGENT_MAX_RUNS_PER_DAY, runsInPastDay } from "./runs";
 import { nextAgentRun } from "./schedule";
 
 // What the Agent screen shows.
@@ -151,8 +152,7 @@ export async function loadAgentView(now = new Date()): Promise<AgentView> {
     search,
     setupProblem,
     setupSection: setupProblem ? sectionOf(setupProblem) : null,
-    // TEMP: caps skipped in runs.ts — restore: runsInPastDay(...).length >= AGENT_MAX_RUNS_PER_DAY
-    limitReached: false,
+    limitReached: runsInPastDay(settings.agentRuns, now).length >= AGENT_MAX_RUNS_PER_DAY,
     lastRun: last ? { at: formatDateTime(new Date(last.at), timeZone, now), message: last.message } : null,
     nextRun: settings.agentEnabled ? formatDateTime(nextAgentRun(now, settings.agentHour, timeZone, settings.agentRuns), timeZone, now) : null,
     runJobId: runJobs[0]?.id ?? null,

@@ -7,16 +7,10 @@ import { loadSettings, saveSettings } from "@/lib/settings/settings-data";
 // runs, and they stay after task data is deleted.
 
 /** At most this many runs in any 24 hours, scheduled or Run now. */
-export const AGENT_MAX_RUNS_PER_DAY = 3;
+export const AGENT_MAX_RUNS_PER_DAY = 10;
 /** Run now waits this long after the previous run of either kind. */
 export const AGENT_MANUAL_INTERVAL_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
-
-/**
- * TEMP: skip daily / hourly agent caps so Run now can be tested freely.
- * Set back to false before shipping.
- */
-const TEMP_SKIP_AGENT_RUN_LIMITS = true;
 
 /** The runs in the 24 hours before `now`, newest first. */
 export const runsInPastDay = (runs: readonly AgentRun[], now: Date) =>
@@ -24,7 +18,6 @@ export const runsInPastDay = (runs: readonly AgentRun[], now: Date) =>
 
 /** Why no run may start now, in words, or null when one may. */
 export function runLimitProblem(runs: readonly AgentRun[], now: Date, { manual }: { manual: boolean }): string | null {
-  if (TEMP_SKIP_AGENT_RUN_LIMITS) return null;
   const recent = runsInPastDay(runs, now);
   if (recent.length >= AGENT_MAX_RUNS_PER_DAY) {
     const free = new Date(Math.min(...recent.map((run) => Date.parse(run.at))) + DAY_MS);

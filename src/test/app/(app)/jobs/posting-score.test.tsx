@@ -21,6 +21,24 @@ vi.mock("@/app/(app)/jobs/actions", () => ({
   dismissFoundPosting: vi.fn(),
   restorePosting: vi.fn(),
   startScoringPosting: vi.fn(async () => ({ ok: true, data: { jobId: "score-job" } })),
+  loadPostingIntel: vi.fn(async () => ({
+    ok: true,
+    data: {
+      offerLabel: "Not listed",
+      marketLabel: "No market data",
+      market: null,
+      comparison: null,
+      layoffs: {
+        summary: "No layoff records found for this company.",
+        events: [],
+        attribution: "Data from Layoffs.fyi",
+        attributionUrl: "https://layoffs.fyi/",
+        sources: [],
+      },
+    },
+  })),
+  syncLayoffData: vi.fn(async () => ({ ok: true, data: { imported: 0, companies: 0, url: "", sources: [] } })),
+  loadMarketSalary: vi.fn(async () => ({ ok: true, data: { median: null, currency: null, label: null, sourceLabel: null, attributionUrl: null } })),
 }));
 // The scoring job, as a test moves it along.
 const jobs = vi.hoisted(() => ({ listeners: new Map<string, (job: JobView<PostingFit>) => void>() }));

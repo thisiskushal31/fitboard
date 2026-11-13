@@ -1,6 +1,5 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { prisma } from "@/lib/core/prisma";
 import {
   clearAllBoardCrawls,
   clearResolvedBoardCrawls,
@@ -10,10 +9,27 @@ import {
   recordBoardCrawl,
   syncBoardCrawlWithCatalog,
 } from "@/lib/job-search/crawl-results";
+import { createTestClient, resetDatabase } from "@/test/db";
+
+const db = vi.hoisted(() => ({ client: undefined as ReturnType<typeof createTestClient> | undefined }));
+vi.mock("@/lib/core/prisma", async () => {
+  const { createTestClient } = await import("@/test/db");
+  db.client = createTestClient();
+  return { prisma: db.client };
+});
+vi.mock("@/lib/core/env", () => ({ env: { FITBOARD_SECRET: "a".repeat(32) } }));
+
+function prisma() {
+  return db.client!;
+}
 
 describe("board crawl results", () => {
-  afterEach(async () => {
-    await prisma.boardCrawlResult.deleteMany();
+  beforeEach(async () => {
+    await resetDatabase(prisma());
+  });
+
+  afterAll(async () => {
+    await prisma().$disconnect();
   });
 
   it("upserts by URL, lists problems, and supports resolve/delete", async () => {
@@ -59,7 +75,7 @@ describe("board crawl results", () => {
       openProblem: true,
     });
 
-    expect(await prisma.boardCrawlResult.count()).toBe(2);
+    expect(await prisma().boardCrawlResult.count()).toBe(2);
     const ok = await listBoardCrawlResults("ok");
     expect(ok).toHaveLength(1);
     expect(ok[0]).toMatchObject({ company: "Example Co", hitCount: 2, status: "ok", resolvedAt: null });
@@ -72,7 +88,7 @@ describe("board crawl results", () => {
     expect(await listBoardCrawlResults("problems")).toEqual([]);
     expect(await listBoardCrawlResults("resolved")).toHaveLength(1);
     expect(await clearResolvedBoardCrawls()).toBe(1);
-    expect(await prisma.boardCrawlResult.count()).toBe(1);
+    expect(await prisma().boardCrawlResult.count()).toBe(1);
 
     const remaining = await listBoardCrawlResults("all");
     await deleteBoardCrawlResult(remaining[0].id);
@@ -112,7 +128,7 @@ describe("board crawl results", () => {
     expect(await listBoardCrawlResults("problems")).toHaveLength(1);
     expect(await listBoardCrawlResults("resolved")).toHaveLength(1);
     expect(await syncBoardCrawlWithCatalog(["https://careers.dyson.com/en-gb/search-results/"])).toBe(1);
-    expect(await prisma.boardCrawlResult.count()).toBe(1);
+    expect(await prisma().boardCrawlResult.count()).toBe(1);
     expect((await listBoardCrawlResults("all"))[0].url).toContain("/search-results");
   });
 });

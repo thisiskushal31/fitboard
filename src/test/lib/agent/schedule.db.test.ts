@@ -75,11 +75,12 @@ describe("the limits", () => {
     expect(runLimitProblem([run("2026-10-20T11:35:00Z")], now, { manual: false })).toBeNull();
   });
 
-  it("allows 3 runs in any 24 hours", () => {
-    const three = [run("2026-10-20T11:00:00Z"), run("2026-10-20T08:00:00Z"), run("2026-10-19T13:00:00Z")];
-    expect(runLimitProblem(three, now, { manual: false })).toBe("The agent has run 3 times in the past 24 hours, as many as it may. Try again in 1 hour.");
-    expect(runLimitProblem(three, new Date("2026-10-20T13:00:01Z"), { manual: false })).toBeNull();
-    expect(runLimitProblem(three.slice(0, 2), now, { manual: false })).toBeNull();
+  it("allows 10 runs in any 24 hours", () => {
+    const ten = Array.from({ length: 10 }, (_, index) => run(`2026-10-20T${String(11 - index).padStart(2, "0")}:00:00Z`));
+    // Oldest of the ten is 02:00Z → free again at 02:00Z next day → from 12:00Z that's 14 hours.
+    expect(runLimitProblem(ten, now, { manual: false })).toBe("The agent has run 10 times in the past 24 hours, as many as it may. Try again in 14 hours.");
+    expect(runLimitProblem(ten, new Date("2026-10-21T02:00:01Z"), { manual: false })).toBeNull();
+    expect(runLimitProblem(ten.slice(0, 9), now, { manual: false })).toBeNull();
   });
 });
 

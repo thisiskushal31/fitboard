@@ -70,12 +70,14 @@ describe("Run now", () => {
     expect(await runAgentNow({})).toMatchObject({ ok: false, error: "Choose a job source in Settings → Job search first." });
   });
 
-  it("waits an hour after the previous run, and keeps to 3 a day", async () => {
+  it("waits an hour after the previous run, and keeps to 10 a day", async () => {
     const at = (minutesAgo: number) => new Date(Date.now() - minutesAgo * 60_000).toISOString();
     await saveSettings({ agentRuns: [{ at: at(20), manual: false, message: null }] });
     expect(await runAgentNow({})).toEqual({ ok: false, error: "The agent ran less than an hour ago. Try again in 40 minutes." });
-    await saveSettings({ agentRuns: [at(70), at(200), at(400)].map((time) => ({ at: time, manual: true, message: null })) });
-    expect(await runAgentNow({})).toMatchObject({ ok: false, error: expect.stringMatching(/^The agent has run 3 times in the past 24 hours/) });
+    await saveSettings({
+      agentRuns: Array.from({ length: 10 }, (_, index) => ({ at: at(70 + index * 30), manual: true, message: null })),
+    });
+    expect(await runAgentNow({})).toMatchObject({ ok: false, error: expect.stringMatching(/^The agent has run 10 times in the past 24 hours/) });
   });
 });
 

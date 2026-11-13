@@ -245,7 +245,7 @@ function Notices({ view }: { view: AgentView }) {
       </>,
     );
   }
-  if (view.limitReached) return note("The agent has run 3 times in the past 24 hours, as many as it may. It runs again once a day has passed since the first.");
+  if (view.limitReached) return note("The agent has run 10 times in the past 24 hours, as many as it may. It runs again once a day has passed since the first.");
   return null;
 }
 

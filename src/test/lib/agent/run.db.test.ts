@@ -253,7 +253,7 @@ describe("runAgentScan", () => {
     expect(await prisma().agentCandidate.count()).toBe(0);
   });
 
-  it("stops without asking the source when it's off, not set up, or has run 3 times in 24 hours", async () => {
+  it("stops without asking the source when it's off, not set up, or has run 10 times in 24 hours", async () => {
     const stop = async (manual = false) => (await runAgentScan({ manual }, context(), now)).message;
     await saveSettings({ agentEnabled: false });
     expect(await stop()).toBe("The job agent is off.");
@@ -277,21 +277,22 @@ describe("runAgentScan", () => {
 
   it("holds the daily limit from its own record, whatever the task-data sweep deletes", async () => {
     await saveSettings({ jobRetentionHours: 1 });
-    for (const hours of [0, 2, 4]) {
+    for (let index = 0; index < 10; index++) {
       // Each run's Job row, as the runner leaves it, which the sweep deletes an hour later.
-      const at = new Date(now.getTime() + hours * hour);
+      // Space runs by more than an hour so the manual cooldown does not block earlier ones.
+      const at = new Date(now.getTime() + index * 1.5 * hour);
       await prisma().job.create({ data: { type: "agent-scan", key: "agent", status: "DONE", input: { manual: true }, finishedAt: at } });
       await runAgentScan({ manual: true }, context(), at);
-      await sweepFinishedJobs(new Date(now.getTime() + (hours + 1.5) * hour));
+      await sweepFinishedJobs(new Date(at.getTime() + 1.5 * hour));
     }
-    expect(fake.searches).toBe(3);
+    expect(fake.searches).toBe(10);
     expect(await prisma().job.count()).toBe(0);
-    const fourth = await runAgentScan({ manual: true }, context(), new Date(now.getTime() + 6 * hour));
-    expect(fourth.message).toBe("The agent has run 3 times in the past 24 hours, as many as it may. Try again in 18 hours.");
-    expect(fake.searches).toBe(3);
+    const eleventh = await runAgentScan({ manual: true }, context(), new Date(now.getTime() + 16 * hour));
+    expect(eleventh.message).toBe("The agent has run 10 times in the past 24 hours, as many as it may. Try again in 8 hours.");
+    expect(fake.searches).toBe(10);
     // A day after the first, one may go again.
     await runAgentScan({ manual: true }, context(), new Date(now.getTime() + 24 * hour + 1));
-    expect(fake.searches).toBe(4);
+    expect(fake.searches).toBe(11);
   });
 
   it("records the run before it asks the source, so a failing source still counts", async () => {
