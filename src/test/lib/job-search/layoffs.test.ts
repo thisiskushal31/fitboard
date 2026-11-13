@@ -1,54 +1,61 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+type LayoffRow = {
+  company: string;
+  normalizedCompany: string;
+  laidOff: number | null;
+  percentage: number | null;
+  date: Date | null;
+  location: string;
+  country: string;
+  industry: string;
+  sourceUrl: string;
+  rawNote: string;
+};
+
+type PrismaStub = {
+  companyLayoff: {
+    deleteMany: () => Promise<{ count: number }>;
+    createMany: (args: { data: LayoffRow[] }) => Promise<{ count: number }>;
+    findMany: (args: {
+      where: { normalizedCompany?: string | { contains: string }; OR?: unknown[] };
+      orderBy?: { date?: "desc" | "asc" }[];
+    }) => Promise<LayoffRow[]>;
+    count: () => Promise<number>;
+  };
+  $transaction: (work: (tx: PrismaStub) => Promise<unknown>) => Promise<unknown>;
+};
+
 const store = vi.hoisted(() => {
-  const prisma = {
+  const rows: LayoffRow[] = [];
+  const prisma: PrismaStub = {
     companyLayoff: {
       deleteMany: async () => {
-        store.rows = [];
+        rows.length = 0;
         return { count: 0 };
       },
-      createMany: async ({ data }: { data: typeof store.rows }) => {
-        store.rows.push(...data);
+      createMany: async ({ data }) => {
+        rows.push(...data);
         return { count: data.length };
       },
-      findMany: async ({
-        where,
-        orderBy,
-      }: {
-        where: { normalizedCompany?: string | { contains: string }; OR?: unknown[] };
-        orderBy?: { date?: "desc" | "asc" }[];
-      }) => {
-        let rows = store.rows;
+      findMany: async ({ where, orderBy }) => {
+        let filtered = rows;
         if (typeof where.normalizedCompany === "string") {
-          rows = rows.filter((row) => row.normalizedCompany === where.normalizedCompany);
+          filtered = filtered.filter((row) => row.normalizedCompany === where.normalizedCompany);
         } else {
           const needle = typeof where.normalizedCompany === "object" ? where.normalizedCompany.contains : "";
-          rows = rows.filter((row) => !needle || row.normalizedCompany.includes(needle) || needle.includes(row.normalizedCompany));
+          filtered = filtered.filter((row) => !needle || row.normalizedCompany.includes(needle) || needle.includes(row.normalizedCompany));
         }
         if (orderBy?.[0]?.date === "desc") {
-          rows = [...rows].sort((a, b) => (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0));
+          filtered = [...filtered].sort((a, b) => (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0));
         }
-        return rows;
+        return filtered;
       },
-      count: async () => store.rows.length,
+      count: async () => rows.length,
     },
-    $transaction: async (work: (tx: typeof prisma) => Promise<unknown>) => work(prisma),
+    $transaction: async (work) => work(prisma),
   };
-  return {
-    rows: [] as {
-      company: string;
-      normalizedCompany: string;
-      laidOff: number | null;
-      percentage: number | null;
-      date: Date | null;
-      location: string;
-      country: string;
-      industry: string;
-      sourceUrl: string;
-      rawNote: string;
-    }[],
-    prisma,
-  };
+  return { rows, prisma };
 });
 
 vi.mock("@/lib/core/prisma", () => ({ prisma: store.prisma }));
@@ -57,7 +64,7 @@ vi.mock("@/lib/core/log", () => ({ logServerError: vi.fn() }));
 
 describe("layoffs", () => {
   beforeEach(() => {
-    store.rows = [];
+    store.rows.length = 0;
     vi.resetModules();
     vi.unstubAllGlobals();
   });

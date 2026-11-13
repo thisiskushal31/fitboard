@@ -14,7 +14,7 @@ import { mkdir, writeFile, rm } from "node:fs/promises";
 import path from "node:path";
 
 import catalog from "../config/job-boards.json";
-import { careerSitesForSearch, officialCareers, isRelevantListing } from "../src/lib/job-search/board-crawl";
+import { careerSitesForSearch, officialCareers, matchesSearchKeywords } from "../src/lib/job-search/board-crawl";
 import { searchCareerPage, resetCareerSearchPoolForTests } from "../src/lib/job-search/career-page-search";
 
 type Row = {
@@ -36,6 +36,8 @@ const CAREER_LIMIT = process.env.SCAN_CAREER_LIMIT ? Number(process.env.SCAN_CAR
 const OUT = path.join(process.cwd(), "tmp", "live-board-scan.json");
 const TIMEOUT_MS = 20_000;
 const USER_AGENT = "Fitboard/1.0 (live board scan)";
+
+const isRelevantListing = (title: string, description = "") => matchesSearchKeywords(title, description, KEYWORDS);
 
 function readBoard(url: string): { kind: string; slug?: string; host?: string; tenant?: string; site?: string; base?: string } | null {
   let parsed: URL;

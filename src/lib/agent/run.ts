@@ -8,7 +8,7 @@ import { AiError } from "@/lib/ai/errors";
 import { searchPostings } from "@/lib/job-search";
 import { credentialsFor, loadJobSearchConfig, requestContext } from "@/lib/job-search/config";
 import { JobSearchError } from "@/lib/job-search/errors";
-import { postingKey, type FoundPosting, type SearchQuery } from "@/lib/job-search/search";
+import { postingKey, type FoundPosting, type SearchPage, type SearchQuery } from "@/lib/job-search/search";
 import { startJob, type JobContext } from "@/lib/jobs/runner";
 import { logServerError } from "@/lib/core/log";
 import { saveScore } from "@/lib/postings/posting-scores";
@@ -126,7 +126,7 @@ export async function runAgentScan({ manual }: { manual: boolean }, context: Job
   try {
     for (let page = 0; page < pageMax; page++) {
       if (context.signal.aborted) break;
-      const result = await searchPostings(source, credentialsFor(config, source), settings.agentQuery, next, requestContext(source));
+      const result: SearchPage = await searchPostings(source, credentialsFor(config, source), settings.agentQuery, next, requestContext(source));
       if (result.postings.length === 0) break;
       for (const posting of result.postings) {
         const key = postingKey(posting);

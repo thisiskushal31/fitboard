@@ -648,7 +648,7 @@ async function crawlAtsBoards(keywords: string, signal?: AbortSignal): Promise<C
     else if (board.kind === "ashby") tasks.push(() => fetchAshby(company.name, board.slug, keywords, withTimeout(signal)));
     else if (board.kind === "recruitee") tasks.push(() => fetchRecruitee(company.name, board.slug, keywords, withTimeout(signal)));
     else if (board.kind === "smartrecruiters") tasks.push(() => fetchSmartRecruiters(company.name, board.slug, keywords, withTimeout(signal)));
-    else tasks.push(() => fetchWorkday(company.name, board, keywords, withTimeout(signal)));
+    else if (board.kind === "workday") tasks.push(() => fetchWorkday(company.name, board, keywords, withTimeout(signal)));
   }
   const settled = await pool(tasks, 16);
   const postings: CrawledPosting[] = [];

@@ -31,6 +31,40 @@ type IntelData = {
   };
 };
 
+function toIntel(data: {
+  offerLabel: string;
+  marketLabel: string;
+  market: { sourceLabel?: string | null; attributionUrl?: string | null } | null;
+  comparison: string | null;
+  layoffs: {
+    summary: string;
+    events: { date: string | null; laidOff: number | null; roleMention: boolean; source: string }[];
+    attribution: string;
+    attributionUrl: string;
+    sources: string[];
+  };
+}): IntelData {
+  return {
+    offerLabel: data.offerLabel,
+    marketLabel: data.marketLabel,
+    marketSourceLabel: data.market?.sourceLabel ?? null,
+    marketAttributionUrl: data.market?.attributionUrl ?? null,
+    comparison: data.comparison,
+    layoffs: {
+      summary: data.layoffs.summary,
+      events: data.layoffs.events.slice(0, 3).map((event) => ({
+        date: event.date,
+        laidOff: event.laidOff,
+        roleMention: event.roleMention,
+        source: event.source,
+      })),
+      attribution: data.layoffs.attribution,
+      attributionUrl: data.layoffs.attributionUrl,
+      sources: data.layoffs.sources,
+    },
+  };
+}
+
 /**
  * Compact pay + layoff context for a posting (Find jobs detail / Agent cards).
  * Loads on the client so selection changes don't block the list.
@@ -48,13 +82,22 @@ export function PostingIntelPanel({
 }) {
   const [open, setOpen] = useState(!lazy);
   const [intel, setIntel] = useState<IntelData | null>(null);
-  const [loading, setLoading] = useState(!lazy);
+  const [loadedKey, setLoadedKey] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
+
+  const requestKey = [
+    posting.company,
+    posting.title,
+    posting.place ?? "",
+    posting.country ?? "",
+    posting.salary ?? "",
+    (posting.description ?? "").slice(0, 4_000),
+  ].join("\0");
+  const loading = open && loadedKey !== requestKey;
 
   useEffect(() => {
     if (!open) return;
     let current = true;
-    setLoading(true);
     void loadPostingIntel({
       company: posting.company,
       title: posting.title,
@@ -64,33 +107,13 @@ export function PostingIntelPanel({
       description: (posting.description ?? "").slice(0, 4_000),
     }).then((result) => {
       if (!current) return;
-      if (result.ok) {
-        setIntel({
-          offerLabel: result.data.offerLabel,
-          marketLabel: result.data.marketLabel,
-          marketSourceLabel: result.data.market?.sourceLabel ?? null,
-          marketAttributionUrl: result.data.market?.attributionUrl ?? null,
-          comparison: result.data.comparison,
-          layoffs: {
-            summary: result.data.layoffs.summary,
-            events: result.data.layoffs.events.slice(0, 3).map((event) => ({
-              date: event.date,
-              laidOff: event.laidOff,
-              roleMention: event.roleMention,
-              source: event.source,
-            })),
-            attribution: result.data.layoffs.attribution,
-            attributionUrl: result.data.layoffs.attributionUrl,
-            sources: result.data.layoffs.sources,
-          },
-        });
-      }
-      setLoading(false);
+      if (result.ok) setIntel(toIntel(result.data));
+      setLoadedKey(requestKey);
     });
     return () => {
       current = false;
     };
-  }, [open, posting.company, posting.title, posting.place, posting.country, posting.salary, posting.description]);
+  }, [open, requestKey, posting.company, posting.title, posting.place, posting.country, posting.salary, posting.description]);
 
   const refreshLayoffs = () => {
     setSyncing(true);
@@ -100,7 +123,7 @@ export function PostingIntelPanel({
       if (!ok.ok) return;
       const sourceBit = Array.isArray(ok.data.sources) && ok.data.sources.length > 0 ? ` via ${ok.data.sources.join(", ")}` : "";
       toast(`Imported ${ok.data.imported} layoff events (${ok.data.companies} companies)${sourceBit}.`);
-      setLoading(true);
+      setLoadedKey(null);
       void loadPostingIntel({
         company: posting.company,
         title: posting.title,
@@ -109,28 +132,8 @@ export function PostingIntelPanel({
         salary: posting.salary ?? "",
         description: (posting.description ?? "").slice(0, 4_000),
       }).then((again) => {
-        if (again.ok) {
-          setIntel({
-            offerLabel: again.data.offerLabel,
-            marketLabel: again.data.marketLabel,
-            marketSourceLabel: again.data.market?.sourceLabel ?? null,
-            marketAttributionUrl: again.data.market?.attributionUrl ?? null,
-            comparison: again.data.comparison,
-            layoffs: {
-              summary: again.data.layoffs.summary,
-              events: again.data.layoffs.events.slice(0, 3).map((event) => ({
-                date: event.date,
-                laidOff: event.laidOff,
-                roleMention: event.roleMention,
-                source: event.source,
-              })),
-              attribution: again.data.layoffs.attribution,
-              attributionUrl: again.data.layoffs.attributionUrl,
-              sources: again.data.layoffs.sources,
-            },
-          });
-        }
-        setLoading(false);
+        if (again.ok) setIntel(toIntel(again.data));
+        setLoadedKey(requestKey);
       });
     });
   };
