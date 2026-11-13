@@ -4,7 +4,7 @@ import { fakeJobSearches, resetData, sql } from "./support";
 
 // The job agent end to end: turned on in Settings, run now against the
 // fake Boardsearch and the fake AI, a draft prepared and approved, a posting
-// dismissed, and a second run that brings none of them back.
+// dismissed, and later runs that walk further pages then find nothing new.
 test.beforeAll(resetData);
 // Off again, so its timer leaves the other specs alone.
 test.afterAll(async () => {
@@ -14,7 +14,16 @@ test.afterAll(async () => {
 
 const card = (page: import("@playwright/test").Page, title: string) => page.getByRole("listitem").filter({ has: page.getByRole("heading", { level: 3, name: title }) });
 
+/** Clears agent state so a Playwright retry starts clean after a partial run. */
+async function resetAgentState() {
+  await sql(`DELETE FROM "AgentCandidate"`);
+  await sql(`DELETE FROM "Application" WHERE origin = 'AGENT'`);
+  await sql(`DELETE FROM "Setting" WHERE key LIKE 'agent%'`);
+}
+
 test("finds, scores, drafts and dismisses, and never brings a posting back", async ({ page }) => {
+  await resetAgentState();
+
   await page.goto("/settings?section=agent");
   await page.getByLabel("What").fill("Product designer");
   await page.getByLabel("Country").selectOption("nl");
@@ -69,13 +78,23 @@ test("finds, scores, drafts and dismisses, and never brings a posting back", asy
   await expect(page.getByText("Dismissed. It won't come back.")).toBeVisible();
   await expect(page.getByRole("heading", { level: 3, name: "Product Designer, Logistics" })).toHaveCount(0);
 
-  // A later run brings none of them back…
-  const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
-  await sql(`UPDATE "Setting" SET value = $1 WHERE key = 'agentRuns'`, [JSON.stringify([{ at: twoHoursAgo, manual: true, message: null }])]);
+  // A later run keeps walking the Boardsearch cursor: page 1 is all seen, page 2
+  // has one new posting below the minimum. The earlier three do not come back.
+  const twoHoursAgo = () => new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+  await sql(`UPDATE "Setting" SET value = $1 WHERE key = 'agentRuns'`, [JSON.stringify([{ at: twoHoursAgo(), manual: true, message: null }])]);
+  await page.reload();
+  await page.getByRole("button", { name: "Run now" }).click();
+  await expect(page.getByText("Scored 1 new posting; none reached your minimum score of 70.").first()).toBeVisible({ timeout: 30_000 });
+  await expect(scored.getByRole("heading", { level: 3 })).toHaveCount(0);
+  await page.getByRole("button", { name: /below your minimum score of 70 · Show/ }).click();
+  await expect(page.getByRole("heading", { level: 3, name: "Design Systems Designer" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 3, name: "Product Designer, Logistics" })).toHaveCount(0);
+
+  // Once every page is known, another run finds nothing new.
+  await sql(`UPDATE "Setting" SET value = $1 WHERE key = 'agentRuns'`, [JSON.stringify([{ at: twoHoursAgo(), manual: true, message: null }])]);
   await page.reload();
   await page.getByRole("button", { name: "Run now" }).click();
   await expect(page.getByText("No new postings this time.").first()).toBeVisible({ timeout: 30_000 });
-  await expect(scored.getByRole("heading", { level: 3 })).toHaveCount(0);
 
   // …and Run now waits an hour after it.
   await page.getByRole("button", { name: "Run now" }).click();
