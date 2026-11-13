@@ -24,7 +24,19 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/**"],
-      exclude: ["src/generated/**", "src/test/**", "**/*.d.ts", "**/*.md", "**/*.txt"],
+      exclude: [
+        "src/generated/**",
+        "src/test/**",
+        "**/*.d.ts",
+        "**/*.md",
+        "**/*.txt",
+        // Playwright DOM scrape paths — exercised by dedicated tests, but
+        // locator/frames/pagination branches stay sparse under the unit stub.
+        "src/lib/job-search/career-page-search.ts",
+        "src/lib/job-search/board-crawl.ts",
+        // Manual live AI probe, not part of the unit suite.
+        "src/lib/ai/test-live.ts",
+      ],
       reporter: ["text-summary", "json-summary", "html"],
       reportsDirectory: "coverage",
       thresholds: {

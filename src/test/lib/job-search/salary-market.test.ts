@@ -165,5 +165,81 @@ describe("marketSalaryForRole", () => {
     const html = `<html><script>window.app={"medianTotalPay":185000,"percentile25":150000,"percentile75":220000}</script></html>`;
     const market = parseGlassdoorSalaryHtml(html, source!, "Software Engineer");
     expect(market).toMatchObject({ source: "glassdoor", median: 185000, p25: 150000, p75: 220000 });
+
+    const percentile = parseGlassdoorSalaryHtml(
+      `<html>"percentile50":210000,"p25":180000,"p75":250000</html>`,
+      source!,
+      "SRE",
+    );
+    expect(percentile).toMatchObject({ median: 210000, p25: 180000, p75: 250000 });
+    expect(parseGlassdoorSalaryHtml(`<html><title>Security | Glassdoor</title></html>`, source!, "SRE")).toBeNull();
+  });
+
+  it("compares offers to market median and skips currency mismatches", async () => {
+    const { offerVsMarket } = await import("@/lib/job-search/salary-market");
+    const market = {
+      currency: "USD",
+      median: 100000,
+      p25: 80000,
+      p75: 120000,
+      label: "USD 80k–120k",
+      source: "adzuna",
+      sourceLabel: "Adzuna",
+      note: "Adzuna",
+    };
+    expect(offerVsMarket(null, market)).toBeNull();
+    expect(offerVsMarket({ mid: 100000, min: 100000, max: 100000, currency: "EUR", label: "EUR 100k", period: "year" }, market)).toBeNull();
+    expect(offerVsMarket({ mid: 102000, min: 102000, max: 102000, currency: "USD", label: "USD 102k", period: "year" }, market)).toBe(
+      "About in line with the market median.",
+    );
+    expect(offerVsMarket({ mid: 120000, min: 120000, max: 120000, currency: "USD", label: "USD 120k", period: "year" }, market)).toBe(
+      "About 20% above the market median.",
+    );
+    expect(offerVsMarket({ mid: 80000, min: 80000, max: 80000, currency: "USD", label: "USD 80k", period: "year" }, market)).toBe(
+      "About 20% below the market median.",
+    );
+  });
+
+  it("builds slug candidates and returns null for blank title or country", async () => {
+    const { titleSlugCandidates, marketSalaryForRole } = await import("@/lib/job-search/salary-market");
+    expect(titleSlugCandidates("DevOps Engineer")).toEqual(expect.arrayContaining(["devops-engineer"]));
+    expect(await marketSalaryForRole({ title: "  ", country: "us" })).toBeNull();
+    expect(await marketSalaryForRole({ title: "DevOps Engineer", country: "" })).toBeNull();
+  });
+
+  it("uses Adzuna history when the histogram is empty and caches the result", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/histogram")) {
+        return new Response(JSON.stringify({ histogram: {} }), { status: 200, headers: { "content-type": "application/json" } });
+      }
+      if (url.includes("/history")) {
+        return new Response(JSON.stringify({ month: { "2025-01": "90000", "2025-02": "95000", "2025-03": "100000" } }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      return new Response("{}", { status: 200 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { marketSalaryForRole } = await import("@/lib/job-search/salary-market");
+    const first = await marketSalaryForRole({ title: "Platform Engineer", country: "us" });
+    expect(first).toMatchObject({ source: "adzuna", currency: "USD" });
+    expect(first?.median).toBeGreaterThan(0);
+    const calls = fetchMock.mock.calls.length;
+    const second = await marketSalaryForRole({ title: "Platform Engineer", country: "us" });
+    expect(second?.median).toBe(first?.median);
+    expect(fetchMock.mock.calls.length).toBe(calls);
+  });
+
+  it("caches a miss when no salary source returns data", async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({}), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const { marketSalaryForRole } = await import("@/lib/job-search/salary-market");
+    expect(await marketSalaryForRole({ title: "Obscure Role XYZ", country: "us" })).toBeNull();
+    const calls = fetchMock.mock.calls.length;
+    expect(await marketSalaryForRole({ title: "Obscure Role XYZ", country: "us" })).toBeNull();
+    expect(fetchMock.mock.calls.length).toBe(calls);
   });
 });

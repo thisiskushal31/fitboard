@@ -22,6 +22,13 @@ test("finds, scores, drafts and dismisses, and never brings a posting back", asy
   await expect(page.getByRole("switch", { name: "Run the job agent" })).toHaveAttribute("aria-checked", "true");
   await expect(page.getByText("All changes saved")).toBeVisible();
 
+  // Cap scores at three so the first Boardsearch page is enough (one request).
+  // Without that, the agent walks the cursor to fill agentMaxScores (15).
+  await sql(
+    `INSERT INTO "Setting" (key, value, "updatedAt") VALUES ('agentMaxScores', '3', now())
+     ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, "updatedAt" = now()`,
+  );
+
   // Run now: one search, three postings scored, two in the queue.
   const searches = await fakeJobSearches();
   await page.getByRole("link", { name: "Agent", exact: true }).click();

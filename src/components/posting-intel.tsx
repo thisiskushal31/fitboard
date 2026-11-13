@@ -168,40 +168,44 @@ export function PostingIntelPanel({
           </div>
           <div>
             <dt className="text-meta text-muted">Market for this role</dt>
-            <dd className="text-ink">{intel.marketLabel}</dd>
-            {intel.comparison ? <p className="text-meta text-muted">{intel.comparison}</p> : null}
-            {intel.marketSourceLabel ? (
-              <p className="mt-1 text-meta text-muted">
-                {intel.marketAttributionUrl ? (
-                  <a href={intel.marketAttributionUrl} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
-                    {intel.marketSourceLabel}
-                  </a>
-                ) : (
-                  intel.marketSourceLabel
-                )}
-              </p>
-            ) : null}
+            <dd className="text-ink">
+              <p>{intel.marketLabel}</p>
+              {intel.comparison ? <p className="text-meta text-muted">{intel.comparison}</p> : null}
+              {intel.marketSourceLabel ? (
+                <p className="mt-1 text-meta text-muted">
+                  {intel.marketAttributionUrl ? (
+                    <a href={intel.marketAttributionUrl} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
+                      {intel.marketSourceLabel}
+                    </a>
+                  ) : (
+                    intel.marketSourceLabel
+                  )}
+                </p>
+              ) : null}
+            </dd>
           </div>
           <div>
             <dt className="text-meta text-muted">Layoffs</dt>
-            <dd className="text-ink text-pretty">{intel.layoffs.summary}</dd>
-            {intel.layoffs.events.length > 0 ? (
-              <ul className="mt-1 list-disc pl-5 text-meta text-muted">
-                {intel.layoffs.events.map((event, index) => (
-                  <li key={`${event.date ?? "x"}-${event.source}-${index}`}>
-                    {event.date ?? "Unknown date"}
-                    {event.laidOff != null ? ` · ${event.laidOff.toLocaleString("en-US")} people` : ""}
-                    {event.source ? ` · ${event.source}` : ""}
-                    {event.roleMention ? " · may touch this role/team" : ""}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-            <p className="mt-1 text-meta text-muted">
-              <a href={intel.layoffs.attributionUrl} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
-                {intel.layoffs.attribution}
-              </a>
-            </p>
+            <dd className="text-ink text-pretty">
+              <p>{intel.layoffs.summary}</p>
+              {intel.layoffs.events.length > 0 ? (
+                <ul className="mt-1 list-disc pl-5 text-meta text-muted">
+                  {intel.layoffs.events.map((event, index) => (
+                    <li key={`${event.date ?? "x"}-${event.source}-${index}`}>
+                      {event.date ?? "Unknown date"}
+                      {event.laidOff != null ? ` · ${event.laidOff.toLocaleString("en-US")} people` : ""}
+                      {event.source ? ` · ${event.source}` : ""}
+                      {event.roleMention ? " · may touch this role/team" : ""}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              <p className="mt-1 text-meta text-muted">
+                <a href={intel.layoffs.attributionUrl} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
+                  {intel.layoffs.attribution}
+                </a>
+              </p>
+            </dd>
           </div>
         </dl>
       )}
