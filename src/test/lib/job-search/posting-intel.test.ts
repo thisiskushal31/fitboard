@@ -54,7 +54,8 @@ describe("loadPostingIntel", () => {
       label: "USD 110k–170k",
       source: "adzuna",
       sourceLabel: "Adzuna",
-      note: "Adzuna",
+      attributionUrl: "https://www.adzuna.com/",
+      detail: "Adzuna",
     });
     const { loadPostingIntel } = await import("@/lib/job-search/posting-intel");
     const intel = await loadPostingIntel({

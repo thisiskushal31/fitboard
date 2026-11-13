@@ -185,7 +185,8 @@ describe("marketSalaryForRole", () => {
       label: "USD 80k–120k",
       source: "adzuna",
       sourceLabel: "Adzuna",
-      note: "Adzuna",
+      attributionUrl: "https://www.adzuna.com/",
+      detail: "Adzuna",
     };
     expect(offerVsMarket(null, market)).toBeNull();
     expect(offerVsMarket({ mid: 100000, min: 100000, max: 100000, currency: "EUR", label: "EUR 100k", period: "year" }, market)).toBeNull();
