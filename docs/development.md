@@ -262,7 +262,7 @@ docker build -t fitboard:local .
 FITBOARD_IMAGE=fitboard:local FITBOARD_PORT=3300 docker compose -f compose.production.yml -p fitboard-local up -d
 ```
 
-CI runs on a pull request and on a push to `main`. It lints, type-checks and tests. It does not publish an image. A semver tag (`v0.0.1`, or `v0.0.1-lts`) builds the production image, publishes it to `ghcr.io/<owner>/<repository>` (lower case), and publishes the GitHub release with notes generated from the commits since the previous tag. An LTS tag does not move `latest`.
+CI runs on a pull request and on a push to `main`. It lints, type-checks and tests. It does not publish an image. A semver tag (`0.0.1`, or `0.0.1-lts`) builds the production image, publishes it to `ghcr.io/<owner>/<repository>` (lower case), and publishes the GitHub release with notes generated from the commits since the previous tag. An LTS tag does not move `latest`.
 
 ## Reset
 

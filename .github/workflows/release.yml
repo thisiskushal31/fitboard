@@ -1,11 +1,13 @@
 name: Release
 
-# A semver tag (vX.Y.Z or vX.Y.Z-lts) builds the production image and
-# publishes the GitHub release. A push to main does not.
+# A semver tag (X.Y.Z or X.Y.Z-lts, with or without a leading v) builds the
+# production image and publishes the GitHub release. A push to main does not.
 
 on:
   push:
     tags:
+      - "*.*.*"
+      - "*.*.*-lts"
       - "v*.*.*"
       - "v*.*.*-lts"
 
@@ -109,6 +111,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ steps.meta.outputs.is_lts == 'true' && format('v{0} LTS', steps.meta.outputs.version) || format('v{0}', steps.meta.outputs.version) }}
+          name: ${{ steps.meta.outputs.is_lts == 'true' && format('{0} LTS', steps.meta.outputs.version) || steps.meta.outputs.version }}
           body_path: release-notes.md
           append_body: false
