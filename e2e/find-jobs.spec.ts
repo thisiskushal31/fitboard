@@ -22,7 +22,7 @@ test("searches, keeps postings, and starts an application from one", async ({ pa
   await expect(list.getByRole("listitem")).toHaveCount(3);
   await expect(page.getByRole("heading", { level: 2, name: "Senior Product Designer, Payments" })).toBeVisible();
   await expect(page.getByText("Ledgerly · Rotterdam · EUR 75,000–90,000 a year")).toBeVisible();
-  await expect(page.getByRole("region", { name: "Posting text" })).toContainText("Strong prototyping skills in Figma");
+  await expect(page.getByRole("region", { name: "Posting details" })).toContainText("Strong prototyping skills in Figma");
 
   // The next page, through the cursor.
   await page.getByRole("button", { name: "Show more" }).click();
@@ -153,7 +153,7 @@ test("searches FreeHire, which needs no key and has no radius", async ({ page })
   await expect(page.getByRole("heading", { level: 2, name: "Senior Product Designer, Payments" })).toBeVisible();
   await expect(page.getByText(/^1 posting from FreeHire · searched/)).toBeVisible();
   // Its whole text came with the search.
-  await expect(page.getByRole("region", { name: "Posting text" })).toContainText("for its payments team");
+  await expect(page.getByRole("region", { name: "Posting details" })).toContainText("for its payments team");
   await expect(page.getByText("Jobs by FreeHire").last()).toBeVisible();
 
   // Back to Boardsearch, as the environment sets it, for the tests after.
