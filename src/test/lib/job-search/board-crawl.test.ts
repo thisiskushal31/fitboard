@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { json, stubFetch } from "@/lib/ai/test-http";
 
-import { filterPublicBoards, officialCareers, type CrawledPosting } from "@/lib/job-search/board-crawl";
+import { catalogCompanyByName, filterPublicBoards, officialCareers, type CrawledPosting } from "@/lib/job-search/board-crawl";
 import { EMPTY_QUERY } from "@/lib/job-search/search";
 
 vi.mock("@/lib/job-search/career-page-search", () => ({
@@ -37,6 +37,25 @@ describe("career links", () => {
     const keys = links.map((link) => `${link.name}\n${link.url}`);
     expect(new Set(keys).size).toBe(links.length);
     expect(links.filter((link) => link.url === "https://careers.jio.com/frmJobCategories.aspx").map((link) => link.name).sort()).toEqual(["Jio", "Jio Platforms"]);
+  });
+
+  it("resolves a catalog company by name", () => {
+    const row = catalogCompanyByName("Deloitte India");
+    expect(row?.name).toBe("Deloitte India");
+    expect(catalogCompanyByName("No Such Employer XYZ")).toBeUndefined();
+  });
+});
+
+describe("company post-filter", () => {
+  it("keeps only the selected employer when company is set", () => {
+    const kept = filterPublicBoards(
+      [
+        posting({ title: "DevOps Engineer", place: "Mumbai, India", company: "Deloitte India" }),
+        posting({ title: "DevOps Engineer", place: "Mumbai, India", company: "Accenture" }),
+      ],
+      { ...query, place: "", company: "Deloitte India" },
+    );
+    expect(kept.map((row) => row.company)).toEqual(["Deloitte India"]);
   });
 });
 

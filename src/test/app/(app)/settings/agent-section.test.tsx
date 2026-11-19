@@ -12,7 +12,7 @@ vi.mock("@/components/toast", () => ({ toast: vi.fn(), toastResult: (result: { o
 
 const initial: AgentSettings = {
   enabled: false,
-  query: { keywords: "Data scientist", place: "Berlin", country: "de", radiusKm: 25, remoteOnly: false, postedWithin: "any" },
+  query: { keywords: "Data scientist", company: "", place: "Berlin", country: "de", radiusKm: 25, remoteOnly: false, postedWithin: "any" },
   hour: 7,
   minScore: 70,
   maxScores: 15,
@@ -45,7 +45,7 @@ describe("Settings → Job agent", () => {
     open({ initial: { ...initial, query: { ...initial.query, keywords: "", country: "" } } });
     await user.click(screen.getByRole("switch", { name: "Run the job agent" }));
     expect(saveAgentSettings).not.toHaveBeenCalled();
-    expect(screen.getByLabelText("What")).toHaveAccessibleDescription("Type what the agent should look for.");
+    expect(screen.getByLabelText("What")).toHaveAccessibleDescription("Type what the agent should look for, or choose a company.");
     expect(screen.getByLabelText("Country")).toHaveAccessibleDescription("Choose a country.");
     expect(screen.getByRole("switch", { name: "Run the job agent" })).toHaveAttribute("aria-checked", "false");
   });
@@ -105,10 +105,13 @@ describe("Settings → Job agent", () => {
 
   it("switches back and says why when a change isn't saved", async () => {
     const user = userEvent.setup();
-    vi.mocked(saveAgentSettings).mockResolvedValueOnce({ ok: false, error: "Type what the agent should look for before turning it on." });
+    vi.mocked(saveAgentSettings).mockResolvedValueOnce({
+      ok: false,
+      error: "Type what the agent should look for, or choose a company, before turning it on.",
+    });
     open();
     await user.click(screen.getByRole("switch", { name: "Run the job agent" }));
     await waitFor(() => expect(screen.getByRole("switch", { name: "Run the job agent" })).toHaveAttribute("aria-checked", "false"));
-    expect(toast).toHaveBeenCalledWith("Type what the agent should look for before turning it on.");
+    expect(toast).toHaveBeenCalledWith("Type what the agent should look for, or choose a company, before turning it on.");
   });
 });

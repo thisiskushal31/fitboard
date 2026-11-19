@@ -20,12 +20,13 @@ export function uncoveredCountry(source: JobSource | null, query: SearchQuery, c
   return `${SOURCE_INFO[source].name} doesn't list jobs in ${name}.`;
 }
 
-/** What, Where, Country, Within and Posted, for a grid; Remote only is RemoteOnlyField. */
+/** What, Company, Where, Country, Within and Posted, for a grid; Remote only is RemoteOnlyField. */
 export function SearchFields({
   value,
   onChange,
   source,
   countries,
+  companies = [],
   errors = {},
   onBlur,
 }: {
@@ -33,6 +34,8 @@ export function SearchFields({
   onChange: (patch: Partial<SearchQuery>) => void;
   source: JobSource | null;
   countries: readonly Country[];
+  /** Catalog employer names for the Company field. */
+  companies?: readonly string[];
   errors?: SearchFieldErrors;
   /** For text fields that save once typing is done. */
   onBlur?: () => void;
@@ -45,11 +48,19 @@ export function SearchFields({
         label="What"
         className="sm:col-span-2 lg:col-span-1"
         value={value.keywords}
-        placeholder="Job title, skill or company"
+        placeholder="Job title or skill"
         error={errors.keywords}
         onChange={(event) => onChange({ keywords: event.target.value })}
         onBlur={onBlur}
       />
+      <Select label="Company" value={value.company} onChange={(event) => onChange({ company: event.target.value })}>
+        <option value="">Any company</option>
+        {companies.map((name) => (
+          <option key={name} value={name}>
+            {name}
+          </option>
+        ))}
+      </Select>
       <Input label="Where" value={value.place} placeholder="City or region" onChange={(event) => onChange({ place: event.target.value })} onBlur={onBlur} />
       <Select label="Country" value={value.country} error={errors.country ?? uncovered} onChange={(event) => onChange({ country: event.target.value })}>
         <option value="">Choose a country or zone</option>

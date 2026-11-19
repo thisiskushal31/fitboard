@@ -33,4 +33,34 @@ describe("skill-led gap read", () => {
     expect(read.resumeNote.toLowerCase()).toContain("resume");
     expect(read.regions).toContain("UK");
   });
+
+  it("notes when skills fit but the title differs from the search", () => {
+    const read = assessGap(
+      {
+        title: "Platform Consultant",
+        description: "We need Kubernetes, Terraform, Python, and AWS in production.",
+        place: "Bengaluru, India",
+        remote: false,
+      },
+      ["Kubernetes", "Terraform", "Python", "AWS"],
+      "DevOps Engineer",
+    );
+    expect(read.fit).toBe("suited");
+    expect(read.titleAligned).toBe(false);
+    expect(read.titleNote.toLowerCase()).toContain("title differs");
+  });
+
+  it("skips the title note when the title already matches the search", () => {
+    const read = assessGap(
+      {
+        title: "DevOps Engineer",
+        description: "Kubernetes, Terraform, Python, AWS.",
+        place: "Bengaluru, India",
+      },
+      ["Kubernetes", "Terraform", "Python", "AWS"],
+      "DevOps Engineer",
+    );
+    expect(read.titleAligned).toBe(true);
+    expect(read.titleNote).toBe("");
+  });
 });

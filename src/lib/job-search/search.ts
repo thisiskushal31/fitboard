@@ -40,6 +40,8 @@ const POSTED_VALUES = POSTED_WITHIN.map((option) => option.value) as [PostedWith
 /** One search, as every source gets it. */
 export const searchQuerySchema = z.object({
   keywords: z.string().trim().max(200),
+  /** Employer from the job-boards catalog; empty means any company. */
+  company: z.string().trim().max(120).default(""),
   /** A city or region; empty searches the whole country. */
   place: z.string().trim().max(200),
   /** ISO 3166-1 alpha-2 in lower case, e.g. "de", or a zone code such as "apac"; empty until one is chosen. */
@@ -56,12 +58,18 @@ export type SearchQuery = z.output<typeof searchQuerySchema>;
 
 export const EMPTY_QUERY: SearchQuery = {
   keywords: "",
+  company: "",
   place: "",
   country: "",
   radiusKm: DEFAULT_RADIUS_KM,
   remoteOnly: false,
   postedWithin: "any",
 };
+
+/** Keywords plus company for external APIs that take a single text query. */
+export function sourceWhatText(query: Pick<SearchQuery, "keywords" | "company">): string {
+  return [query.keywords, query.company].map((part) => part.trim()).filter(Boolean).join(" ");
+}
 
 /** A posting as a source found it, in one shape for every source. */
 export const foundPostingSchema = z.object({
@@ -132,11 +140,11 @@ export type PastSearchDay = {
   searches: { id: string; source: JobSource; query: SearchQuery; found: number; time: string }[];
 };
 
-/** "product designer · Hamburg, 25 km · Remote only · Past week": a search in a line, without the km for a source that has no radius. */
+/** "product designer · Deloitte India · Hamburg, 25 km · Remote only · Past week": a search in a line, without the km for a source that has no radius. */
 export function describeSearch(query: SearchQuery, countryName: string, source?: JobSource | null): string {
   const where = query.place ? (source && !SOURCE_INFO[source].radius ? query.place : `${query.place}, ${query.radiusKm} km`) : countryName;
   const posted = POSTED_WITHIN.find((option) => option.value === query.postedWithin);
-  return [query.keywords, where, query.remoteOnly ? "Remote only" : "", posted && posted.value !== "any" ? posted.label : ""].filter(Boolean).join(" · ");
+  return [query.keywords, query.company, where, query.remoteOnly ? "Remote only" : "", posted && posted.value !== "any" ? posted.label : ""].filter(Boolean).join(" · ");
 }
 
 /** Identifies a posting across searches. */
@@ -178,15 +186,17 @@ export function linkKey(link: string): string {
 
 const one = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value) ?? "";
 
-/** The search in the URL, or null when there's none (no keywords). */
+/** The search in the URL, or null when there's none (no keywords and no company). */
 export function queryFromParams(params: Record<string, string | string[] | undefined>): SearchQuery | null {
   const keywords = one(params.q).trim();
-  if (!keywords) return null;
+  const company = one(params.company).trim();
+  if (!keywords && !company) return null;
   const radius = Number(one(params.radius));
   const posted = POSTED_VALUES.find((value) => value === one(params.posted));
   const country = one(params.country).trim().toLowerCase();
   return {
     keywords: keywords.slice(0, 200),
+    company: company.slice(0, 120),
     place: one(params.where).trim().slice(0, 200),
     country: /^[a-z]{2}$/.test(country) || zoneByCode(country) ? country : "",
     radiusKm: RADII_KM.find((km) => km === radius) ?? DEFAULT_RADIUS_KM,
@@ -210,7 +220,9 @@ export const searchRunHref = (id: string) => `/jobs?search=${encodeURIComponent(
 
 /** The Find jobs URL for a search. */
 export function searchHref(query: SearchQuery): string {
-  const params = new URLSearchParams({ q: query.keywords });
+  const params = new URLSearchParams();
+  if (query.keywords) params.set("q", query.keywords);
+  if (query.company) params.set("company", query.company);
   if (query.place) params.set("where", query.place);
   if (query.country) params.set("country", query.country);
   if (query.radiusKm !== DEFAULT_RADIUS_KM) params.set("radius", String(query.radiusKm));

@@ -251,6 +251,7 @@ export function PostingResults(props: PostingResultsProps) {
           scoring={scoring[postingKey(selected)] ?? null}
           onScore={() => void score(selected)}
           profileSkills={profileSkills}
+          searchKeywords={mode === "search" ? props.search.query.keywords : ""}
         >
           {!selected.state.dismissed && (
             <StartButton starting={starting === postingKey(selected)} onClick={() => void start(withoutState(selected), postingKey(selected))} />
@@ -414,6 +415,7 @@ function GapReadout({ read }: { read: GapRead }) {
         {read.label}
         {read.regions.length > 0 ? ` · ${read.regions.join(" · ")}` : ""}
       </p>
+      {read.titleNote ? <p className="text-muted">{read.titleNote}</p> : null}
       {read.matched.length > 0 && <p className="text-muted">On the profile: {read.matched.join(", ")}</p>}
       {read.missing.length > 0 && (
         <p>
@@ -471,6 +473,7 @@ function PostingDetail({
   scoring,
   onScore,
   profileSkills,
+  searchKeywords = "",
   children,
 }: {
   ref: Ref<HTMLElement>;
@@ -485,6 +488,8 @@ function PostingDetail({
   scoring: { step: string | null } | null;
   onScore: () => void;
   profileSkills: readonly string[];
+  /** Find jobs keywords, for the title-alignment note on the gap readout. */
+  searchKeywords?: string;
   /** More actions, before Save. */
   children?: ReactNode;
 }) {
@@ -511,13 +516,15 @@ function PostingDetail({
   const { state } = posting;
   const ago = postedAgo(posting.postedAt, now);
 
+  const description = text.status === "loading" ? posting.description : text.text;
+
   return (
     <section
       ref={ref}
       aria-labelledby={headingId}
-      className="flex min-w-0 flex-[999_1_420px] scroll-mt-[121px] flex-col gap-4 rounded-panel border border-line-card bg-card p-7 max-lg:order-first max-lg:max-h-[75vh] lg:sticky lg:top-[121px] lg:max-h-[calc(100dvh-145px)]"
+      className="flex min-w-0 flex-[999_1_420px] scroll-mt-[121px] flex-col gap-4 overflow-hidden rounded-panel border border-line-card bg-card p-7 max-lg:order-first max-lg:max-h-[75vh] lg:sticky lg:top-[121px] lg:max-h-[calc(100dvh-145px)]"
     >
-      <div className="flex flex-col gap-1.5">
+      <div className="flex shrink-0 flex-col gap-1.5">
         <h2 id={headingId} className="font-serif text-section text-pretty">
           {posting.title || "Untitled posting"}
         </h2>
@@ -528,7 +535,7 @@ function PostingDetail({
       </div>
 
       {state.applicationId && (
-        <p role="note" className="rounded-card bg-track px-4 py-3 text-meta">
+        <p role="note" className="shrink-0 rounded-card bg-track px-4 py-3 text-meta">
           You&apos;ve applied for this.{" "}
           <Link href={`/applications/${state.applicationId}`} className="underline underline-offset-2">
             Open the application
@@ -536,7 +543,7 @@ function PostingDetail({
         </p>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex shrink-0 flex-wrap items-center gap-2">
         {children}
         {state.dismissed ? (
           <Button variant="secondary" size="sm" onClick={onRestore}>
@@ -570,56 +577,73 @@ function PostingDetail({
         )}
       </div>
 
-      <PostingIntelPanel
-        posting={{
-          company: posting.company,
-          title: posting.title,
-          place: posting.place,
-          country,
-          salary: posting.salary,
-          description: text.status === "loading" ? posting.description : text.text,
-        }}
-      />
-
-      <GapReadout
-        read={assessGap(
-          {
-            title: posting.title,
-            description: text.status === "loading" ? posting.description : text.text,
-            place: posting.place,
-            remote: posting.remote,
-          },
-          profileSkills,
-        )}
-      />
-
-      {scoring ? (
-        <p role="status" className="text-meta text-muted">
-          {scoring.step ?? "Starting…"}
-        </p>
-      ) : (
-        state.score && <Fit fit={state.score} />
-      )}
-
-      {/* Only the text scrolls, so the title and actions stay in view; focusable, so it scrolls from the keyboard too. */}
-      <div tabIndex={0} role="region" aria-label="Posting text" className="-mx-1 min-h-0 flex-1 overflow-y-auto border-t border-line px-1 pt-4">
-        {text.status === "loading" ? (
-          <p role="status" className="text-sm text-muted">
-            Getting the whole posting…
-          </p>
-        ) : (
-          <>
-            {text.status === "partial" && (
-              <p className="mb-3 rounded-card bg-warning-surface px-4 py-3 text-meta text-warning">
-                This is only the start of the posting. When you start an application, you can paste the rest from the posting&apos;s page.
-              </p>
+      {/* One scroll under the title and actions: fit / pay first, then posting text
+          only when the source returned any. Empty listings show a short note here. */}
+      <div tabIndex={0} role="region" aria-label="Posting details" className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        <div className="flex flex-col gap-3 pr-1">
+          <PostingIntelPanel
+            posting={{
+              company: posting.company,
+              title: posting.title,
+              place: posting.place,
+              country,
+              salary: posting.salary,
+              description,
+            }}
+          />
+          {scoring ? (
+            <p role="status" className="text-meta text-muted">
+              {scoring.step ?? "Starting…"}
+            </p>
+          ) : (
+            state.score && <Fit fit={state.score} />
+          )}
+          <GapReadout
+            read={assessGap(
+              {
+                title: posting.title,
+                description,
+                place: posting.place,
+                remote: posting.remote,
+              },
+              profileSkills,
+              searchKeywords,
             )}
-            <div className="text-sm leading-relaxed whitespace-pre-line">{text.text || "The source didn't send a description."}</div>
-          </>
-        )}
+          />
+
+          {text.status === "loading" ? (
+            <p role="status" className="border-t border-line pt-3 text-sm text-muted">
+              Getting the whole posting…
+            </p>
+          ) : text.text.trim() ? (
+            <div className="border-t border-line pt-3">
+              {text.status === "partial" && (
+                <p className="mb-3 rounded-card bg-warning-surface px-4 py-3 text-meta text-warning">
+                  This is only the start of the posting. When you start an application, you can paste the rest from the posting&apos;s page.
+                </p>
+              )}
+              <div className="text-sm leading-relaxed whitespace-pre-line">{text.text}</div>
+            </div>
+          ) : (
+            <p className="rounded-card bg-track px-4 py-3 text-sm text-muted">
+              {posting.url ? (
+                <>
+                  No description was returned for this listing.{" "}
+                  <a href={posting.url} target="_blank" rel="noopener noreferrer" className="font-medium text-ink underline underline-offset-2">
+                    Open the posting
+                  </a>{" "}
+                  to read it, then paste it when you start an application.
+                </>
+              ) : (
+                "No description was returned for this listing."
+              )}
+            </p>
+          )}
+        </div>
       </div>
+
       {/* As the source's terms ask. */}
-      <SourceAttribution source={posting.source} url={posting.url} className="self-start" />
+      <SourceAttribution source={posting.source} url={posting.url} className="shrink-0 self-start" />
     </section>
   );
 }

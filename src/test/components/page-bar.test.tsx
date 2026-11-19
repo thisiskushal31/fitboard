@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { PageHeader } from "@/components/page-header";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/jobs" }));
+vi.mock("@/hooks/use-navigation", () => ({ usePathname: () => "/jobs" }));
 
 describe("PageHeader", () => {
   it("puts the title and actions in the bar, with the section's icon, and the description under it", () => {

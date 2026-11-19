@@ -23,14 +23,31 @@ import {
 
 describe("search in the URL", () => {
   it("round-trips a search", () => {
-    const query = { keywords: "product designer", place: "Hamburg", country: "de", radiusKm: 50 as const, remoteOnly: true, postedWithin: "week" as const };
+    const query = {
+      keywords: "product designer",
+      company: "Deloitte India",
+      place: "Hamburg",
+      country: "de",
+      radiusKm: 50 as const,
+      remoteOnly: true,
+      postedWithin: "week" as const,
+    };
     const href = searchHref(query);
-    expect(href).toBe("/jobs?q=product+designer&where=Hamburg&country=de&radius=50&remote=1&posted=week");
+    expect(href).toBe("/jobs?q=product+designer&company=Deloitte+India&where=Hamburg&country=de&radius=50&remote=1&posted=week");
     expect(queryFromParams(Object.fromEntries(new URL(href, "http://x").searchParams))).toEqual(query);
   });
 
   it("leaves defaults out of the URL", () => {
     expect(searchHref({ ...EMPTY_QUERY, keywords: "nurse" })).toBe("/jobs?q=nurse");
+  });
+
+  it("allows a company-only search in the URL", () => {
+    expect(queryFromParams({ company: "Deloitte India", country: "in" })).toMatchObject({
+      keywords: "",
+      company: "Deloitte India",
+      country: "in",
+    });
+    expect(searchHref({ ...EMPTY_QUERY, company: "Deloitte India", country: "in" })).toBe("/jobs?company=Deloitte+India&country=in");
   });
 
   it("reads the view from the URL", () => {
@@ -41,7 +58,7 @@ describe("search in the URL", () => {
     expect(viewHref("saved")).toBe("/jobs?view=saved");
   });
 
-  it("has no search without keywords", () => {
+  it("has no search without keywords or company", () => {
     expect(queryFromParams({})).toBeNull();
     expect(queryFromParams({ q: "  ", where: "Berlin" })).toBeNull();
   });
@@ -70,6 +87,9 @@ describe("a search in a line", () => {
     expect(describeSearch(query, "Germany", "ADZUNA")).toBe("product designer · Hamburg, 25 km · Remote only · Past week");
     expect(describeSearch(query, "Germany", "FREEHIRE")).toBe("product designer · Hamburg · Remote only · Past week");
     expect(describeSearch({ ...query, place: "" }, "Germany", "FREEHIRE")).toBe("product designer · Germany · Remote only · Past week");
+    expect(describeSearch({ ...query, company: "Deloitte India" }, "Germany")).toBe(
+      "product designer · Deloitte India · Hamburg, 25 km · Remote only · Past week",
+    );
   });
 });
 

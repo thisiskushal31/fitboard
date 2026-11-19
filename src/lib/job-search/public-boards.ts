@@ -25,18 +25,24 @@ function toFound(posting: CrawledPosting): FoundPosting {
     url: safeLink(posting.url).slice(0, 2000),
     via: posting.via,
     description: posting.description,
-    complete: posting.description.length > 0,
+    // Crawl already has whatever text this source can give; details() cannot fetch more.
+    complete: true,
   };
 }
 
 async function searchPage(query: SearchQuery, _credentials: Record<string, never>, next: string | null, context?: { signal?: AbortSignal }) {
   let crawled;
   try {
-    crawled = await crawlPublicBoards({ keywords: query.keywords, place: query.place, country: query.country }, context?.signal);
+    crawled = await crawlPublicBoards(
+      { keywords: query.keywords, place: query.place, country: query.country, company: query.company },
+      context?.signal,
+    );
   } catch (error) {
     throw jobSearchError("unavailable", "PUBLIC_BOARDS", { detail: error instanceof Error ? error.message : "crawl failed" });
   }
-  const relatedTerms = await expandRelatedRoleTerms(query.keywords, context?.signal).catch(() => [] as string[]);
+  const relatedTerms = query.keywords.trim()
+    ? await expandRelatedRoleTerms(query.keywords, context?.signal).catch(() => [] as string[])
+    : [];
   const filtered = filterPublicBoards(crawled, {
     keywords: query.keywords,
     place: query.place,
@@ -44,6 +50,7 @@ async function searchPage(query: SearchQuery, _credentials: Record<string, never
     remoteOnly: query.remoteOnly,
     postedWithinDays: postedWithinDays(query.postedWithin),
     relatedTerms,
+    company: query.company,
   });
   const offset = next?.startsWith("offset:") ? Number(next.slice("offset:".length)) || 0 : 0;
   const postings = filtered.slice(offset, offset + PAGE_SIZE).map(toFound);

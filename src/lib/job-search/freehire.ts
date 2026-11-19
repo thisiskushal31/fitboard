@@ -7,7 +7,7 @@ import { fetchPosting } from "@/lib/postings/posting-fetch";
 import type { JobSourceAdapter, RequestContext } from "./adapter";
 import { jobSearchError } from "./errors";
 import { requestJson } from "./http";
-import { POSTED_WITHIN, safeLink, type FoundPosting, type SearchPage, type SearchQuery } from "./search";
+import { POSTED_WITHIN, safeLink, sourceWhatText, type FoundPosting, type SearchPage, type SearchQuery } from "./search";
 import { FREEHIRE_URL } from "./sources";
 
 // FreeHire: ATS-direct catalogue over a public HTTP API (no key). Search
@@ -105,8 +105,9 @@ export function postingFromJob(job: Job): FoundPosting {
 }
 
 /** "designer in Hamburg": FreeHire has no radius; place rides in the query text. */
-function queryText({ keywords, place }: SearchQuery): string {
-  return place ? `${keywords} in ${place}` : keywords;
+function queryText(query: SearchQuery): string {
+  const what = sourceWhatText(query);
+  return query.place ? `${what} in ${query.place}` : what;
 }
 
 function searchUrl(query: SearchQuery, offset: number, baseUrl?: string): URL {
@@ -159,6 +160,6 @@ export const freehire: JobSourceAdapter<"FREEHIRE"> = {
     return page.ok ? page.text : null;
   },
   test: async (_credentials, context) => {
-    await searchPage({ keywords: "developer", place: "", country: "us", radiusKm: 25, remoteOnly: false, postedWithin: "any" }, {}, null, context);
+    await searchPage({ keywords: "developer", company: "", place: "", country: "us", radiusKm: 25, remoteOnly: false, postedWithin: "any" }, {}, null, context);
   },
 };

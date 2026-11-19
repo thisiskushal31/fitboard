@@ -7,7 +7,7 @@ import { NavLinks } from "@/app/(app)/nav-links";
 import { SidebarFrame } from "@/app/(app)/sidebar-frame";
 import { ThemeToggle } from "@/app/(app)/theme-toggle";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
+vi.mock("@/hooks/use-navigation", () => ({ usePathname: () => "/" }));
 vi.mock("next/link", () => ({
   default: ({ href, ...props }: ComponentProps<"a">) => <a href={href} {...props} />,
 }));

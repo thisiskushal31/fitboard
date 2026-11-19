@@ -8,7 +8,8 @@ import { rememberQuietDays } from "@/app/(app)/actions";
 import { Dashboard } from "@/app/(app)/dashboard";
 
 const router = vi.hoisted(() => ({ replace: vi.fn(), refresh: vi.fn() }));
-vi.mock("next/navigation", () => ({ useRouter: () => router, usePathname: () => null, useSearchParams: () => new URLSearchParams() }));
+vi.mock("next/navigation", () => ({ useRouter: () => router }));
+vi.mock("@/hooks/use-navigation", () => ({ usePathname: () => "/", useSearchParams: () => new URLSearchParams() }));
 vi.mock("@/app/(app)/actions", () => ({ rememberDashboardPeriod: vi.fn(), rememberQuietDays: vi.fn(async () => ({ ok: true, data: null })) }));
 vi.mock("@/components/toast", () => ({ toast: vi.fn(), toastResult: (result: unknown) => result }));
 

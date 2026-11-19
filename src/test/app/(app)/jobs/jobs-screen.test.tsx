@@ -158,14 +158,25 @@ describe("the search form", () => {
     expect(screen.getByText("That search is no longer kept. Search again, or open one from Past searches.")).toBeInTheDocument();
   });
 
-  it("asks for keywords and a country first", async () => {
-    renderScreen({ query: EMPTY_QUERY });
+  it("asks for keywords or a company, and a country first", async () => {
+    renderScreen({ query: EMPTY_QUERY, companies: ["Deloitte India"] });
     await userEvent.click(screen.getByRole("button", { name: "Search" }));
-    expect(screen.getByText("Type what you're looking for.")).toBeInTheDocument();
+    expect(screen.getByText("Type what you're looking for, or choose a company.")).toBeInTheDocument();
     expect(screen.getByText("Choose a country.")).toBeInTheDocument();
     expect(runJobSearch).not.toHaveBeenCalled();
     // Without a place, the radius has nothing to go by.
     expect(screen.getByLabelText("Within")).toBeDisabled();
+  });
+
+  it("allows a company-only search when What is empty", async () => {
+    renderScreen({ query: { ...EMPTY_QUERY, country: "in" }, companies: ["Deloitte India"] });
+    await userEvent.selectOptions(screen.getByLabelText("Company"), "Deloitte India");
+    await userEvent.click(screen.getByRole("button", { name: "Search" }));
+    await waitFor(() =>
+      expect(runJobSearch).toHaveBeenCalledWith({
+        query: expect.objectContaining({ keywords: "", company: "Deloitte India", country: "in" }),
+      }),
+    );
   });
 
   it("has no radius for a source without one", () => {

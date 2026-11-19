@@ -3,6 +3,7 @@ import "server-only";
 import { credentialsFor, loadJobSearchConfig, requestContext } from "./config";
 import { JobSearchError } from "./errors";
 import { postingDetails, searchPostings } from "./index";
+import { refineFoundPostings } from "./refine-results";
 import type { FoundPosting, JobSource, SearchPage, SearchProblem, SearchQuery } from "./search";
 
 // Asking a job source from Find jobs: a page of postings, or what
@@ -23,7 +24,8 @@ export async function askSource(
   if (!query.country) return { ok: false, problem: "no-country", message: "Choose a country to search in." };
   try {
     const page = await searchPostings(from, credentialsFor(config, from), query, next, requestContext(from));
-    return { ok: true, source: from, ...page };
+    const postings = await refineFoundPostings(page.postings, query, from);
+    return { ok: true, source: from, postings, next: page.next };
   } catch (error) {
     if (error instanceof JobSearchError) return { ok: false, problem: error.problem, message: error.message };
     throw error;

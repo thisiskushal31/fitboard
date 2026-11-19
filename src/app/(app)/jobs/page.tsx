@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { isAiUsable } from "@/lib/ai/config";
 import { handsOffToClaude } from "@/lib/connector/handoff";
+import { catalogCareers } from "@/lib/job-search/board-crawl";
 import { loadJobSearchConfig } from "@/lib/job-search/config";
 import { COUNTRIES } from "@/lib/job-search/countries";
 import { defaultSearch, latestRole, queryFromParams, viewFromParams } from "@/lib/job-search/search";
@@ -42,6 +43,8 @@ export default async function JobsPage({ searchParams }: PageProps<"/jobs">) {
     view === "history" ? listSearches({ timeZone, now }) : undefined,
   ]);
 
+  const companies = Array.from(new Set(catalogCareers().map((row) => row.name))).sort((a, b) => a.localeCompare(b));
+
   return (
     <JobsScreen
       source={config.source}
@@ -49,6 +52,7 @@ export default async function JobsPage({ searchParams }: PageProps<"/jobs">) {
       scoreInClaude={scoreInClaude}
       // Named here: the browser's ICU can name a few countries differently from the server's.
       countries={COUNTRIES}
+      companies={companies}
       view={view}
       query={typed ?? search?.query ?? (await latestQuery()) ?? (await profileSearch())}
       search={search}

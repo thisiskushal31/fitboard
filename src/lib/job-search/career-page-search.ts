@@ -10,13 +10,8 @@ import { env } from "@/lib/core/env";
 
 import { countryName } from "./countries";
 import { recordBoardCrawl, type BoardCrawlStatus } from "./crawl-results";
-import {
-  expandRelatedRoleTerms,
-  queryTokens,
-  roleMatchesQuery,
-  specialtyTokens,
-  specialtyTokensRelated,
-} from "./related-roles";
+import { expandRelatedRoleTerms } from "./related-roles";
+import { queryTokens, roleMatchesQuery, specialtyTokens, specialtyTokensRelated } from "./related-roles-core";
 
 // Re-export match helpers for tests / callers that import from this module.
 export { queryTokens, roleMatchesQuery, specialtyTokens, specialtyTokensRelated };
@@ -1190,7 +1185,6 @@ export async function searchCareerPage(
 ): Promise<CareerPagePosting[]> {
   if (signal?.aborted) throw signal.reason ?? new Error("aborted");
   const keywords = query.keywords.trim();
-  if (!keywords) return [];
   const key = cacheKey(company.url, { ...query, keywords });
   const cached = await readCache(key);
   if (cached) {
@@ -1239,20 +1233,22 @@ export async function searchCareerPage(
   };
 
   // Fast JSON paths when the host exposes a public jobs API for the same search.
-  for (const attempt of [
-    () => searchAccentureJobs(company.url, keywords, location, signal),
-    () => searchPhenomJobs(company.url, keywords, location, signal),
-  ]) {
-    const apiJobs = await attempt();
-    if (apiJobs) {
-      const jobs = toPostings(company.name, apiJobs);
-      return finish(
-        jobs,
-        jobs.length > 0 ? "ok" : "empty",
-        jobs.length > 0 ? `Portal API returned ${jobs.length} listing${jobs.length === 1 ? "" : "s"}.` : "Portal API answered but returned no listings for this search.",
-        "api",
-        false,
-      );
+  if (keywords) {
+    for (const attempt of [
+      () => searchAccentureJobs(company.url, keywords, location, signal),
+      () => searchPhenomJobs(company.url, keywords, location, signal),
+    ]) {
+      const apiJobs = await attempt();
+      if (apiJobs) {
+        const jobs = toPostings(company.name, apiJobs);
+        return finish(
+          jobs,
+          jobs.length > 0 ? "ok" : "empty",
+          jobs.length > 0 ? `Portal API returned ${jobs.length} listing${jobs.length === 1 ? "" : "s"}.` : "Portal API answered but returned no listings for this search.",
+          "api",
+          false,
+        );
+      }
     }
   }
 
@@ -1290,7 +1286,8 @@ export async function searchCareerPage(
       const brandSweep = await sweepBrandCategoryFilters(page, page.url());
       // No search box yet — still bump page size / paginate and harvest cards.
       const listedBefore = mergeRawJobs(brandSweep.jobs, await collectAllListings(page, page.url()));
-      const searched = await fillSearch(page, keywords, location);
+      // Company-only browse leaves the search box alone and keeps every listing.
+      const searched = keywords ? await fillSearch(page, keywords, location) : false;
       if (!searched) {
         // Ctrl+F-style match: direct tokens + nearby skill/role families.
         const matched = await filterJobsByQuery(listedBefore, keywords, signal);
@@ -1405,11 +1402,11 @@ export async function searchOfficialCareers(
   query: CareerSearchQuery,
   signal?: AbortSignal,
 ): Promise<CareerPagePosting[]> {
+  if (companies.length === 0) return [];
   const keywords = query.keywords.trim();
-  if (!keywords) return [];
   const normalized = { keywords, place: query.place, country: query.country };
   // One AI expansion for the whole crawl (cached) so every company sees the same related roles.
-  await expandRelatedRoleTerms(keywords, signal).catch(() => []);
+  if (keywords) await expandRelatedRoleTerms(keywords, signal).catch(() => []);
   const work = companies.map((company) => async () => searchCareerPage(company, normalized, signal));
   const results: PromiseSettledResult<CareerPagePosting[]>[] = new Array(work.length);
   let next = 0;

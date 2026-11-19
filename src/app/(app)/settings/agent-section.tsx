@@ -45,6 +45,7 @@ export function AgentSection({
   source,
   scoring,
   countries,
+  companies = [],
   timeZone,
 }: {
   initial: AgentSettings;
@@ -53,6 +54,8 @@ export function AgentSection({
   /** What scores the postings (Settings → Scoring), and whether it's set up. */
   scoring: { scorer: Scorer; ready: boolean };
   countries: readonly Country[];
+  /** Catalog employer names for the Company field. */
+  companies?: readonly string[];
   /** The user's time zone, which the hour is in. */
   timeZone: string;
 }) {
@@ -75,8 +78,9 @@ export function AgentSection({
 
   const turnOn = (on: boolean) => {
     if (on) {
+      const hasWhat = Boolean(settings.query.keywords.trim() || settings.query.company.trim());
       const problems = {
-        keywords: settings.query.keywords.trim() ? undefined : "Type what the agent should look for.",
+        keywords: hasWhat ? undefined : "Type what the agent should look for, or choose a company.",
         country: settings.query.country ? undefined : "Choose a country.",
       };
       setErrors(problems);
@@ -135,7 +139,7 @@ export function AgentSection({
           </p>
         </div>
         <div className="grid grid-cols-1 items-start gap-x-4 gap-y-4 sm:grid-cols-2" onBlur={flush}>
-          <SearchFields value={settings.query} onChange={setQuery} source={source} countries={countries} errors={errors} />
+          <SearchFields value={settings.query} onChange={setQuery} source={source} countries={countries} companies={companies} errors={errors} />
           <div className="sm:col-span-2">
             <RemoteOnlyField value={settings.query} onChange={setQuery} source={source} />
           </div>

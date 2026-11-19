@@ -6,7 +6,7 @@ import type { JobSourceAdapter, BoardsearchHost, RequestContext, SourceCredentia
 import { countryName } from "./countries";
 import { jobSearchError } from "./errors";
 import { requestJson } from "./http";
-import { safeLink, type FoundPosting, type PostedWithin, type SearchPage, type SearchQuery } from "./search";
+import { safeLink, sourceWhatText, type FoundPosting, type PostedWithin, type SearchPage, type SearchQuery } from "./search";
 
 // Boardsearch: Google for Jobs through OpenWeb Ninja, or the same API on
 // RapidAPI. One search page is one request from the plan (200 a month free).
@@ -137,8 +137,9 @@ function keysOf(answer: unknown): string {
 }
 
 /** "designer in Hamburg": Boardsearch reads the place from the query text, as Google does. */
-function queryText({ keywords, place }: SearchQuery): string {
-  return place ? `${keywords} in ${place}` : keywords;
+function queryText(query: SearchQuery): string {
+  const what = sourceWhatText(query);
+  return query.place ? `${what} in ${query.place}` : what;
 }
 
 function searchUrl(query: SearchQuery, host: BoardsearchHost, next: string | null, baseUrl?: string): URL {
@@ -185,6 +186,6 @@ export const boardsearch: JobSourceAdapter<"BOARDSEARCH"> = {
   // Search results carry the whole description.
   details: async (posting) => (posting.description ? posting.description : null),
   test: async (credentials, context) => {
-    await searchPage({ keywords: "developer", place: "", country: "us", radiusKm: 25, remoteOnly: false, postedWithin: "any" }, credentials, null, context);
+    await searchPage({ keywords: "developer", company: "", place: "", country: "us", radiusKm: 25, remoteOnly: false, postedWithin: "any" }, credentials, null, context);
   },
 };

@@ -3,6 +3,7 @@
 // suited when the skills match. Skills the posting asks for and the profile
 // does not have are a gap. They are not resume lines.
 
+import { roleMatchesQuery } from "@/lib/job-search/related-roles-core";
 import { detectRegions, regionRank, type Region } from "@/lib/job-search/regions";
 
 export type GapFit = "suited" | "stretch" | "not_suited";
@@ -18,6 +19,10 @@ export type GapRead = {
   regionRank: number;
   /** Always true of `missing`: do not write these onto the resume. */
   resumeNote: string;
+  /** Whether the posting title aligns with the search keywords. */
+  titleAligned: boolean;
+  /** Short note when skills fit but the title differs from the search. */
+  titleNote: string;
 };
 
 const LABELS: Record<GapFit, string> = {
@@ -134,6 +139,7 @@ function classify(matched: number, missing: number, roleHit: boolean): GapFit {
 export function assessGap(
   posting: { title: string; description: string; place?: string; remote?: boolean | null },
   profileSkills: readonly string[],
+  searchKeywords = "",
 ): GapRead {
   const blob = `${posting.title}\n${posting.place ?? ""}\n${posting.description}`;
   const asked = skillsAsked(blob);
@@ -144,6 +150,12 @@ export function assessGap(
   const roleHit = ROLE_HINTS.some((hint) => title.includes(hint));
   const fit = classify(matched.length, missing.length, roleHit);
   const regions = detectRegions(blob, posting.remote ?? null);
+  const keywords = searchKeywords.trim();
+  const titleAligned = !keywords || roleMatchesQuery(posting.title, keywords);
+  const titleNote =
+    !titleAligned && (fit === "suited" || fit === "stretch")
+      ? "The title differs from your search; skills still overlap this company's role under another name."
+      : "";
   return {
     fit,
     label: LABELS[fit],
@@ -152,5 +164,7 @@ export function assessGap(
     regions,
     regionRank: regionRank(regions),
     resumeNote: missing.length > 0 ? RESUME_GAP_NOTE : "Nothing in this posting is a skill gap against the profile.",
+    titleAligned,
+    titleNote,
   };
 }

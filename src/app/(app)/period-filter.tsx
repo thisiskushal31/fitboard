@@ -1,11 +1,12 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createContext, use, useOptimistic, useTransition, type ReactNode } from "react";
 
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { cn } from "@/lib/core/cn";
 import { DASHBOARD_PERIODS, type DashboardPeriod } from "@/lib/dashboard/dashboard";
+import { useSearchParams } from "@/hooks/use-navigation";
 
 import { rememberDashboardPeriod } from "./actions";
 

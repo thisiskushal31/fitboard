@@ -158,7 +158,8 @@ export function createFitboardServer(origin: string): McpServer {
         "Searches the job source set up in Fitboard's settings and keeps the search in Find jobs → Past searches. Each search uses one search from the user's plan with that source. " +
         "Returns a search_id and numbered postings; pass both to get_posting, save_job_scores or save_application, or the search_id to more_jobs.",
       inputSchema: z.object({
-        keywords: z.string().trim().min(1).max(200).describe("Job title, skill or company, e.g. 'product designer'"),
+        keywords: z.string().trim().max(200).optional().describe("Job title or skill, e.g. 'product designer'. Optional when company is set."),
+        company: z.string().trim().max(120).optional().describe("Employer from Fitboard's job-boards catalog, e.g. 'Deloitte India'."),
         place: z.string().max(200).optional().describe("City or region. Defaults to the profile's city. Use '' for the whole country."),
         country: z.string().max(60).optional().describe("Country name or ISO code, e.g. 'Germany' or 'de'. Defaults to the profile's country."),
         remote_only: z.boolean().optional().describe("Only remote postings."),
@@ -171,9 +172,13 @@ export function createFitboardServer(origin: string): McpServer {
       const { basics } = await loadProfile();
       const country = countryCodeFor(input.country ?? basics.country) || (input.country?.trim().length === 2 ? input.country.trim().toLowerCase() : "");
       if (!country) return failure("Say which country to search in, e.g. country: 'Germany'.");
+      const keywords = (input.keywords ?? "").trim();
+      const company = (input.company ?? "").trim();
+      if (!keywords && !company) return failure("Say what to look for (keywords), or which company to browse.");
       const remoteOnly = input.remote_only ?? false;
       const query: SearchQuery = {
-        keywords: input.keywords,
+        keywords,
+        company,
         place: remoteOnly ? "" : (input.place ?? basics.city).trim(),
         country,
         radiusKm: input.radius_km ?? DEFAULT_RADIUS_KM,
@@ -184,9 +189,10 @@ export function createFitboardServer(origin: string): McpServer {
       if (!ran.ok) return failure(ran.message);
       const search = await loadSearch(ran.id);
       if (!search) return failure("The search ran, but couldn't be read back. Try again.");
+      const what = [query.keywords, query.company].filter(Boolean).join(" at ");
       return text({
         search_id: search.id,
-        searched: `${query.keywords} in ${query.place || countryName(country)}${query.remoteOnly ? " (remote only)" : ""}`,
+        searched: `${what} in ${query.place || countryName(country)}${query.remoteOnly ? " (remote only)" : ""}`,
         found: search.postings.length,
         more_available: search.next !== null,
         postings: search.postings.map((posting, index) => postingLine(posting, index + 1)),

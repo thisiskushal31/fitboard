@@ -65,7 +65,7 @@ describe("stored settings", () => {
       scorer: null,
       typesafeKeyEnc: null,
       agentEnabled: false,
-      agentQuery: { keywords: "", place: "", country: "", radiusKm: 25, remoteOnly: false, postedWithin: "any" },
+      agentQuery: { keywords: "", company: "", place: "", country: "", radiusKm: 25, remoteOnly: false, postedWithin: "any" },
       agentHour: 7,
       agentMinScore: 70,
       agentMaxScores: 15,
@@ -170,7 +170,7 @@ describe("stored settings", () => {
 
 describe("the job agent's settings", () => {
   it("reads its search and runs as JSON, and values out of range as the defaults", () => {
-    const query = { keywords: "Data scientist", place: "Berlin", country: "de", radiusKm: 50, remoteOnly: true, postedWithin: "week" } as const;
+    const query = { keywords: "Data scientist", company: "", place: "Berlin", country: "de", radiusKm: 50, remoteOnly: true, postedWithin: "week" } as const;
     const runs = [{ at: "2026-10-20T07:00:00.000Z", manual: false, message: "2 new postings scored." }];
     const rows = Object.entries({ agentQuery: query, agentRuns: runs, agentEnabled: true, agentHour: 9 }).map(([key, value]) => ({ key, value: settingValue(value)! }));
     expect(rows).toContainEqual({ key: "agentQuery", value: JSON.stringify(query) });

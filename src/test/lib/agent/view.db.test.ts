@@ -29,7 +29,7 @@ beforeEach(async () => {
   await resetDatabase(prisma());
   await saveSettings({
     agentEnabled: true,
-    agentQuery: { keywords: "Data scientist", place: "Berlin", country: "de", radiusKm: 25, remoteOnly: false, postedWithin: "any" },
+    agentQuery: { keywords: "Data scientist", company: "", place: "Berlin", country: "de", radiusKm: 25, remoteOnly: false, postedWithin: "any" },
     agentRuns: [{ at: "2026-10-20T05:00:00Z", manual: false, message: "2 new postings are waiting for a look." }],
   });
 });
@@ -65,7 +65,7 @@ describe("the Agent screen's data", () => {
   it("says what's missing, and when the day's runs are used up", async () => {
     await saveSettings({
       agentEnabled: false,
-      agentQuery: { keywords: "", place: "", country: "", radiusKm: 25, remoteOnly: false, postedWithin: "any" },
+      agentQuery: { keywords: "", company: "", place: "", country: "", radiusKm: 25, remoteOnly: false, postedWithin: "any" },
       agentRuns: Array.from({ length: 10 }, (_, index) => ({
         at: new Date(now.getTime() - (index + 1) * 60 * 60 * 1000).toISOString(),
         manual: true,

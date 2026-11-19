@@ -36,7 +36,7 @@ const candidate = (data: { status?: "SCORED" | "DRAFTED" | "DRAFTING"; applicati
   prisma().agentCandidate.create({
     data: { source: "BOARDSEARCH", externalId: `job-${Math.random()}`, dedupeKey: `key-${Math.random()}`, title: "Data Scientist", company: "Ledgerly", url: "https://jobs.example/1", score: 88, reasons: ["Python"], ...data },
   });
-const query: SearchQuery = { keywords: "Data scientist", place: "", country: "de", radiusKm: 25, remoteOnly: false, postedWithin: "any" };
+const query: SearchQuery = { keywords: "Data scientist", company: "", place: "", country: "de", radiusKm: 25, remoteOnly: false, postedWithin: "any" };
 
 beforeEach(async () => {
   Object.assign(setup, { ai: true, source: "BOARDSEARCH" });
@@ -131,7 +131,10 @@ describe("the drafts' actions", () => {
 describe("saving the agent's settings", () => {
   it("saves each change, and turns on only with keywords and a country", async () => {
     await saveSettings({ agentEnabled: false, agentQuery: { ...query, keywords: "" } });
-    expect(await saveAgentSettings({ enabled: true })).toEqual({ ok: false, error: "Type what the agent should look for before turning it on." });
+    expect(await saveAgentSettings({ enabled: true })).toEqual({
+      ok: false,
+      error: "Type what the agent should look for, or choose a company, before turning it on.",
+    });
     expect(await saveAgentSettings({ enabled: true, query: { ...query, country: "" } })).toEqual({ ok: false, error: "Choose a country for the search before turning the agent on." });
     expect(await saveAgentSettings({ enabled: true, query })).toEqual({ ok: true, data: null });
     expect(await saveAgentSettings({ hour: 9, minScore: 80, autoDraft: true, maxDrafts: 5 })).toEqual({ ok: true, data: null });

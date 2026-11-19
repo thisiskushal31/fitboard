@@ -6,6 +6,7 @@ import catalog from "../../../config/job-boards.json";
 import { COUNTRY_REGION, detectRegions, matchesArea, matchesCountry, mentionsPlace, openInCountry, zoneByCode, zoneRegion, type Region } from "./regions";
 
 import { searchOfficialCareers } from "./career-page-search";
+import { companyMatchesSelected } from "./company-filter";
 import { syncBoardCrawlWithCatalog } from "./crawl-results";
 import { expandRelatedRoleTerms, roleMatchesQuery } from "./related-roles";
 import { isJobSeekerHnPost } from "@/lib/startups/sources/hn";
@@ -93,13 +94,30 @@ export function officialCareers(): CareerLink[] {
   return catalogCareers().filter((row) => !readBoard(row.url));
 }
 
+/** Catalog row whose name matches `name` (exact, then contains), or undefined. */
+export function catalogCompanyByName(name: string): CareerLink | undefined {
+  const key = name.trim().toLowerCase();
+  if (!key) return undefined;
+  const rows = catalogCareers();
+  const exact = rows.find((row) => row.name.toLowerCase() === key);
+  if (exact) return exact;
+  const namedIn = rows.find((row) => row.name.toLowerCase().includes(key));
+  if (namedIn) return namedIn;
+  // Typed name contains a catalog name only when that name is long enough to be distinctive.
+  return rows.find((row) => {
+    const n = row.name.toLowerCase();
+    return n.length >= 6 && key.includes(n);
+  });
+}
+
 /**
  * Match a listing to whatever the user typed in Find jobs / the agent.
  * Uses dynamic relatedness (DevOps ↔ SRE / Platform) plus any AI-expanded
  * terms from the active crawl — not a brittle "every word must appear" check.
+ * Empty keywords keep every title (company-only browse).
  */
 export function matchesSearchKeywords(title: string, description: string, keywords: string, relatedTerms?: readonly string[]): boolean {
-  if (!keywords.trim()) return false;
+  if (!keywords.trim()) return true;
   const related = relatedTerms ?? relatedTermsStore.getStore() ?? [];
   return roleMatchesQuery(title, keywords, description.slice(0, 2500), related);
 }
@@ -631,33 +649,43 @@ async function pool<T>(work: (() => Promise<T>)[], limit: number): Promise<Promi
   return results;
 }
 
-let atsCache: { at: number; postings: CrawledPosting[]; keywords: string } | null = null;
+let atsCache: { at: number; postings: CrawledPosting[]; cacheKey: string } | null = null;
 
-export type PublicCrawlQuery = { keywords: string; place?: string; country?: string };
+export type PublicCrawlQuery = { keywords: string; place?: string; country?: string; company?: string };
 
 /** JSON boards and feeds only, cached for 30 minutes. */
-async function crawlAtsBoards(keywords: string, relatedTerms: readonly string[], signal?: AbortSignal): Promise<CrawledPosting[]> {
-  if (atsCache && atsCache.keywords === keywords && Date.now() - atsCache.at < TTL_MS) return atsCache.postings;
+async function crawlAtsBoards(
+  keywords: string,
+  relatedTerms: readonly string[],
+  signal?: AbortSignal,
+  company?: CareerLink,
+): Promise<CrawledPosting[]> {
+  const cacheKey = `${keywords}\0${company?.name ?? ""}`;
+  if (atsCache && atsCache.cacheKey === cacheKey && Date.now() - atsCache.at < TTL_MS) return atsCache.postings;
   return relatedTermsStore.run(relatedTerms, async () => {
-    const { remotive, remoteOk, arbeitnow, hackerNews, codeforces, myCareersFuture } = catalog.jobBoards;
     const tasks: (() => Promise<CrawledPosting[]>)[] = [];
-    if (remotive) tasks.push(() => fetchRemotive(remotive, keywords, withTimeout(signal)));
-    if (remoteOk) tasks.push(() => fetchRemoteOk(remoteOk, withTimeout(signal)));
-    if (arbeitnow) tasks.push(() => fetchArbeitnow(arbeitnow, withTimeout(signal)));
-    if (hackerNews) tasks.push(() => fetchHn(hackerNews, withTimeout(signal)));
-    if (codeforces) tasks.push(() => fetchCodeforces(codeforces, withTimeout(signal)));
-    if (myCareersFuture) tasks.push(() => fetchMyCareersFuture(myCareersFuture, keywords, withTimeout(signal)));
-    for (const feed of catalog.feeds) tasks.push(() => fetchRss(feed.url, feed.name, feed.place, keywords, withTimeout(signal)));
-    for (const company of catalog.companies) {
-      const board = readBoard(company.url);
-      if (!board) continue;
-      if (board.kind === "greenhouse") tasks.push(() => fetchGreenhouse(company.name, board.slug, keywords, withTimeout(signal)));
-      else if (board.kind === "lever") tasks.push(() => fetchLever(company.name, board.slug, keywords, withTimeout(signal)));
-      else if (board.kind === "ashby") tasks.push(() => fetchAshby(company.name, board.slug, keywords, withTimeout(signal)));
-      else if (board.kind === "recruitee") tasks.push(() => fetchRecruitee(company.name, board.slug, keywords, withTimeout(signal)));
-      else if (board.kind === "smartrecruiters") tasks.push(() => fetchSmartRecruiters(company.name, board.slug, keywords, withTimeout(signal)));
-      else if (board.kind === "workday") tasks.push(() => fetchWorkday(company.name, board, keywords, withTimeout(signal)));
+    if (!company) {
+      const { remotive, remoteOk, arbeitnow, hackerNews, codeforces, myCareersFuture } = catalog.jobBoards;
+      if (remotive) tasks.push(() => fetchRemotive(remotive, keywords, withTimeout(signal)));
+      if (remoteOk) tasks.push(() => fetchRemoteOk(remoteOk, withTimeout(signal)));
+      if (arbeitnow) tasks.push(() => fetchArbeitnow(arbeitnow, withTimeout(signal)));
+      if (hackerNews) tasks.push(() => fetchHn(hackerNews, withTimeout(signal)));
+      if (codeforces) tasks.push(() => fetchCodeforces(codeforces, withTimeout(signal)));
+      if (myCareersFuture) tasks.push(() => fetchMyCareersFuture(myCareersFuture, keywords, withTimeout(signal)));
+      for (const feed of catalog.feeds) tasks.push(() => fetchRss(feed.url, feed.name, feed.place, keywords, withTimeout(signal)));
     }
+    const companies = company ? [company] : catalog.companies;
+    for (const row of companies) {
+      const board = readBoard(row.url);
+      if (!board) continue;
+      if (board.kind === "greenhouse") tasks.push(() => fetchGreenhouse(row.name, board.slug, keywords, withTimeout(signal)));
+      else if (board.kind === "lever") tasks.push(() => fetchLever(row.name, board.slug, keywords, withTimeout(signal)));
+      else if (board.kind === "ashby") tasks.push(() => fetchAshby(row.name, board.slug, keywords, withTimeout(signal)));
+      else if (board.kind === "recruitee") tasks.push(() => fetchRecruitee(row.name, board.slug, keywords, withTimeout(signal)));
+      else if (board.kind === "smartrecruiters") tasks.push(() => fetchSmartRecruiters(row.name, board.slug, keywords, withTimeout(signal)));
+      else if (board.kind === "workday") tasks.push(() => fetchWorkday(row.name, board, keywords, withTimeout(signal)));
+    }
+    if (tasks.length === 0) return [];
     const settled = await pool(tasks, 16);
     const postings: CrawledPosting[] = [];
     const seen = new Set<string>();
@@ -678,8 +706,10 @@ async function crawlAtsBoards(keywords: string, relatedTerms: readonly string[],
       throw new Error("Every public board failed");
     }
     // Feeds/RemoteOK/etc. may return a wide list; keep roles that match the query or related titles.
-    const matched = postings.filter((job) => matchesSearchKeywords(job.title, job.description, keywords, relatedTerms));
-    atsCache = { at: Date.now(), postings: matched, keywords };
+    const matched = keywords.trim()
+      ? postings.filter((job) => matchesSearchKeywords(job.title, job.description, keywords, relatedTerms))
+      : postings;
+    atsCache = { at: Date.now(), postings: matched, cacheKey };
     return matched;
   });
 }
@@ -711,8 +741,12 @@ function careerPortalRank(url: string): number {
  * and real job-portal hosts go first so useful listings arrive early; nothing
  * is dropped for a cap. Company names are never hard-coded.
  */
-export function careerSitesForSearch(keywords: string): CareerLink[] {
+export function careerSitesForSearch(keywords: string, company?: CareerLink): CareerLink[] {
   const all = officialCareers();
+  if (company) {
+    const scoped = all.find((row) => row.url === company.url || row.name.toLowerCase() === company.name.toLowerCase());
+    return scoped ? [scoped] : [];
+  }
   const tokens = keywords
     .toLowerCase()
     .split(/[^a-z0-9]+/i)
@@ -741,16 +775,19 @@ export function careerSitesForSearch(keywords: string): CareerLink[] {
 export async function crawlPublicBoards(query: string | PublicCrawlQuery, signal?: AbortSignal): Promise<CrawledPosting[]> {
   const request: PublicCrawlQuery = typeof query === "string" ? { keywords: query } : query;
   const keywords = request.keywords.trim();
-  if (!keywords) return [];
-  const relatedTerms = await expandRelatedRoleTerms(keywords, signal).catch(() => [] as string[]);
-  const ats = await crawlAtsBoards(keywords, relatedTerms, signal);
+  const companyName = request.company?.trim() ?? "";
+  if (!keywords && !companyName) return [];
+  const selected = companyName ? catalogCompanyByName(companyName) : undefined;
+  if (companyName && !selected) return [];
+  const relatedTerms = keywords ? await expandRelatedRoleTerms(keywords, signal).catch(() => [] as string[]) : [];
+  const ats = await crawlAtsBoards(keywords, relatedTerms, signal, selected);
   // Drop diagnostics for catalog URLs that were replaced or removed.
   await syncBoardCrawlWithCatalog(officialCareers().map((row) => row.url));
   // Careers crawl is best-effort with a hard budget. ATS results always return
   // even when Chromium is still chewing through job-boards.json.
   const careerSignal = signal ? AbortSignal.any([signal, AbortSignal.timeout(CAREERS_BUDGET_MS)]) : AbortSignal.timeout(CAREERS_BUDGET_MS);
   const career = await searchOfficialCareers(
-    careerSitesForSearch(keywords),
+    careerSitesForSearch(keywords, selected),
     { keywords, place: request.place ?? "", country: request.country ?? "" },
     careerSignal,
   ).catch(() => [] as CrawledPosting[]);
@@ -785,12 +822,15 @@ export function filterPublicBoards(
     remoteOnly: boolean;
     postedWithinDays: number | null;
     relatedTerms?: readonly string[];
+    company?: string;
   },
 ): CrawledPosting[] {
   const related = query.relatedTerms ?? relatedTermsStore.getStore() ?? [];
   const zone = zoneByCode(query.country);
   const region: Region | undefined = zone ? zoneRegion(zone) : query.country ? COUNTRY_REGION[query.country] : undefined;
+  const company = query.company?.trim() ?? "";
   const filtered = postings.filter((posting) => {
+    if (company && !companyMatchesSelected(posting.company, company)) return false;
     const blob = `${posting.title} ${posting.company} ${posting.place} ${posting.description}`.toLowerCase();
     const located = `${posting.title} ${posting.place} ${posting.description}`;
     if (

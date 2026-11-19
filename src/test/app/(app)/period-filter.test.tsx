@@ -7,7 +7,8 @@ import { PeriodFilter } from "@/app/(app)/period-filter";
 
 const router = { replace: vi.fn() };
 const params = vi.hoisted(() => ({ current: new URLSearchParams() }));
-vi.mock("next/navigation", () => ({ useRouter: () => router, useSearchParams: () => params.current }));
+vi.mock("next/navigation", () => ({ useRouter: () => router }));
+vi.mock("@/hooks/use-navigation", () => ({ useSearchParams: () => params.current }));
 vi.mock("@/app/(app)/actions", () => ({ rememberDashboardPeriod: vi.fn(async () => ({ ok: true, data: null })) }));
 
 describe("the dashboard's period filter", () => {

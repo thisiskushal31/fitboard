@@ -38,7 +38,11 @@ export const saveAgentSettings = action(
     const settings = await loadSettings();
     const query = changes.query ?? settings.agentQuery;
     if (changes.enabled && !agentQueryReady(query)) {
-      throw new ActionError(query.keywords.trim() ? "Choose a country for the search before turning the agent on." : "Type what the agent should look for before turning it on.");
+      throw new ActionError(
+        query.keywords.trim() || query.company.trim()
+          ? "Choose a country for the search before turning the agent on."
+          : "Type what the agent should look for, or choose a company, before turning it on.",
+      );
     }
     await saveSettings({
       agentEnabled: changes.enabled,

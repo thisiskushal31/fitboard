@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { NavLinks } from "@/app/(app)/nav-links";
 
 let pathname = "/";
-vi.mock("next/navigation", () => ({ usePathname: () => pathname }));
+vi.mock("@/hooks/use-navigation", () => ({ usePathname: () => pathname }));
 vi.mock("next/link", () => ({
   default: ({ href, ...props }: ComponentProps<"a">) => <a href={href} {...props} />,
 }));

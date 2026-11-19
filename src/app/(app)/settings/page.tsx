@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { loadAiConfig, loadAiSettingsView } from "@/lib/ai/config";
+import { catalogCareers, officialCareers } from "@/lib/job-search/board-crawl";
 import { jobSearchView, loadJobSearchConfig } from "@/lib/job-search/config";
 import { COUNTRIES } from "@/lib/job-search/countries";
 import { loadSearch } from "@/lib/postings/posting-searches";
@@ -38,7 +39,6 @@ import { AboutSection, type AboutFacts, type UsagePingView } from "./about-secti
 import { ConnectorSection } from "./connector-section";
 import { settingsSectionFromParam } from "./sections";
 import { SettingsScreen } from "./settings-screen";
-import { officialCareers } from "@/lib/job-search/board-crawl";
 import {
   countBoardCrawlProblems,
   countBoardCrawlResults,
@@ -70,7 +70,10 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
           initial={{
             enabled: settings.agentEnabled,
             // With no search of its own yet, it starts from the last one in Find jobs.
-            query: settings.agentQuery.keywords.trim() ? settings.agentQuery : ((await loadSearch())?.query ?? settings.agentQuery),
+            query:
+              settings.agentQuery.keywords.trim() || settings.agentQuery.company.trim()
+                ? settings.agentQuery
+                : ((await loadSearch())?.query ?? settings.agentQuery),
             hour: settings.agentHour,
             minScore: settings.agentMinScore,
             maxScores: settings.agentMaxScores,
@@ -80,6 +83,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
           source={(await loadJobSearchConfig()).source}
           scoring={await scoringReadiness()}
           countries={COUNTRIES}
+          companies={Array.from(new Set(catalogCareers().map((row) => row.name))).sort((a, b) => a.localeCompare(b))}
           timeZone={await lastKnownTimeZone()}
         />
       ) : section === "crawl" ? (

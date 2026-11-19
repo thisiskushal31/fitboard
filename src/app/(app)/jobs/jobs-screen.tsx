@@ -41,6 +41,8 @@ export type JobsScreenProps = {
   profileSkills?: readonly string[];
   /** Every country by name, named on the server. */
   countries: readonly Country[];
+  /** Catalog employer names for the Company field. */
+  companies?: readonly string[];
   /** The search, past searches, or the Saved or Dismissed postings. */
   view: JobsView;
   /** What the form starts from: the open search, else the last one, else the profile's. */
@@ -67,6 +69,7 @@ export function JobsScreen({
   arbeitsagenturNote = false,
   scoreInClaude = false,
   countries,
+  companies = [],
   view,
   query,
   search,
@@ -141,7 +144,7 @@ export function JobsScreen({
     <>
       {header}
       {arbeitsagenturNote && <ArbeitsagenturNote accepted={false} onAccept={acceptArbeitsagentur} className="mx-10 mb-5 max-w-[760px]" />}
-      <SearchForm source={source} countries={countries} query={query} pending={pending} onSearch={run} />
+      <SearchForm source={source} countries={countries} companies={companies} query={query} pending={pending} onSearch={run} />
       {/* Announces each new set of results; the list itself is replaced. */}
       <p role="status" className="sr-only">
         {pending ? "Searching…" : failed ? failed.problem.message : search ? `${search.postings.length} postings found.` : ""}
@@ -184,12 +187,14 @@ export function JobsScreen({
 function SearchForm({
   source,
   countries,
+  companies,
   query,
   pending,
   onSearch,
 }: {
   source: JobSource;
   countries: readonly Country[];
+  companies: readonly string[];
   query: SearchQuery;
   pending: boolean;
   onSearch: (query: SearchQuery) => void;
@@ -210,13 +215,14 @@ function SearchForm({
   const submit = (event: FormEvent) => {
     event.preventDefault();
     if (pending) return;
+    const hasWhat = Boolean(form.keywords.trim() || form.company.trim());
     const problems = {
-      keywords: form.keywords.trim() ? undefined : "Type what you're looking for.",
+      keywords: hasWhat ? undefined : "Type what you're looking for, or choose a company.",
       country: form.country ? uncovered : "Choose a country.",
     };
     setErrors(problems);
     if (problems.keywords || problems.country) return;
-    onSearch({ ...form, keywords: form.keywords.trim(), place: form.place.trim() });
+    onSearch({ ...form, keywords: form.keywords.trim(), company: form.company.trim(), place: form.place.trim() });
   };
 
   return (
@@ -225,10 +231,10 @@ function SearchForm({
       aria-label="Search postings"
       noValidate
       onSubmit={submit}
-      className="mx-10 mb-7 grid grid-cols-1 items-start gap-x-4 gap-y-4 rounded-panel border border-line-card bg-card p-6 sm:grid-cols-2 lg:grid-cols-[2fr_1.5fr_1.3fr_1fr_1fr]"
+      className="mx-10 mb-7 grid grid-cols-1 items-start gap-x-4 gap-y-4 rounded-panel border border-line-card bg-card p-6 sm:grid-cols-2 lg:grid-cols-[1.6fr_1.4fr_1.3fr_1.2fr_0.9fr_0.9fr]"
     >
-      <SearchFields value={form} onChange={set} source={source} countries={countries} errors={errors} />
-      <div className="flex flex-wrap items-center justify-between gap-4 sm:col-span-2 lg:col-span-5">
+      <SearchFields value={form} onChange={set} source={source} countries={countries} companies={companies} errors={errors} />
+      <div className="flex flex-wrap items-center justify-between gap-4 sm:col-span-2 lg:col-span-6">
         <RemoteOnlyField value={form} onChange={set} source={source} />
         <Button type="submit" aria-disabled={pending || undefined}>
           {pending ? "Searching…" : "Search"}

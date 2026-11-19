@@ -7,7 +7,7 @@ import { fetchPosting } from "@/lib/postings/posting-fetch";
 import type { JobSourceAdapter, RequestContext } from "./adapter";
 import { JobSearchError, jobSearchError } from "./errors";
 import { requestJson } from "./http";
-import { POSTED_WITHIN, safeLink, type FoundPosting, type SearchPage, type SearchQuery } from "./search";
+import { POSTED_WITHIN, safeLink, sourceWhatText, type FoundPosting, type SearchPage, type SearchQuery } from "./search";
 import { arbeitsagenturPage } from "./sources";
 import { fromMarkdown } from "./text";
 
@@ -92,7 +92,7 @@ export function postingFromOffer(offer: Offer): FoundPosting {
 
 function searchUrl(query: SearchQuery, page: number, baseUrl?: string): URL {
   const url = new URL(`${baseUrl ?? BASE}${PATHS.search}`);
-  url.searchParams.set("was", query.keywords);
+  url.searchParams.set("was", sourceWhatText(query));
   // Jobs, as the agency's own search starts with; not training places or internships.
   url.searchParams.set("angebotsart", "1");
   url.searchParams.set("page", String(page));
@@ -146,6 +146,6 @@ export const arbeitsagentur: JobSourceAdapter<"ARBEITSAGENTUR"> = {
   search: (query, _credentials, next, context) => searchPage(query, next, context),
   details: (posting, _credentials, context) => details(posting, context),
   test: async (_credentials, context) => {
-    await searchPage({ keywords: "Softwareentwickler", place: "", country: "de", radiusKm: 25, remoteOnly: false, postedWithin: "any" }, null, context);
+    await searchPage({ keywords: "Softwareentwickler", company: "", place: "", country: "de", radiusKm: 25, remoteOnly: false, postedWithin: "any" }, null, context);
   },
 };

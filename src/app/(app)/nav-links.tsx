@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/core/cn";
 import { isCurrent, NAV } from "@/lib/core/nav";
+import { usePathname } from "@/hooks/use-navigation";
 
 import { useSidebarCollapsed } from "./sidebar-frame";
 

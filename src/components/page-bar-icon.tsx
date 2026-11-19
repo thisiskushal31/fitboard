@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname } from "@/hooks/use-navigation";
 
 import { currentSection } from "@/lib/core/nav";
 

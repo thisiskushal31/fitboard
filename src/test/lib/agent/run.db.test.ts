@@ -80,7 +80,7 @@ vi.mock("@/lib/ai", async (importOriginal) => ({
 }));
 
 const prisma = () => db.client!;
-const query: SearchQuery = { keywords: "Product designer", place: "Rotterdam", country: "nl", radiusKm: 25, remoteOnly: false, postedWithin: "any" };
+const query: SearchQuery = { keywords: "Product designer", company: "", place: "Rotterdam", country: "nl", radiusKm: 25, remoteOnly: false, postedWithin: "any" };
 const now = new Date("2026-10-20T08:00:00Z");
 const hour = 60 * 60 * 1000;
 

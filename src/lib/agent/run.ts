@@ -44,7 +44,7 @@ export type AgentScanResult = z.infer<typeof agentScanResultSchema>;
 const stopped = (message: string): AgentScanResult => ({ found: 0, fresh: 0, scored: 0, drafted: 0, skipped: 0, message });
 
 /** Whether a search is complete enough to run: keywords and a country. */
-export const agentQueryReady = (query: SearchQuery) => Boolean(query.keywords.trim() && query.country);
+export const agentQueryReady = (query: SearchQuery) => Boolean((query.keywords.trim() || query.company.trim()) && query.country);
 
 /** Why the agent can't run at all, in words, or null when it's set up. */
 export async function agentSetupProblem(query: SearchQuery): Promise<string | null> {
