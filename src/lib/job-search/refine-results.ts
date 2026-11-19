@@ -16,7 +16,7 @@ export async function refineFoundPostings(
   source?: JobSource,
   signal?: AbortSignal,
 ): Promise<FoundPosting[]> {
-  let next = filterByCompany(postings, query.company);
+  const next = filterByCompany(postings, query.company);
   const keywords = query.keywords.trim();
   if (!keywords || source !== "PUBLIC_BOARDS") return next;
   const related = await expandRelatedRoleTerms(keywords, signal).catch(() => [] as string[]);
