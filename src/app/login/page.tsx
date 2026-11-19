@@ -22,7 +22,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           <BrandMark className="size-10" />
           <div className="flex flex-col">
             <div className="font-serif text-[30px] font-medium tracking-[-0.01em]">Fitboard</div>
-            <div className="text-sm text-muted">Your job search, on your server</div>
+            <div className="text-sm text-muted">A career automation tool, with AI</div>
           </div>
         </div>
         <LoginForm next={typeof next === "string" ? next : undefined} />

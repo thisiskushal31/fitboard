@@ -47,10 +47,9 @@ export function Sidebar({
       brand={
         <>
           <BrandMark />
-          <div className="flex min-w-0 flex-col group-data-collapsed/sidebar:hidden">
-            <span className="font-serif text-2xl leading-none font-medium tracking-[-0.01em]">Fitboard</span>
-            <span className="truncate text-xs text-muted">Your job search, on your server</span>
-          </div>
+          <span className="flex h-8 min-w-0 translate-y-px items-center truncate font-serif text-2xl leading-none font-medium tracking-[-0.01em] group-data-collapsed/sidebar:hidden">
+            Fitboard
+          </span>
         </>
       }
     >

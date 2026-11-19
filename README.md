@@ -4,9 +4,9 @@
 
 # Fitboard
 
-### A job search you run yourself.
+### A career automation tool, with AI.
 
-**One profile in Postgres, a resume and cover letter that only use facts from that profile, and a board of applications from draft to offer.**
+**One profile on your server: find jobs and gigs, see the next step, pick events that fit, and move applications from draft to offer—without Fitboard applying for you.**
 
 [![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue.svg?style=flat-square)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-run-0A66C2?style=flat-square)](docs/run.md)

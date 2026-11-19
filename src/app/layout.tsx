@@ -10,7 +10,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: { default: "Fitboard", template: "%s · Fitboard" },
-  description: "Your job search, on your server.",
+  description: "A career automation tool, with AI — on your server.",
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
