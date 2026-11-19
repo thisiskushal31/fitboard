@@ -101,7 +101,9 @@ describe("job board config", () => {
     listed({ name: "SLB", url: "https://careers.slb.com/job-listing" });
     listed({ name: "Halliburton", url: "https://jobs.halliburton.com/search/" });
     listed({ name: "PwC", url: "https://www.pwc.com/gx/en/careers.html" });
-    listed({ name: "Deloitte", url: "https://jobs.lever.co/deloitte" });
+    listed({ name: "Deloitte India", url: "https://southasiacareers.deloitte.com/go/Deloitte-India/718244/" });
+    listed({ name: "Deloitte Mauritius", url: "https://southasiacareers.deloitte.com/go/Deloitte-Mauritius/718444/" });
+    listed({ name: "Deloitte Sri Lanka and Maldives", url: "https://southasiacareers.deloitte.com/go/Deloitte-Sri-Lanka-and-Maldives/718344/" });
     listed({ name: "EY", url: "https://www.ey.com/en_gl/careers/job-search" });
     listed({ name: "KPMG", url: "https://kpmg.com/xx/en/careers/job-search.html" });
     listed({ name: "HCLTech", url: "https://www.hcltech.com/careers" });
