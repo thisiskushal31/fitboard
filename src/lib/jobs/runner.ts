@@ -149,7 +149,15 @@ export async function cancelJob(id: string): Promise<void> {
     await finish(id, { status: JobStatus.FAILED, error: JOB_MESSAGES.cancelled });
     return;
   }
-  state.running.get(id)?.abort();
+  const running = state.running.get(id);
+  if (running) {
+    running.abort();
+    // Force the DB row closed even if the worker is wedged and ignores abort.
+    await finish(id, { status: JobStatus.FAILED, error: JOB_MESSAGES.cancelled });
+    return;
+  }
+  // Not in this process (e.g. leftover after a hang): still close the row.
+  await finish(id, { status: JobStatus.FAILED, error: JOB_MESSAGES.cancelled });
 }
 
 /** Stops every queued or running job that works on an application, e.g. before it's deleted. */

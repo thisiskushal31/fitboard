@@ -48,6 +48,45 @@ describe("useJob", () => {
     expect(fetch).toHaveBeenCalledWith("/api/jobs/job-1");
   });
 
+  it("starts only one poll loop when onerror fires repeatedly", async () => {
+    vi.useFakeTimers();
+    const fetch = vi.fn(async () => Response.json(job("RUNNING", "Still working")));
+    vi.stubGlobal("fetch", fetch);
+    renderHook(() => useJob("job-1"));
+    const onerror = FakeEventSource.last!.onerror!;
+    act(() => {
+      onerror();
+      onerror();
+      onerror();
+    });
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(fetch).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2500);
+    });
+    expect(fetch).toHaveBeenCalledTimes(2);
+    vi.useRealTimers();
+  });
+
+  it("stops polling when the job is gone", async () => {
+    vi.useFakeTimers();
+    const fetch = vi.fn(async () => new Response(null, { status: 404 }));
+    vi.stubGlobal("fetch", fetch);
+    renderHook(() => useJob("job-1"));
+    act(() => FakeEventSource.last!.onerror?.());
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(fetch).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10_000);
+    });
+    expect(fetch).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
+
   it("follows nothing without an id, and starts over for a new run", () => {
     const { result, rerender } = renderHook(({ revision }) => useJob("job-1", revision), { initialProps: { revision: 0 } });
     const first = FakeEventSource.last!;

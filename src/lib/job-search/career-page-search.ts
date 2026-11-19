@@ -1224,7 +1224,8 @@ export async function searchCareerPage(
     openProblem?: boolean,
     samples?: string[],
   ) => {
-    await writeCache(key, jobs);
+    // Never cache aborts/errors as empty — that poisoned Find jobs for 30 minutes.
+    if (status === "ok" || status === "empty") await writeCache(key, jobs);
     await noteCrawl(company, { ...query, keywords }, {
       status,
       jobs,

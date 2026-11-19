@@ -32,6 +32,8 @@ export const GET = route<RouteContext<"/api/jobs/[id]/events">>(async (request, 
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(job)}\n\n`));
         if (isFinished(job)) stop();
       };
+      // If the client reconnects before close() sticks, wait — don't hammer.
+      controller.enqueue(encoder.encode("retry: 5000\n\n"));
       // Listen before reading, so a change in between isn't missed.
       const unsubscribe = subscribeJob(id, send);
       request.signal.addEventListener("abort", () => stop(), { once: true });

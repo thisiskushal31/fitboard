@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { json, stubFetch } from "@/lib/ai/test-http";
 
 import { placeOf } from "@/lib/startups/place";
-import { fetchHnStartups, startupFromHnPost } from "@/lib/startups/sources/hn";
+import { fetchHnStartups, isJobSeekerHnPost, startupFromHnPost } from "@/lib/startups/sources/hn";
 import { fetchYcStartups, readJobTitle, startupFromJob } from "@/lib/startups/sources/yc";
 
 vi.mock("@/lib/core/env", () => ({ env: {} }));
@@ -94,6 +94,18 @@ describe("Hacker News' Who is hiring?", () => {
     expect(startupFromHnPost(post("Acme | Engineer | New York, NY | Onsite"), placeOf({ city: "", country: "" }))).toMatchObject({ location: "New York, NY · Onsite" });
     expect(startupFromHnPost({ id: 2, text: null }, berlin)).toBeNull();
     expect(startupFromHnPost(post("| x"), berlin)).toBeNull();
+  });
+
+  it("drops job-seeker comments wrongly posted in Who is hiring?", () => {
+    const seeker =
+      "Hemant Singh | Software Engineer / Backend Engineer | India (REMOTE / ONSITE)\n\nI'm a software engineer focused on backend development.\nTechnical Skills: Java, Python\nI'm currently looking for Software Engineer opportunities (0–2 years).\nOpen to remote opportunities worldwide.\nResume: https://example.com/resume\nLinkedIn: https://linkedin.com/in/example";
+    expect(isJobSeekerHnPost(seeker)).toBe(true);
+    expect(startupFromHnPost(post(seeker), berlin)).toBeNull();
+    expect(startupFromHnPost(post(seeker), placeOf({ city: "", country: "" }))).toBeNull();
+    // Real hiring posts that say "looking for an engineer" still pass.
+    expect(
+      startupFromHnPost(post("PAGNOS | Cloud Engineer | REMOTE (Germany)\n<p>We're hiring a Cloud Engineer. Apply: jobs@pagnos.de</p>"), berlin),
+    ).toMatchObject({ company: "PAGNOS" });
   });
 
   it("reads this month's thread through Algolia", async () => {

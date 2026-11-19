@@ -149,7 +149,11 @@ export function PostingResults(props: PostingResultsProps) {
       else toast(job.error ?? "The posting couldn't be scored. Try again.");
       return;
     }
-    setScoring((current) => (current[key] ? { ...current, [key]: { ...current[key], step: job.step } } : current));
+    setScoring((current) => {
+      const entry = current[key];
+      if (!entry || entry.step === job.step) return current;
+      return { ...current, [key]: { ...entry, step: job.step } };
+    });
   };
 
   const showMore = async () => {

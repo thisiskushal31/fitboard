@@ -1094,7 +1094,7 @@ describe("job board config", () => {
     listed({ name: "IQVIA", url: "https://iqvia.wd1.myworkdayjobs.com/IQVIA" });
     listed({ name: "HCA Healthcare", url: "https://careers.hcahealthcare.com/" });
     listed({ name: "Veeva", url: "https://careers.veeva.com/" });
-    listed({ name: "Sysco", url: "https://careers.sysco.com/en" });
+    listed({ name: "Sysco", url: "https://careers.sysco.com/en/search-jobs" });
     listed({ name: "Intuitive Surgical", url: "https://careers.intuitive.com/en/" });
     listed({ name: "TransUnion", url: "https://www.transunion.com/about-us/careers" });
     listed({ name: "McKesson", url: "https://careers.mckesson.com/en" });

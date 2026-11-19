@@ -10,9 +10,12 @@ import { agentQueryReady, agentSetupProblem } from "@/lib/agent/run";
 import { runLimitProblem } from "@/lib/agent/runs";
 import { action, ActionError } from "@/lib/core/action";
 import { safeLink, searchQuerySchema } from "@/lib/job-search/search";
-import { findUnfinishedJobs, startJob } from "@/lib/jobs/runner";
+import { cancelJob, findUnfinishedJobs, startJob } from "@/lib/jobs/runner";
 import { prisma } from "@/lib/core/prisma";
 import { loadSettings, saveSettings } from "@/lib/settings/settings-data";
+
+/** A scan stuck longer than this is treated as dead so Run now can start again. */
+const STALE_AGENT_MS = 15 * 60_000;
 
 // The Agent screen's actions. Nothing here ever sends anything:
 // approving only makes a draft a normal Draft application.
@@ -62,7 +65,17 @@ export const runAgentNow = action(z.object({}), async () => {
   const setup = await agentSetupProblem(settings.agentQuery);
   if (setup) throw new ActionError(setup);
   const [unfinished] = await findUnfinishedJobs(AGENT_JOB_KEY);
-  if (unfinished) return { jobId: unfinished.id, reused: true };
+  if (unfinished) {
+    const row = await prisma.job.findUnique({
+      where: { id: unfinished.id },
+      select: { startedAt: true, createdAt: true },
+    });
+    const started = row?.startedAt ?? row?.createdAt;
+    const age = started ? Date.now() - started.getTime() : 0;
+    if (age < STALE_AGENT_MS) return { jobId: unfinished.id, reused: true };
+    // Wedged on a careers crawl / hung AI call — drop it and start fresh.
+    await cancelJob(unfinished.id);
+  }
   const limit = runLimitProblem(settings.agentRuns, new Date(), { manual: true });
   if (limit) throw new ActionError(limit);
   const jobId = await startJob(agentScanJob, { manual: true }, { key: AGENT_JOB_KEY });

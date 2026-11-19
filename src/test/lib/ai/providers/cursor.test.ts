@@ -53,7 +53,9 @@ describe("CursorProvider", () => {
         schemaName: "person",
       }),
     ).resolves.toEqual({ name: "Ada" });
-    expect(prompt.mock.calls[0][0]).toContain("Reply with only JSON");
+    const sent = prompt.mock.calls[0][0] as string;
+    expect(sent).toContain("JSON object only");
+    expect(sent.indexOf("User:\nAda")).toBeLessThan(sent.indexOf("CRITICAL:"));
   });
 
   it("turns a rejected key into an auth error without repeating the key", async () => {

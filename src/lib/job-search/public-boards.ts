@@ -3,6 +3,7 @@ import "server-only";
 import type { JobSourceAdapter } from "./adapter";
 import { crawlPublicBoards, filterPublicBoards, testPublicBoards, type CrawledPosting } from "./board-crawl";
 import { jobSearchError } from "./errors";
+import { expandRelatedRoleTerms } from "./related-roles";
 import { POSTED_WITHIN, safeLink, type FoundPosting, type SearchQuery } from "./search";
 
 const PAGE_SIZE = 20;
@@ -35,12 +36,14 @@ async function searchPage(query: SearchQuery, _credentials: Record<string, never
   } catch (error) {
     throw jobSearchError("unavailable", "PUBLIC_BOARDS", { detail: error instanceof Error ? error.message : "crawl failed" });
   }
+  const relatedTerms = await expandRelatedRoleTerms(query.keywords, context?.signal).catch(() => [] as string[]);
   const filtered = filterPublicBoards(crawled, {
     keywords: query.keywords,
     place: query.place,
     country: query.country,
     remoteOnly: query.remoteOnly,
     postedWithinDays: postedWithinDays(query.postedWithin),
+    relatedTerms,
   });
   const offset = next?.startsWith("offset:") ? Number(next.slice("offset:".length)) || 0 : 0;
   const postings = filtered.slice(offset, offset + PAGE_SIZE).map(toFound);

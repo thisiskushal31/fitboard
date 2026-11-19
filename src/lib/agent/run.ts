@@ -126,7 +126,10 @@ export async function runAgentScan({ manual }: { manual: boolean }, context: Job
   try {
     for (let page = 0; page < pageMax; page++) {
       if (context.signal.aborted) break;
-      const result: SearchPage = await searchPostings(source, credentialsFor(config, source), settings.agentQuery, next, requestContext(source));
+      const result: SearchPage = await searchPostings(source, credentialsFor(config, source), settings.agentQuery, next, {
+        ...requestContext(source),
+        signal: context.signal,
+      });
       if (result.postings.length === 0) break;
       for (const posting of result.postings) {
         const key = postingKey(posting);

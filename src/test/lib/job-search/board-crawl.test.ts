@@ -122,6 +122,19 @@ describe("public board location filter", () => {
     expect(filterPublicBoards([old, recent], { ...query, place: "", postedWithinDays: 7 }).map((item) => item.postedAt)).toEqual([recent.postedAt]);
     expect(filterPublicBoards([office, remote], { ...query, place: "", remoteOnly: true }).map((item) => item.place)).toEqual(["Remote"]);
   });
+
+  it("keeps related titles like SRE for a DevOps query, and short keywords like QA", () => {
+    const sre = posting({ title: "Site Reliability Engineer", place: "Mumbai, India" });
+    const sales = posting({ title: "Sales Manager", place: "Mumbai, India" });
+    const qa = posting({ title: "QA Engineer", place: "Mumbai, India" });
+
+    expect(
+      filterPublicBoards([sre, sales], { ...query, relatedTerms: ["sre", "site reliability"] }).map((item) => item.title),
+    ).toEqual(["Site Reliability Engineer"]);
+    expect(
+      filterPublicBoards([qa, sales], { ...query, keywords: "QA", relatedTerms: [] }).map((item) => item.title),
+    ).toEqual(["QA Engineer"]);
+  });
 });
 
 const devops = {

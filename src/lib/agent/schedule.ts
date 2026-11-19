@@ -3,7 +3,7 @@ import "server-only";
 import { AgentCandidateStatus } from "@/generated/prisma/enums";
 import { addDays, dayOf } from "@/lib/dashboard/calendar-view";
 import { zonedTime } from "@/lib/google/slots";
-import { findUnfinishedJobs, startJob } from "@/lib/jobs/runner";
+import { cancelJob, findUnfinishedJobs, startJob } from "@/lib/jobs/runner";
 import { logServerError } from "@/lib/core/log";
 import { prisma } from "@/lib/core/prisma";
 import type { AgentRun } from "@/lib/settings/settings";
@@ -50,7 +50,16 @@ export async function startDueRun(now = new Date()): Promise<string | null> {
   const settings = await loadSettings();
   if (!settings.agentEnabled) return null;
   if (!scheduledRunDue(now, settings.agentHour, await lastKnownTimeZone(), settings.agentRuns)) return null;
-  if ((await findUnfinishedJobs(AGENT_JOB_KEY)).length > 0) return null;
+  const unfinished = await findUnfinishedJobs(AGENT_JOB_KEY);
+  if (unfinished.length > 0) {
+    const staleBefore = new Date(now.getTime() - 15 * 60_000);
+    for (const job of unfinished) {
+      const row = await prisma.job.findUnique({ where: { id: job.id }, select: { startedAt: true, createdAt: true } });
+      const started = row?.startedAt ?? row?.createdAt;
+      if (started && started < staleBefore) await cancelJob(job.id);
+      else return null;
+    }
+  }
   return startJob(agentScanJob, { manual: false }, { key: AGENT_JOB_KEY });
 }
 

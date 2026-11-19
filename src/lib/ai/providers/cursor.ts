@@ -80,10 +80,11 @@ export class CursorProvider extends BaseProvider {
 /** One prompt: the task, the conversation, and a request for the answer only. */
 function renderPrompt(call: ChatCall): string {
   const shape = call.json
-    ? `Reply with only JSON matching this schema, and no markdown fence:\n${JSON.stringify(toJSONSchema(call.json.schema))}`
+    ? `CRITICAL: Your entire reply must be one JSON object only — no markdown fence, no preamble, no tools, no files. Match this JSON schema exactly:\n${JSON.stringify(toJSONSchema(call.json.schema))}`
     : "Reply with only the answer. No preamble, no tools, and no files.";
   const turns = call.messages.map((message) => `${message.role === "assistant" ? "Assistant" : "User"}:\n${message.content}`).join("\n\n");
-  return `${call.system}\n\n${shape}\n\n${turns}`;
+  // Shape last: cloud agents often weight the final instruction most.
+  return `${call.system}\n\n${turns}\n\n${shape}`;
 }
 
 /** A Cursor startup failure, without passing the SDK's own text through to the screen. */
