@@ -14,7 +14,7 @@
 
 **[Run](docs/run.md) · [Development](docs/development.md) · [Contributing](docs/contributing.md) · [Privacy](docs/privacy.md) · [Security](docs/security.md)**
 
-[Public boards](#public-boards) · [Other sources](#other-sources) · [Where the files are](#where-the-files-are) · [Known limitations](#known-limitations)
+[Public boards](#public-boards) · [Other sources](#other-sources) · [Career path](#career-path) · [Where the files are](#where-the-files-are) · [Known limitations](#known-limitations)
 
 </div>
 
@@ -40,7 +40,15 @@ Remote, then APAC, JAPAC, EMEA, MEA, Nordics, and the Americas.
 
 ## Career path
 
+Finding a role on the boards is one move. The same profile also scores where you are headed, and other ways to get there.
+
 Current, next, destination, and trending titles, scored against the live crawl.
+
+Startups to join: Y Combinator companies that are hiring and Hacker News’ “Who is hiring?”, ranked against your profile. You write to each one yourself.
+
+Freelance work: contract, project, and temporary gigs from Hacker News’ “Seeking freelancer?” thread, Freelancer.com project feeds, Remotive, Remote OK, and We Work Remotely. Ranked against your profile. Fitboard never applies for you.
+
+Events and meetups: tech conferences and groups from TechConf.Directory, TechMeetups, confs.tech, and Meetup calendars. Ranked by how near they are and how well they fit your skills. Fitboard never registers for you.
 
 ## The starting profile
 
@@ -57,11 +65,11 @@ Development opens at http://localhost:3001 (`compose.yml`). Production on the sa
 | Path | What it is |
 | --- | --- |
 | `src/app` | Screens and route handlers |
-| `src/lib` | Server logic, in folders such as `applications`, `documents`, `profile`, `postings`, `settings`, `core`, `ai`, `job-search`, `scoring`, and `career` |
+| `src/lib` | Server logic, in folders such as `applications`, `documents`, `profile`, `postings`, `settings`, `core`, `ai`, `job-search`, `scoring`, `career`, `startups`, `freelance`, and `events` |
 | `src/components` | Shared interface pieces |
 | `prisma` | Database schema and the demo seed |
 | `docker` | Container start scripts |
-| `config` | Lint, test, Playwright, the env example, and `job-boards.json` (companies and shared boards) |
+| `config` | Lint, test, Playwright, the env example, `job-boards.json` (companies and shared boards), and `meetup-groups.json` (Meetup calendars for Events) |
 | `docs` | How to run it, build it, and the privacy and security notes |
 | `e2e` | Browser tests |
 
