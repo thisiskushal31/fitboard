@@ -14,4 +14,6 @@ import "@/lib/agent/jobs";
 import "@/lib/agent/draft";
 import "./score-posting";
 import "@/lib/startups/refresh";
+import "@/lib/freelance/refresh";
+import "@/lib/events/refresh";
 import "@/lib/connector/draft";

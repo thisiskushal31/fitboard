@@ -30,6 +30,14 @@ export async function register() {
     const { startStartupsSchedule } = await import("@/lib/startups/schedule");
     startStartupsSchedule();
 
+    // Freelance's daily refresh, once it was refreshed by hand and while the screen is in use.
+    const { startFreelanceSchedule } = await import("@/lib/freelance/schedule");
+    startFreelanceSchedule();
+
+    // Events' daily refresh, once it was refreshed by hand and while the screen is in use.
+    const { startEventsSchedule } = await import("@/lib/events/schedule");
+    startEventsSchedule();
+
     // FITBOARD_JOBS_SOURCE=arbeitsagentur: the log says what that choice means.
     const { arbeitsagenturStartupNotice, loadJobSearchConfig } = await import("@/lib/job-search/config");
     try {

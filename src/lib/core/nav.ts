@@ -1,4 +1,4 @@
-import { Bot, BriefcaseBusiness, FileText, House, Inbox, Rocket, Route, Search, Settings, UserRound, type LucideIcon } from "lucide-react";
+import { Bot, BriefcaseBusiness, CalendarDays, FileText, Handshake, House, Inbox, Rocket, Route, Search, Settings, UserRound, type LucideIcon } from "lucide-react";
 
 // The app's sections, shared by the sidebar and the page bar so they always agree.
 
@@ -21,23 +21,29 @@ export const NAV: { label?: string; items: NavItem[] }[] = [
     items: [
       { href: "/profile", label: "Profile", icon: UserRound },
       { href: "/resume", label: "Base resume", icon: FileText },
+      { href: "/career", label: "Career path", icon: Route },
     ],
   },
   {
     label: "Job search",
     items: [
       { href: "/jobs", label: "Find jobs", icon: Search },
-      { href: "/career", label: "Career path", icon: Route },
       { href: "/startups", label: "Startups", icon: Rocket },
       { href: "/agent", label: "Agent", icon: Bot },
       {
         href: "/applications",
         label: "Applications",
         icon: BriefcaseBusiness,
-        // A new application becomes one, so the flow belongs to Applications.
         isActive: (pathname) => within(pathname, "/applications") || within(pathname, "/new"),
       },
       { href: "/inbox", label: "Inbox", icon: Inbox },
+    ],
+  },
+  {
+    label: "Engagement",
+    items: [
+      { href: "/freelance", label: "Freelance", icon: Handshake },
+      { href: "/events", label: "Events", icon: CalendarDays },
     ],
   },
   { items: [{ href: "/settings", label: "Settings", icon: Settings }] },

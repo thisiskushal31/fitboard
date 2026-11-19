@@ -78,7 +78,7 @@ const jsonList = (value: unknown) => (Array.isArray(value) ? value : []) as Pris
  * settings (the usage ping's) stay as they are.
  */
 export async function importExport(db: PrismaClient, data: FitboardExport): Promise<void> {
-  const { profile, themes, settings, applications, postings, searches, agentCandidates, startups, startupBlocks, apiKey, jobSourceKeys } = data;
+  const { profile, themes, settings, applications, postings, searches, agentCandidates, startups, startupBlocks, freelanceOpportunities, freelanceBlocks, eventOpportunities, eventBlocks, apiKey, jobSourceKeys } = data;
   const fromFile: Record<string, string | null> = {
     apiKeyEnc: apiKey ? encryptApiKey(apiKey) : null,
     boardsearchKeyEnc: jobSourceKeys?.boardsearch || jobSourceKeys?.jsearch
@@ -98,6 +98,10 @@ export async function importExport(db: PrismaClient, data: FitboardExport): Prom
       await tx.agentCandidate.deleteMany();
       await tx.startup.deleteMany();
       await tx.startupBlock.deleteMany();
+      await tx.freelanceOpportunity.deleteMany();
+      await tx.freelanceBlock.deleteMany();
+      await tx.eventOpportunity.deleteMany();
+      await tx.eventBlock.deleteMany();
       // Scores of postings belong to the profile being replaced; they're left out of exports, since they can be made again.
       await tx.postingScore.deleteMany();
       // Mail from Gmail belongs to the applications being replaced; the next check fetches what's still relevant.
@@ -215,6 +219,22 @@ export async function importExport(db: PrismaClient, data: FitboardExport): Prom
         })),
       });
       await tx.startupBlock.createMany({ data: startupBlocks, skipDuplicates: true });
+      await tx.freelanceOpportunity.createMany({
+        data: freelanceOpportunities.map((gig) => ({
+          ...gig,
+          reasons: jsonList(gig.reasons),
+          applicationId: gig.applicationId && applicationIds.has(gig.applicationId) ? gig.applicationId : null,
+        })),
+      });
+      await tx.freelanceBlock.createMany({ data: freelanceBlocks, skipDuplicates: true });
+      await tx.eventOpportunity.createMany({
+        data: eventOpportunities.map((event) => ({
+          ...event,
+          speakers: jsonList(event.speakers),
+          reasons: jsonList(event.reasons),
+        })),
+      });
+      await tx.eventBlock.createMany({ data: eventBlocks, skipDuplicates: true });
     },
     // A big export takes longer than the default five seconds.
     { timeout: 120_000, maxWait: 10_000 },

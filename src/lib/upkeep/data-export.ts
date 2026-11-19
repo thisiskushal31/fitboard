@@ -19,6 +19,8 @@ import {
   PhotoShape,
   PostingSource,
   SidebarStyle,
+  FreelanceEngagement,
+  FreelanceStatus,
   StartupStatus,
   ThemeAlign,
   ThemeFont,
@@ -40,10 +42,10 @@ import { appVersion } from "@/lib/upkeep/version";
 // behind: they belong to the server or the mailbox, not the user's data.
 
 export const EXPORT_FORMAT = "fitboard-export";
-/** Bump when the file's shape changes; imports refuse versions they don't know. 2 added Find jobs' postings and keys, 3 projects and the job agent, 4 facts, 5 publications, the profile photo's theme and application options and Startups, 6 the line about a role's company, 7 skill groups. */
-export const EXPORT_SCHEMA_VERSION = 7;
+/** Bump when the file's shape changes; imports refuse versions they don't know. 2 added Find jobs' postings and keys, 3 projects and the job agent, 4 facts, 5 publications, the profile photo's theme and application options and Startups, 6 the line about a role's company, 7 skill groups, 8 Freelance, 9 Events. */
+export const EXPORT_SCHEMA_VERSION = 9;
 /** The versions imports can read. */
-export const EXPORT_SCHEMA_VERSIONS: readonly number[] = [1, 2, 3, 4, 5, 6, 7];
+export const EXPORT_SCHEMA_VERSIONS: readonly number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 /** The setting that holds the encrypted API key, which only this server can read. */
 const API_KEY_SETTING = "apiKeyEnc";
@@ -61,6 +63,12 @@ export const INSTALL_SETTINGS: readonly string[] = [
   // When Startups was last opened and what its last refresh found.
   "startupsViewedAt",
   "startupsLastRefresh",
+  // When Freelance was last opened and what its last refresh found.
+  "freelanceViewedAt",
+  "freelanceLastRefresh",
+  // When Events was last opened and what its last refresh found.
+  "eventsViewedAt",
+  "eventsLastRefresh",
   "latestVersion",
   "latestVersionUrl",
   "updateCheckDay",
@@ -288,6 +296,62 @@ const startup = z.object({
   updatedAt: date,
 });
 
+/** A Freelance opportunity. */
+const freelanceOpportunity = z.object({
+  id: text,
+  source: text,
+  externalId: text,
+  title: text,
+  company: text,
+  place: text,
+  remote: z.boolean().nullable(),
+  engagement: z.enum(FreelanceEngagement),
+  budget: text,
+  duration: text,
+  url: text,
+  description: text,
+  postedAt: optionalDate,
+  score: int,
+  reasons: z.unknown().nullable(),
+  scoredWith: text,
+  status: z.enum(FreelanceStatus),
+  notes: text,
+  seenAt: date,
+  applicationId: text.nullable(),
+  createdAt: date,
+  updatedAt: date,
+});
+
+/** An Events opportunity. */
+const eventOpportunity = z.object({
+  id: text,
+  source: text,
+  externalId: text,
+  title: text,
+  summary: text,
+  url: text,
+  place: text,
+  city: text,
+  country: text,
+  remote: z.boolean().nullable(),
+  format: z.enum(["IN_PERSON", "VIRTUAL", "HYBRID", "UNKNOWN"]),
+  startsAt: optionalDate,
+  endsAt: optionalDate,
+  ticketPrice: text,
+  speakers: z.unknown().nullable(),
+  attendance: int.nullable(),
+  audience: text,
+  score: int,
+  proximity: int,
+  reasons: z.unknown().nullable(),
+  scoredWith: text,
+  status: z.enum(["NEW", "SAVED", "DISMISSED"]),
+  notes: text,
+  seenAt: date,
+  createdAt: date,
+  updatedAt: date,
+});
+
 /** A posting kept from Find jobs. */
 const posting = z.object({
   id: text,
@@ -325,7 +389,7 @@ const postingSearch = z.object({
 /** An export file as read back. */
 export const exportSchema = z.object({
   format: z.literal(EXPORT_FORMAT),
-  schemaVersion: z.literal([1, 2, 3, 4, 5, 6, 7]),
+  schemaVersion: z.literal([1, 2, 3, 4, 5, 6, 7, 8, 9]),
   appVersion: text,
   exportedAt: date,
   profile: z.object({
@@ -365,6 +429,12 @@ export const exportSchema = z.object({
   /** Startups, and hashes of the ones removed for good; absent in older files. */
   startups: z.array(startup).default([]),
   startupBlocks: z.array(z.object({ hash: text, createdAt: date })).default([]),
+  /** Freelance opportunities; absent before version 8. */
+  freelanceOpportunities: z.array(freelanceOpportunity).default([]),
+  freelanceBlocks: z.array(z.object({ hash: text, createdAt: date })).default([]),
+  /** Events; absent before version 9. */
+  eventOpportunities: z.array(eventOpportunity).default([]),
+  eventBlocks: z.array(z.object({ hash: text, createdAt: date })).default([]),
 });
 export type FitboardExport = z.infer<typeof exportSchema>;
 
@@ -386,7 +456,7 @@ export async function buildExport(
   { includeApiKey = false, now = new Date() }: { includeApiKey?: boolean; now?: Date } = {},
 ): Promise<FitboardExport> {
   return db.$transaction(async (tx) => {
-    const [fields, skills, languages, experience, projects, education, publications, references, facts, themes, settings, applications, postings, searches, agentCandidates, startups, startupBlocks] = await Promise.all([
+    const [fields, skills, languages, experience, projects, education, publications, references, facts, themes, settings, applications, postings, searches, agentCandidates, startups, startupBlocks, freelanceOpportunities, freelanceBlocks, eventOpportunities, eventBlocks] = await Promise.all([
       tx.profileField.findMany({ select: { key: true, value: true }, orderBy: { key: "asc" } }),
       tx.skill.findMany({ select: { id: true, name: true, sort: true, group: true, createdAt: true }, orderBy: { createdAt: "asc" } }),
       tx.language.findMany({ select: { id: true, name: true, level: true, sort: true, createdAt: true }, orderBy: { createdAt: "asc" } }),
@@ -419,6 +489,10 @@ export async function buildExport(
       tx.agentCandidate.findMany({ orderBy: { createdAt: "asc" } }),
       tx.startup.findMany({ orderBy: { createdAt: "asc" } }),
       tx.startupBlock.findMany({ orderBy: { createdAt: "asc" } }),
+      tx.freelanceOpportunity.findMany({ orderBy: { createdAt: "asc" } }),
+      tx.freelanceBlock.findMany({ orderBy: { createdAt: "asc" } }),
+      tx.eventOpportunity.findMany({ orderBy: { createdAt: "asc" } }),
+      tx.eventBlock.findMany({ orderBy: { createdAt: "asc" } }),
     ]);
 
     // Keys only when asked for, decrypted; one that's unreadable here too (FITBOARD_SECRET changed) has nothing to export.
@@ -464,6 +538,10 @@ export async function buildExport(
       agentCandidates,
       startups,
       startupBlocks,
+      freelanceOpportunities,
+      freelanceBlocks,
+      eventOpportunities,
+      eventBlocks,
     };
   });
 }

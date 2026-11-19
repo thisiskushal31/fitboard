@@ -4,6 +4,7 @@ import { isAiConfigured } from "@/lib/ai/config";
 import { findUnfinishedJobs } from "@/lib/jobs/runner";
 import { loadProfile } from "@/lib/profile/profile-data";
 import { loadSettings, saveSettings } from "@/lib/settings/settings-data";
+import { lastKnownTimeZone } from "@/lib/settings/time-zone";
 import { placeOf } from "@/lib/startups/place";
 import { STARTUPS_JOB_KEY } from "@/lib/startups/refresh";
 import { listStartups } from "@/lib/startups/store";
@@ -23,7 +24,13 @@ const VIEW_MARK_MS = 60 * 60 * 1000;
  */
 export default async function StartupsPage({ searchParams }: PageProps<"/startups">) {
   const filter = startupFilterFromParams(await searchParams);
-  const [profile, settings, aiReady, [running]] = await Promise.all([loadProfile(), loadSettings(), isAiConfigured(), findUnfinishedJobs(STARTUPS_JOB_KEY)]);
+  const [profile, settings, aiReady, [running], timeZone] = await Promise.all([
+    loadProfile(),
+    loadSettings(),
+    isAiConfigured(),
+    findUnfinishedJobs(STARTUPS_JOB_KEY),
+    lastKnownTimeZone(),
+  ]);
   const place = placeOf(profile.basics);
   const now = new Date();
   if (!settings.startupsViewedAt || now.getTime() - Date.parse(settings.startupsViewedAt) > VIEW_MARK_MS) {
@@ -40,6 +47,7 @@ export default async function StartupsPage({ searchParams }: PageProps<"/startup
       headline={profile.basics.headline.trim()}
       aiReady={aiReady}
       today={now.toISOString()}
+      timeZone={timeZone}
     />
   );
 }

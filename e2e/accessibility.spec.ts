@@ -42,6 +42,8 @@ const SCREENS = [
   "/jobs?view=saved",
   "/jobs?view=dismissed",
   "/startups",
+  "/freelance",
+  "/events",
   "/agent",
   "/inbox",
   // The dashboard's calendar on another month.

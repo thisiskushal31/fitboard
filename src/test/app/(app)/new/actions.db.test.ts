@@ -155,6 +155,29 @@ describe("createApplication", () => {
     expect(await prisma().startup.findUniqueOrThrow({ where: { id: startup.id } })).toMatchObject({ applicationId: result.ok ? result.data : "", status: "NEW" });
   });
 
+  it("links the freelance opportunity it was started from on Freelance", async () => {
+    await finishedJobs();
+    const freelance = await prisma().freelanceOpportunity.create({
+      data: {
+        source: "HN",
+        externalId: "1",
+        title: "Android contract",
+        company: "Ledgerly",
+        place: "Berlin",
+        engagement: "CONTRACT",
+        url: "https://news.ycombinator.com/item?id=1",
+        description: "Need Android help",
+        reasons: [],
+      },
+    });
+    const result = await createApplication({ writeJobId: "write-job", details, postingUrl: "", freelanceId: freelance.id });
+    expect(result.ok).toBe(true);
+    expect(await prisma().freelanceOpportunity.findUniqueOrThrow({ where: { id: freelance.id } })).toMatchObject({
+      applicationId: result.ok ? result.data : "",
+      status: "NEW",
+    });
+  });
+
   it("leaves a posting that already has an application, and one that's gone, alone", async () => {
     await finishedJobs();
     const earlier = await prisma().application.create({ data: { title: "Applied before" } });

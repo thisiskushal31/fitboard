@@ -371,6 +371,32 @@ describe("creating the application", () => {
     await vi.waitFor(() => expect(createApplication).toHaveBeenCalledWith(expect.objectContaining({ postingId: null, startupId: "startup-1" })));
   });
 
+  it("starts from a freelance gig handed over by Freelance, and creates the application for it", async () => {
+    vi.mocked(startWritingDocuments).mockResolvedValue({ ok: true, data: "job-2" });
+    vi.mocked(createApplication).mockResolvedValue({ ok: true, data: "app-1" });
+    render(
+      <NewApplication
+        {...props}
+        fromPosting={{
+          id: null,
+          freelance: { id: "freelance-1", title: "Android contract" },
+          text: "Android contract for farm apps.",
+          url: "https://news.example/freelance/1",
+          complete: true,
+        }}
+      />,
+    );
+    expect(screen.getByLabelText("Job posting")).toHaveValue("Android contract for farm apps.");
+    expect(toast).toHaveBeenCalledWith('Here\'s the freelance gig “Android contract”. Check it, then read it.');
+    await userEvent.click(screen.getByRole("button", { name: "Read the posting →" }));
+    emit({ status: "DONE", result: read });
+    await userEvent.click(screen.getByRole("button", { name: "Create application →" }));
+    emit({ id: "job-2", type: "write-documents", status: "DONE", step: "Writing your cover letter" });
+    await vi.waitFor(() =>
+      expect(createApplication).toHaveBeenCalledWith(expect.objectContaining({ postingId: null, freelanceId: "freelance-1" })),
+    );
+  });
+
   it("goes back to the details when writing fails", async () => {
     await create();
     emit({ id: "job-2", type: "write-documents", status: "FAILED", step: "Tailoring your resume", error: "The model took too long to answer. Try again, or pick a faster model." });

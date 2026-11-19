@@ -28,12 +28,14 @@ describe("NavLinks", () => {
       "Dashboard",
       "Profile",
       "Base resume",
-      "Find jobs",
       "Career path",
+      "Find jobs",
       "Startups",
       "Agent",
       "Applications",
       "Inbox",
+      "Freelance",
+      "Events",
       "Settings",
     ]);
   });
@@ -45,6 +47,8 @@ describe("NavLinks", () => {
     expect(currentItem("/jobs")).toEqual(["Find jobs"]);
     expect(currentItem("/career")).toEqual(["Career path"]);
     expect(currentItem("/startups")).toEqual(["Startups"]);
+    expect(currentItem("/freelance")).toEqual(["Freelance"]);
+    expect(currentItem("/events")).toEqual(["Events"]);
     expect(currentItem("/settings")).toEqual(["Settings"]);
   });
 

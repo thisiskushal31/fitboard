@@ -3,6 +3,8 @@ import { z } from "zod";
 import { AiProvider, Creativity, DateFormat, PaperSize, Tone } from "@/generated/prisma/enums";
 import { EMPTY_QUERY, JOB_SOURCES, BOARDSEARCH_HOSTS, searchQuerySchema } from "@/lib/job-search/search";
 import { SCORERS } from "@/lib/scoring/scorers";
+import { eventsRefreshSchema } from "@/lib/events/types";
+import { freelanceRefreshSchema } from "@/lib/freelance/types";
 import { startupsRefreshSchema } from "@/lib/startups/types";
 
 /** Date styles for documents, each labelled with an example. */
@@ -177,11 +179,15 @@ export const settingsSchema = z.object({
   agentAutoDraft: flag(false),
   /** The latest runs, newest first. They belong to the install: exports leave them out (INSTALL_SETTINGS). */
   agentRuns: json(z.array(agentRunSchema)).catch([]),
-  // Startups: when the screen was last opened, since the daily refresh
-  // only runs while it's in use, and what the last refresh found. They belong
-  // to the install, not its data, so exports leave them out (INSTALL_SETTINGS).
+  // Job search → Startups: last open time and last refresh result. Install-owned.
   startupsViewedAt: z.iso.datetime().nullable().catch(null),
   startupsLastRefresh: json(startupsRefreshSchema).nullable().catch(null),
+  // Engagement → Freelance: last open time and last refresh result. Install-owned.
+  freelanceViewedAt: z.iso.datetime().nullable().catch(null),
+  freelanceLastRefresh: json(freelanceRefreshSchema).nullable().catch(null),
+  // Engagement → Events: last open time and last refresh result. Install-owned.
+  eventsViewedAt: z.iso.datetime().nullable().catch(null),
+  eventsLastRefresh: json(eventsRefreshSchema).nullable().catch(null),
   /** "Check for updates daily" in Settings → About (update-check.ts). */
   updateCheck: flag(true),
   // The newest release the update check has seen, the UTC day it last

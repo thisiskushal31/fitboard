@@ -305,6 +305,11 @@ export const deleteEverything = action(z.object({ confirm: z.literal("DELETE") }
     // Startups, and the fingerprints of ones removed for good.
     await tx.startup.deleteMany();
     await tx.startupBlock.deleteMany();
+    // Freelance opportunities, and fingerprints of ones removed for good.
+    await tx.freelanceOpportunity.deleteMany();
+    await tx.freelanceBlock.deleteMany();
+    await tx.eventOpportunity.deleteMany();
+    await tx.eventBlock.deleteMany();
     // Mail fetched from Gmail.
     await tx.emailMessage.deleteMany();
     // Applications take their history, documents, chat and notes along.

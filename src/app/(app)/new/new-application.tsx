@@ -61,14 +61,18 @@ export type Draft = {
   postingId?: string | null;
   /** The startup it was started from with "Write to them". */
   startupId?: string | null;
+  /** The freelance opportunity it was started from on Freelance. */
+  freelanceId?: string | null;
 };
 
-/** A posting handed over by "Start application" on Find jobs, or by "Write to them" on Startups. */
+/** A posting handed over by Find jobs, Startups, or Freelance. */
 export type FromPosting = {
-  /** The Find jobs posting; null for a startup. */
+  /** The Find jobs posting; null for a startup or freelance gig. */
   id: string | null;
   /** The startup and its name, from Startups. */
   startup?: { id: string; company: string };
+  /** The freelance opportunity, from Freelance. */
+  freelance?: { id: string; title: string };
   text: string;
   url: string;
   /** False when only the start of the posting came through. */
@@ -184,13 +188,22 @@ export function NewApplication({ aiReady, writeInClaude = false, samplePosting, 
   // application" would, at the paste step, to check before reading it.
   useEffect(() => {
     if (!fromPosting) return;
-    draftStore?.set({ ...initial, posting: fromPosting.text, postingUrl: fromPosting.url, postingId: fromPosting.id, startupId: fromPosting.startup?.id ?? null });
+    draftStore?.set({
+      ...initial,
+      posting: fromPosting.text,
+      postingUrl: fromPosting.url,
+      postingId: fromPosting.id,
+      startupId: fromPosting.startup?.id ?? null,
+      freelanceId: fromPosting.freelance?.id ?? null,
+    });
     toast(
       fromPosting.startup
         ? `Here's what Startups knows about ${fromPosting.startup.company}, without its addresses. Add the role you're after if it doesn't say, then read it.`
-        : fromPosting.complete
-          ? "Here's the posting from Find jobs. Check it, then read it."
-          : "Only the start of this posting came through. Paste the rest from the posting's page, then read it.",
+        : fromPosting.freelance
+          ? `Here's the freelance gig “${fromPosting.freelance.title}”. Check it, then read it.`
+          : fromPosting.complete
+            ? "Here's the posting from Find jobs. Check it, then read it."
+            : "Only the start of this posting came through. Paste the rest from the posting's page, then read it.",
     );
     router.replace("/new");
   }, [fromPosting, initial, router]);
@@ -292,6 +305,7 @@ export function NewApplication({ aiReady, writeInClaude = false, samplePosting, 
       postingUrl: draft.postingUrl,
       postingId: draft.postingId ?? null,
       startupId: draft.startupId ?? null,
+      freelanceId: draft.freelanceId ?? null,
     });
     saving.current = false;
     if (!result.ok) {

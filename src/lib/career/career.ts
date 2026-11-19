@@ -1,6 +1,5 @@
-// Company-independent career path. Role names are edited in the app.
-// Each one is scored from the live crawl: skills those listings asked for
-// that the profile still lacks. Listings are signals, not an employer promise.
+// You → Career path: company-independent roles edited in the app, scored
+// from the live crawl for skills those listings ask for that the profile lacks.
 
 import { assessGap } from "@/lib/scoring/gaps";
 

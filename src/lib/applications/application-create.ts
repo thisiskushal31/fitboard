@@ -47,7 +47,7 @@ export type ApplicationReading = {
  * saves through the connector, where one call makes one application.
  */
 export type ApplicationClaim =
-  | { kind: "manual"; writeJobId: string; readJobId: string; postingId: string | null; startupId?: string | null }
+  | { kind: "manual"; writeJobId: string; readJobId: string; postingId: string | null; startupId?: string | null; freelanceId?: string | null }
   | { kind: "agent"; candidateId: string; score: number }
   | { kind: "connector"; postingId: string | null };
 
@@ -173,6 +173,12 @@ export async function createApplicationFromDocuments({ reading, documents, match
       // The startup it was written to: it counts as contacted once the application is sent.
       if (claim.startupId) {
         await tx.startup.updateMany({ where: { id: claim.startupId, applicationId: null }, data: { applicationId: application.id } });
+      }
+      if (claim.freelanceId) {
+        await tx.freelanceOpportunity.updateMany({
+          where: { id: claim.freelanceId, applicationId: null },
+          data: { applicationId: application.id },
+        });
       }
     } else if (claim.kind === "agent") {
       await tx.agentCandidate.update({ where: { id: claim.candidateId }, data: { applicationId: application.id } });

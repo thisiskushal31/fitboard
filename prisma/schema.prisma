@@ -448,6 +448,8 @@ model Application {
   agentCandidate      AgentCandidate?
   // The startup it was started from on Startups, if any.
   startup             Startup?
+  // The freelance opportunity it was started from on Freelance, if any.
+  freelanceOpportunity FreelanceOpportunity?
   // Mail sent and received about it through Gmail.
   emails              EmailMessage[]
   events              StatusEvent[]
@@ -795,6 +797,115 @@ model Startup {
 // SHA-256 hash of its post, its site's domain or its name, so a refresh
 // leaves it out without keeping anything about it.
 model StartupBlock {
+  hash      String   @id
+  createdAt DateTime @default(now())
+}
+
+// ─── Freelance ────────────────────────────────────────────────────────
+
+// Where a freelance opportunity stands on the Freelance screen.
+enum FreelanceStatus {
+  NEW
+  SAVED
+  CONTACTED
+  DISMISSED
+}
+
+// Contract / project / temporary engagement found on a public source.
+enum FreelanceEngagement {
+  CONTRACT
+  PROJECT
+  TEMPORARY
+}
+
+model FreelanceOpportunity {
+  id            String               @id @default(cuid())
+  // Where it was found: "HN", "REMOTIVE", "WWR", …
+  source        String
+  externalId    String
+  title         String
+  company       String               @default("")
+  place         String               @default("")
+  remote        Boolean?
+  engagement    FreelanceEngagement  @default(CONTRACT)
+  budget        String               @default("")
+  duration      String               @default("")
+  url           String
+  description   String               @default("")
+  postedAt      DateTime?
+  score         Int                  @default(0)
+  reasons       Json
+  scoredWith    String               @default("")
+  status        FreelanceStatus      @default(NEW)
+  notes         String               @default("")
+  seenAt        DateTime             @default(now())
+  applicationId String?              @unique
+  application   Application?         @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  @@unique([source, externalId])
+  @@index([status, score])
+}
+
+model FreelanceBlock {
+  hash      String   @id
+  createdAt DateTime @default(now())
+}
+
+// ─── Events (Engagement) ──────────────────────────────────────────────
+
+// Where an event stands on the Events screen.
+enum EventStatus {
+  NEW
+  SAVED
+  DISMISSED
+}
+
+// How the event is held.
+enum EventFormat {
+  IN_PERSON
+  VIRTUAL
+  HYBRID
+  UNKNOWN
+}
+
+model EventOpportunity {
+  id          String      @id @default(cuid())
+  // Where it was found: "TECHCONF", "TECHMEETUPS", …
+  source      String
+  externalId  String
+  title       String
+  summary     String      @default("")
+  url         String
+  place       String      @default("")
+  city        String      @default("")
+  country     String      @default("")
+  remote      Boolean?
+  format      EventFormat @default(UNKNOWN)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  ticketPrice String      @default("")
+  speakers    Json
+  attendance  Int?
+  audience    String      @default("")
+  score       Int         @default(0)
+  // 0 = same city, 1 = same country, 2 = virtual, 3 = elsewhere.
+  proximity   Int         @default(3)
+  reasons     Json
+  scoredWith  String      @default("")
+  status      EventStatus @default(NEW)
+  notes       String      @default("")
+  seenAt      DateTime    @default(now())
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([source, externalId])
+  @@index([status, proximity, score])
+  @@index([status, startsAt])
+}
+
+model EventBlock {
   hash      String   @id
   createdAt DateTime @default(now())
 }

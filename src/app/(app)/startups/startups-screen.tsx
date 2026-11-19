@@ -43,6 +43,8 @@ export type StartupsScreenProps = {
   /** Whether an AI provider is set up, so "Write to them" can start an application. */
   aiReady: boolean;
   today: string;
+  /** Browser/server zone so “Last refreshed” matches SSR and the client. */
+  timeZone: string;
 };
 
 const VIEWS: { status: StartupStatusName; label: string }[] = [
@@ -58,7 +60,7 @@ const VIEWS: { status: StartupStatusName; label: string }[] = [
  * the addresses they publish for applications. Fitboard sends nothing: the
  * user writes to each one, from New application or their own mail.
  */
-export function StartupsScreen({ filter, list, lastRefresh, refreshJobId, city, country, headline, aiReady, today }: StartupsScreenProps) {
+export function StartupsScreen({ filter, list, lastRefresh, refreshJobId, city, country, headline, aiReady, today, timeZone }: StartupsScreenProps) {
   const router = useRouter();
   const [jobId, setJobId] = useState(refreshJobId);
   const [starting, startTransition] = useTransition();
@@ -93,7 +95,7 @@ export function StartupsScreen({ filter, list, lastRefresh, refreshJobId, city, 
         }
       />
       <div className="flex flex-col gap-6 px-10 pb-20">
-        <RefreshStatus lastRefresh={lastRefresh} refreshing={refreshing} step={job?.step ?? null} today={today} />
+        <RefreshStatus lastRefresh={lastRefresh} refreshing={refreshing} step={job?.step ?? null} today={today} timeZone={timeZone} />
         {lastRefresh && (
           <>
             <ViewTabs filter={filter} counts={list.counts} />
@@ -122,7 +124,19 @@ export function StartupsScreen({ filter, list, lastRefresh, refreshJobId, city, 
   );
 }
 
-function RefreshStatus({ lastRefresh, refreshing, step, today }: { lastRefresh: StartupsRefresh | null; refreshing: boolean; step: string | null; today: string }) {
+function RefreshStatus({
+  lastRefresh,
+  refreshing,
+  step,
+  today,
+  timeZone,
+}: {
+  lastRefresh: StartupsRefresh | null;
+  refreshing: boolean;
+  step: string | null;
+  today: string;
+  timeZone: string;
+}) {
   if (refreshing) {
     return (
       <p role="status" className="rounded-card border border-line-card bg-card px-4 py-3 text-meta text-muted">
@@ -148,7 +162,7 @@ function RefreshStatus({ lastRefresh, refreshing, step, today }: { lastRefresh: 
   return (
     <div className="flex flex-col gap-2 text-meta text-muted">
       <p>
-        Last refreshed {formatDateTime(new Date(lastRefresh.at), undefined, new Date(today))}:{" "}
+        Last refreshed {formatDateTime(new Date(lastRefresh.at), timeZone, new Date(today))}:{" "}
         {lastRefresh.sources
           .filter((source) => !source.error)
           .map((source) => `${STARTUP_SOURCE_INFO[source.source].name} ${source.found}`)
