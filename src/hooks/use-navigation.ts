@@ -8,11 +8,11 @@ import {
 } from "next/dist/shared/lib/hooks-client-context.shared-runtime";
 
 /**
- * Pathname and search params without Next.js's Suspense DevTools `use()` path.
- * Next 16.4's `usePathname` / `useSearchParams` call `use(promise)` only when
- * NavigationPromisesContext is set, which trips React 19.3's conditional-use
- * warning in development. Reading the same contexts with `useContext` is enough
- * for highlighting and query updates.
+ * Pathname and search params via router contexts (not `next/navigation`).
+ * Prefer these over Next's hooks so client UI stays clear of Next 16.4's
+ * Suspense DevTools `use(promise)` instrumentation; the yarn patch on `next`
+ * covers the remaining App Router internals that tripped React 19.3's
+ * conditional-use warning.
  */
 export function usePathname(): string {
   return useContext(PathnameContext) ?? "";

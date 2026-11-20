@@ -1,0 +1,280 @@
+diff --git a/dist/client/components/layout-router.js b/dist/client/components/layout-router.js
+--- a/dist/client/components/layout-router.js
++++ b/dist/client/components/layout-router.js
+@@ -27,6 +27,24 @@
+ const _interop_require_wildcard = require("@swc/helpers/_/_interop_require_wildcard");
+ const _jsxruntime = require("react/jsx-runtime");
+ const _react = /*#__PURE__*/ _interop_require_wildcard._(require("react"));
++
++const fulfilledRscPromises = new WeakMap();
++function fulfilledRscPromise(value) {
++  if (value !== null && typeof value === "object") {
++    let promise = fulfilledRscPromises.get(value);
++    if (promise) return promise;
++    promise = Promise.resolve(value);
++    promise.status = "fulfilled";
++    promise.value = value;
++    fulfilledRscPromises.set(value, promise);
++    return promise;
++  }
++  const promise = Promise.resolve(value);
++  promise.status = "fulfilled";
++  promise.value = value;
++  return promise;
++}
++
+ const _approutercontextsharedruntime = require("../../shared/lib/app-router-context.shared-runtime");
+ const _unresolvedthenable = require("./unresolved-thenable");
+ const _errorboundary = require("./error-boundary");
+@@ -225,23 +243,20 @@
+     // it's a promise, we need to unwrap it so we can determine whether or not the
+     // data is missing.
+     let resolvedRsc;
++    // Fitboard: always use() (fulfilled wrapper when resolved) so switching from a
++    // deferred RSC promise to a plain node does not trip React 19.3's conditional-use warning.
++    // Forever-suspend with throw instead of use(unresolvedThenable) for the same reason.
++    if (rsc === null) {
++        throw _unresolvedthenable.unresolvedThenable;
++    }
+     if ((0, _rendertree.isDeferredRsc)(rsc)) {
+-        const unwrappedRsc = (0, _react.use)(rsc);
+-        if (unwrappedRsc === null) {
+-            // If the promise was resolved to `null`, it means the data for this
+-            // segment was not returned by the server. Suspend indefinitely. When this
+-            // happens, the router is responsible for triggering a new state update to
+-            // un-suspend this segment.
+-            (0, _react.use)(_unresolvedthenable.unresolvedThenable);
+-        }
+-        resolvedRsc = unwrappedRsc;
++        resolvedRsc = (0, _react.use)(rsc);
+     } else {
+-        // This is not a deferred RSC promise. Don't need to unwrap it.
+-        if (rsc === null) {
+-            (0, _react.use)(_unresolvedthenable.unresolvedThenable);
+-        }
+-        resolvedRsc = rsc;
++        resolvedRsc = (0, _react.use)(fulfilledRscPromise(rsc));
+     }
++    if (resolvedRsc === null) {
++        throw _unresolvedthenable.unresolvedThenable;
++    }
+     // In dev, we create a NavigationPromisesContext containing the instrumented promises that provide
+     // `useSelectedLayoutSegment` and `useSelectedLayoutSegments`.
+     // Promises are cached outside of render to survive suspense retries.
+@@ -375,7 +390,7 @@
+         // the server tree. Suspend indefinitely; the router will have already
+         // detected the inconsistency when handling the server response, and
+         // triggered a refresh of the page to recover.
+-        (0, _react.use)(_unresolvedthenable.unresolvedThenable);
++        throw _unresolvedthenable.unresolvedThenable;
+     }
+     let maybeValidationBoundaryId = null;
+     if (typeof window === 'undefined' && process.env.__NEXT_CACHE_COMPONENTS) {
+diff --git a/dist/client/components/navigation.js b/dist/client/components/navigation.js
+--- a/dist/client/components/navigation.js
++++ b/dist/client/components/navigation.js
+@@ -114,7 +114,7 @@
+         return instrumentSearchParamsForClientValidation(readonlySearchParams);
+     }
+     // Instrument with Suspense DevTools (dev-only)
+-    if (process.env.NODE_ENV !== 'production' && 'use' in _react.default) {
++    if (false && process.env.NODE_ENV !== 'production' && 'use' in _react.default) {
+         const navigationPromises = (0, _react.use)(_hooksclientcontextsharedruntime.NavigationPromisesContext);
+         if (navigationPromises) {
+             return (0, _react.use)(navigationPromises.searchParams);
+@@ -134,7 +134,7 @@
+         return pathname;
+     }
+     // Instrument with Suspense DevTools (dev-only)
+-    if (process.env.NODE_ENV !== 'production' && 'use' in _react.default) {
++    if (false && process.env.NODE_ENV !== 'production' && 'use' in _react.default) {
+         const navigationPromises = (0, _react.use)(_hooksclientcontextsharedruntime.NavigationPromisesContext);
+         if (navigationPromises) {
+             return (0, _react.use)(navigationPromises.pathname);
+@@ -180,7 +180,7 @@
+         return instrumentParamsForClientValidation(params);
+     }
+     // Instrument with Suspense DevTools (dev-only)
+-    if (process.env.NODE_ENV !== 'production' && 'use' in _react.default) {
++    if (false && process.env.NODE_ENV !== 'production' && 'use' in _react.default) {
+         const navigationPromises = (0, _react.use)(_hooksclientcontextsharedruntime.NavigationPromisesContext);
+         if (navigationPromises) {
+             return (0, _react.use)(navigationPromises.params);
+@@ -199,7 +199,7 @@
+         expectCompleteParamsInClientValidation('useSelectedLayoutSegments()');
+     }
+     // Instrument with Suspense DevTools (dev-only)
+-    if (process.env.NODE_ENV !== 'production' && 'use' in _react.default) {
++    if (false && process.env.NODE_ENV !== 'production' && 'use' in _react.default) {
+         const navigationPromises = (0, _react.use)(_hooksclientcontextsharedruntime.NavigationPromisesContext);
+         if (navigationPromises) {
+             const promise = navigationPromises.selectedLayoutSegmentsPromises?.get(parallelRouteKey);
+@@ -222,7 +222,7 @@
+         expectCompleteParamsInClientValidation('useSelectedLayoutSegment()');
+     }
+     // Instrument with Suspense DevTools (dev-only)
+-    if (process.env.NODE_ENV !== 'production' && navigationPromises && 'use' in _react.default) {
++    if (false && process.env.NODE_ENV !== 'production' && navigationPromises && 'use' in _react.default) {
+         const promise = navigationPromises.selectedLayoutSegmentPromises?.get(parallelRouteKey);
+         if (promise) {
+             // We should always have a promise here, but if we don't, it's not worth erroring over.
+diff --git a/dist/client/components/use-action-queue.js b/dist/client/components/use-action-queue.js
+--- a/dist/client/components/use-action-queue.js
++++ b/dist/client/components/use-action-queue.js
+@@ -128,7 +128,19 @@
+     }, [
+         state
+     ]);
+-    return (0, _isthenable.isThenable)(stateWithDebugInfo) ? (0, _react.use)(stateWithDebugInfo) : stateWithDebugInfo;
++    // Fitboard: always call use() so React 19.3 does not warn when state flips from thenable → plain.
++    const statePromise = (0, _react.useMemo)(()=>{
++        if ((0, _isthenable.isThenable)(stateWithDebugInfo)) {
++            return stateWithDebugInfo;
++        }
++        const fulfilled = Promise.resolve(stateWithDebugInfo);
++        fulfilled.status = 'fulfilled';
++        fulfilled.value = stateWithDebugInfo;
++        return fulfilled;
++    }, [
++        stateWithDebugInfo
++    ]);
++    return (0, _react.use)(statePromise);
+ }
+ 
+ if ((typeof exports.default === 'function' || (typeof exports.default === 'object' && exports.default !== null)) && typeof exports.default.__esModule === 'undefined') {
+diff --git a/dist/esm/client/components/layout-router.js b/dist/esm/client/components/layout-router.js
+--- a/dist/esm/client/components/layout-router.js
++++ b/dist/esm/client/components/layout-router.js
+@@ -14,6 +14,24 @@
+ import { NavigationPromisesContext } from '../../shared/lib/hooks-client-context.shared-runtime';
+ import { getParamValueFromCacheKey } from '../route-params';
+ import { isDeferredRsc } from './render-tree';
++
++const fulfilledRscPromises = new WeakMap();
++function fulfilledRscPromise(value) {
++  if (value !== null && typeof value === "object") {
++    let promise = fulfilledRscPromises.get(value);
++    if (promise) return promise;
++    promise = Promise.resolve(value);
++    promise.status = "fulfilled";
++    promise.value = value;
++    fulfilledRscPromises.set(value, promise);
++    return promise;
++  }
++  const promise = Promise.resolve(value);
++  promise.status = "fulfilled";
++  promise.value = value;
++  return promise;
++}
++
+ /**
+  * Resolve the root scroll padding used by the viewport check.
+  *
+@@ -199,23 +217,20 @@
+     // it's a promise, we need to unwrap it so we can determine whether or not the
+     // data is missing.
+     let resolvedRsc;
++    // Fitboard: always use() (fulfilled wrapper when resolved) so switching from a
++    // deferred RSC promise to a plain node does not trip React 19.3's conditional-use warning.
++    // Forever-suspend with throw instead of use(unresolvedThenable) for the same reason.
++    if (rsc === null) {
++        throw unresolvedThenable;
++    }
+     if (isDeferredRsc(rsc)) {
+-        const unwrappedRsc = use(rsc);
+-        if (unwrappedRsc === null) {
+-            // If the promise was resolved to `null`, it means the data for this
+-            // segment was not returned by the server. Suspend indefinitely. When this
+-            // happens, the router is responsible for triggering a new state update to
+-            // un-suspend this segment.
+-            use(unresolvedThenable);
+-        }
+-        resolvedRsc = unwrappedRsc;
++        resolvedRsc = use(rsc);
+     } else {
+-        // This is not a deferred RSC promise. Don't need to unwrap it.
+-        if (rsc === null) {
+-            use(unresolvedThenable);
+-        }
+-        resolvedRsc = rsc;
++        resolvedRsc = use(fulfilledRscPromise(rsc));
+     }
++    if (resolvedRsc === null) {
++        throw unresolvedThenable;
++    }
+     // In dev, we create a NavigationPromisesContext containing the instrumented promises that provide
+     // `useSelectedLayoutSegment` and `useSelectedLayoutSegments`.
+     // Promises are cached outside of render to survive suspense retries.
+@@ -352,7 +367,7 @@
+         // the server tree. Suspend indefinitely; the router will have already
+         // detected the inconsistency when handling the server response, and
+         // triggered a refresh of the page to recover.
+-        use(unresolvedThenable);
++        throw unresolvedThenable;
+     }
+     let maybeValidationBoundaryId = null;
+     if (typeof window === 'undefined' && process.env.__NEXT_CACHE_COMPONENTS) {
+diff --git a/dist/esm/client/components/navigation.js b/dist/esm/client/components/navigation.js
+--- a/dist/esm/client/components/navigation.js
++++ b/dist/esm/client/components/navigation.js
+@@ -46,7 +46,7 @@
+         return instrumentSearchParamsForClientValidation(readonlySearchParams);
+     }
+     // Instrument with Suspense DevTools (dev-only)
+-    if (process.env.NODE_ENV !== 'production' && 'use' in React) {
++    if (false && process.env.NODE_ENV !== 'production' && 'use' in React) {
+         const navigationPromises = use(NavigationPromisesContext);
+         if (navigationPromises) {
+             return use(navigationPromises.searchParams);
+@@ -83,7 +83,7 @@
+         return pathname;
+     }
+     // Instrument with Suspense DevTools (dev-only)
+-    if (process.env.NODE_ENV !== 'production' && 'use' in React) {
++    if (false && process.env.NODE_ENV !== 'production' && 'use' in React) {
+         const navigationPromises = use(NavigationPromisesContext);
+         if (navigationPromises) {
+             return use(navigationPromises.pathname);
+@@ -166,7 +166,7 @@
+         return instrumentParamsForClientValidation(params);
+     }
+     // Instrument with Suspense DevTools (dev-only)
+-    if (process.env.NODE_ENV !== 'production' && 'use' in React) {
++    if (false && process.env.NODE_ENV !== 'production' && 'use' in React) {
+         const navigationPromises = use(NavigationPromisesContext);
+         if (navigationPromises) {
+             return use(navigationPromises.params);
+@@ -210,7 +210,7 @@
+         expectCompleteParamsInClientValidation('useSelectedLayoutSegments()');
+     }
+     // Instrument with Suspense DevTools (dev-only)
+-    if (process.env.NODE_ENV !== 'production' && 'use' in React) {
++    if (false && process.env.NODE_ENV !== 'production' && 'use' in React) {
+         const navigationPromises = use(NavigationPromisesContext);
+         if (navigationPromises) {
+             const promise = navigationPromises.selectedLayoutSegmentsPromises?.get(parallelRouteKey);
+diff --git a/dist/esm/client/components/use-action-queue.js b/dist/esm/client/components/use-action-queue.js
+--- a/dist/esm/client/components/use-action-queue.js
++++ b/dist/esm/client/components/use-action-queue.js
+@@ -102,7 +102,19 @@
+     }, [
+         state
+     ]);
+-    return isThenable(stateWithDebugInfo) ? use(stateWithDebugInfo) : stateWithDebugInfo;
++    // Fitboard: always call use() so React 19.3 does not warn when state flips from thenable → plain.
++    const statePromise = useMemo(()=>{
++        if (isThenable(stateWithDebugInfo)) {
++            return stateWithDebugInfo;
++        }
++        const fulfilled = Promise.resolve(stateWithDebugInfo);
++        fulfilled.status = 'fulfilled';
++        fulfilled.value = stateWithDebugInfo;
++        return fulfilled;
++    }, [
++        stateWithDebugInfo
++    ]);
++    return use(statePromise);
+ }
+ 
+ //# sourceMappingURL=use-action-queue.js.map
+\ No newline at end of file

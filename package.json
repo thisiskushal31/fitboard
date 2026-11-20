@@ -28,7 +28,7 @@
     "jose": "^6.2.13",
     "lucide-react": "^1.61.0",
     "mammoth": "^1.13.0",
-    "next": "16.4.6",
+    "next": "patch:next@npm%3A16.4.6#./.yarn/patches/next-npm-16.4.6-conditional-use.patch",
     "node-html-parser": "^9.0.5",
     "ollama": "^0.6.4",
     "openai": "^7.43.0",
