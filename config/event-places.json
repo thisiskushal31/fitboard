@@ -1,0 +1,2261 @@
+{
+  "_comment": "Event place catalog: continents by ISO country, subdivision suffixes, and cities where tech events commonly happen. Learned places are stored in the database on refresh and merge with this seed.",
+  "continents": {
+    "ad": "Europe",
+    "ae": "Middle East",
+    "af": "Asia",
+    "ag": "Latin America",
+    "ai": "Latin America",
+    "al": "Europe",
+    "am": "Asia",
+    "ao": "Africa",
+    "aq": "Antarctica",
+    "ar": "Latin America",
+    "as": "Oceania",
+    "at": "Europe",
+    "au": "Oceania",
+    "aw": "Latin America",
+    "ax": "Europe",
+    "az": "Asia",
+    "ba": "Europe",
+    "bb": "Latin America",
+    "bd": "Asia",
+    "be": "Europe",
+    "bf": "Africa",
+    "bg": "Europe",
+    "bh": "Middle East",
+    "bi": "Africa",
+    "bj": "Africa",
+    "bl": "Latin America",
+    "bm": "North America",
+    "bn": "Asia",
+    "bo": "Latin America",
+    "bq": "Latin America",
+    "br": "Latin America",
+    "bs": "Latin America",
+    "bt": "Asia",
+    "bv": "Europe",
+    "bw": "Africa",
+    "by": "Europe",
+    "bz": "Latin America",
+    "ca": "North America",
+    "cc": "Asia",
+    "cd": "Africa",
+    "cf": "Africa",
+    "cg": "Africa",
+    "ch": "Europe",
+    "ci": "Africa",
+    "ck": "Oceania",
+    "cl": "Latin America",
+    "cm": "Africa",
+    "cn": "Asia",
+    "co": "Latin America",
+    "cr": "Latin America",
+    "cu": "Latin America",
+    "cv": "Africa",
+    "cw": "Latin America",
+    "cx": "Asia",
+    "cy": "Europe",
+    "cz": "Europe",
+    "de": "Europe",
+    "dj": "Africa",
+    "dk": "Europe",
+    "dm": "Latin America",
+    "do": "Latin America",
+    "dz": "Africa",
+    "ec": "Latin America",
+    "ee": "Europe",
+    "eg": "Middle East",
+    "eh": "Africa",
+    "er": "Africa",
+    "es": "Europe",
+    "et": "Africa",
+    "fi": "Europe",
+    "fj": "Oceania",
+    "fk": "Latin America",
+    "fm": "Oceania",
+    "fo": "Europe",
+    "fr": "Europe",
+    "ga": "Africa",
+    "gb": "Europe",
+    "gd": "Latin America",
+    "ge": "Asia",
+    "gf": "Latin America",
+    "gg": "Europe",
+    "gh": "Africa",
+    "gi": "Europe",
+    "gl": "North America",
+    "gm": "Africa",
+    "gn": "Africa",
+    "gp": "Latin America",
+    "gq": "Africa",
+    "gr": "Europe",
+    "gs": "Latin America",
+    "gt": "Latin America",
+    "gu": "Oceania",
+    "gw": "Africa",
+    "gy": "Latin America",
+    "hk": "Asia",
+    "hm": "Oceania",
+    "hn": "Latin America",
+    "hr": "Europe",
+    "ht": "Latin America",
+    "hu": "Europe",
+    "id": "Asia",
+    "ie": "Europe",
+    "il": "Middle East",
+    "im": "Europe",
+    "in": "Asia",
+    "io": "Asia",
+    "iq": "Middle East",
+    "ir": "Middle East",
+    "is": "Europe",
+    "it": "Europe",
+    "je": "Europe",
+    "jm": "Latin America",
+    "jo": "Middle East",
+    "jp": "Asia",
+    "ke": "Africa",
+    "kg": "Asia",
+    "kh": "Asia",
+    "ki": "Oceania",
+    "km": "Africa",
+    "kn": "Latin America",
+    "kp": "Asia",
+    "kr": "Asia",
+    "kw": "Middle East",
+    "ky": "Latin America",
+    "kz": "Asia",
+    "la": "Asia",
+    "lb": "Middle East",
+    "lc": "Latin America",
+    "li": "Europe",
+    "lk": "Asia",
+    "lr": "Africa",
+    "ls": "Africa",
+    "lt": "Europe",
+    "lu": "Europe",
+    "lv": "Europe",
+    "ly": "Africa",
+    "ma": "Africa",
+    "mc": "Europe",
+    "md": "Europe",
+    "me": "Europe",
+    "mf": "Latin America",
+    "mg": "Africa",
+    "mh": "Oceania",
+    "mk": "Europe",
+    "ml": "Africa",
+    "mm": "Asia",
+    "mn": "Asia",
+    "mo": "Asia",
+    "mp": "Oceania",
+    "mq": "Latin America",
+    "mr": "Africa",
+    "ms": "Latin America",
+    "mt": "Europe",
+    "mu": "Africa",
+    "mv": "Asia",
+    "mw": "Africa",
+    "mx": "North America",
+    "my": "Asia",
+    "mz": "Africa",
+    "na": "Africa",
+    "nc": "Oceania",
+    "ne": "Africa",
+    "nf": "Oceania",
+    "ng": "Africa",
+    "ni": "Latin America",
+    "nl": "Europe",
+    "no": "Europe",
+    "np": "Asia",
+    "nr": "Oceania",
+    "nu": "Oceania",
+    "nz": "Oceania",
+    "om": "Middle East",
+    "pa": "Latin America",
+    "pe": "Latin America",
+    "pf": "Oceania",
+    "pg": "Oceania",
+    "ph": "Asia",
+    "pk": "Asia",
+    "pl": "Europe",
+    "pm": "North America",
+    "pn": "Oceania",
+    "pr": "Latin America",
+    "ps": "Middle East",
+    "pt": "Europe",
+    "pw": "Oceania",
+    "py": "Latin America",
+    "qa": "Middle East",
+    "re": "Africa",
+    "ro": "Europe",
+    "rs": "Europe",
+    "ru": "Europe",
+    "rw": "Africa",
+    "sa": "Middle East",
+    "sb": "Oceania",
+    "sc": "Africa",
+    "sd": "Africa",
+    "se": "Europe",
+    "sg": "Asia",
+    "sh": "Africa",
+    "si": "Europe",
+    "sj": "Europe",
+    "sk": "Europe",
+    "sl": "Africa",
+    "sm": "Europe",
+    "sn": "Africa",
+    "so": "Africa",
+    "sr": "Latin America",
+    "ss": "Africa",
+    "st": "Africa",
+    "sv": "Latin America",
+    "sx": "Latin America",
+    "sy": "Middle East",
+    "sz": "Africa",
+    "tc": "Latin America",
+    "td": "Africa",
+    "tf": "Africa",
+    "tg": "Africa",
+    "th": "Asia",
+    "tj": "Asia",
+    "tk": "Oceania",
+    "tl": "Asia",
+    "tm": "Asia",
+    "tn": "Africa",
+    "to": "Oceania",
+    "tr": "Middle East",
+    "tt": "Latin America",
+    "tv": "Oceania",
+    "tw": "Asia",
+    "tz": "Africa",
+    "ua": "Europe",
+    "ug": "Africa",
+    "um": "Oceania",
+    "us": "North America",
+    "uy": "Latin America",
+    "uz": "Asia",
+    "va": "Europe",
+    "vc": "Latin America",
+    "ve": "Latin America",
+    "vg": "Latin America",
+    "vi": "Latin America",
+    "vn": "Asia",
+    "vu": "Oceania",
+    "wf": "Oceania",
+    "ws": "Oceania",
+    "xk": "Europe",
+    "ye": "Middle East",
+    "yt": "Africa",
+    "za": "Africa",
+    "zm": "Africa",
+    "zw": "Africa"
+  },
+  "subdivisions": {
+    "us": [
+      "AL",
+      "AK",
+      "AZ",
+      "AR",
+      "CA",
+      "CO",
+      "CT",
+      "DC",
+      "DE",
+      "FL",
+      "GA",
+      "HI",
+      "ID",
+      "IL",
+      "IN",
+      "IA",
+      "KS",
+      "KY",
+      "LA",
+      "ME",
+      "MD",
+      "MA",
+      "MI",
+      "MN",
+      "MS",
+      "MO",
+      "MT",
+      "NE",
+      "NV",
+      "NH",
+      "NJ",
+      "NM",
+      "NY",
+      "NC",
+      "ND",
+      "OH",
+      "OK",
+      "OR",
+      "PA",
+      "RI",
+      "SC",
+      "SD",
+      "TN",
+      "TX",
+      "UT",
+      "VT",
+      "VA",
+      "WA",
+      "WV",
+      "WI",
+      "WY"
+    ],
+    "ca": [
+      "AB",
+      "BC",
+      "MB",
+      "NB",
+      "NL",
+      "NS",
+      "NT",
+      "NU",
+      "ON",
+      "PE",
+      "QC",
+      "SK",
+      "YT"
+    ],
+    "au": [
+      "NSW",
+      "VIC",
+      "QLD",
+      "SA",
+      "TAS",
+      "ACT",
+      "NT"
+    ]
+  },
+  "cities": [
+    {
+      "name": "Abu Dhabi",
+      "country": "ae",
+      "aliases": []
+    },
+    {
+      "name": "Dubai",
+      "country": "ae",
+      "aliases": []
+    },
+    {
+      "name": "Sharjah",
+      "country": "ae",
+      "aliases": []
+    },
+    {
+      "name": "Yerevan",
+      "country": "am",
+      "aliases": []
+    },
+    {
+      "name": "Buenos Aires",
+      "country": "ar",
+      "aliases": []
+    },
+    {
+      "name": "Córdoba",
+      "country": "ar",
+      "aliases": []
+    },
+    {
+      "name": "Rosario",
+      "country": "ar",
+      "aliases": []
+    },
+    {
+      "name": "Graz",
+      "country": "at",
+      "aliases": []
+    },
+    {
+      "name": "Linz",
+      "country": "at",
+      "aliases": []
+    },
+    {
+      "name": "Salzburg",
+      "country": "at",
+      "aliases": []
+    },
+    {
+      "name": "Vienna",
+      "country": "at",
+      "aliases": []
+    },
+    {
+      "name": "Adelaide",
+      "country": "au",
+      "aliases": []
+    },
+    {
+      "name": "Brisbane",
+      "country": "au",
+      "aliases": []
+    },
+    {
+      "name": "Canberra",
+      "country": "au",
+      "aliases": []
+    },
+    {
+      "name": "Gold Coast",
+      "country": "au",
+      "aliases": []
+    },
+    {
+      "name": "Hobart",
+      "country": "au",
+      "aliases": []
+    },
+    {
+      "name": "Melbourne",
+      "country": "au",
+      "aliases": []
+    },
+    {
+      "name": "Perth",
+      "country": "au",
+      "aliases": []
+    },
+    {
+      "name": "Sydney",
+      "country": "au",
+      "aliases": []
+    },
+    {
+      "name": "Baku",
+      "country": "az",
+      "aliases": []
+    },
+    {
+      "name": "Ilidža",
+      "country": "ba",
+      "aliases": []
+    },
+    {
+      "name": "Sarajevo",
+      "country": "ba",
+      "aliases": []
+    },
+    {
+      "name": "Chittagong",
+      "country": "bd",
+      "aliases": []
+    },
+    {
+      "name": "Dhaka",
+      "country": "bd",
+      "aliases": []
+    },
+    {
+      "name": "Antwerp",
+      "country": "be",
+      "aliases": []
+    },
+    {
+      "name": "Bruges",
+      "country": "be",
+      "aliases": []
+    },
+    {
+      "name": "Brussels",
+      "country": "be",
+      "aliases": []
+    },
+    {
+      "name": "Ghent",
+      "country": "be",
+      "aliases": []
+    },
+    {
+      "name": "Leuven",
+      "country": "be",
+      "aliases": []
+    },
+    {
+      "name": "Sofia",
+      "country": "bg",
+      "aliases": []
+    },
+    {
+      "name": "Manama",
+      "country": "bh",
+      "aliases": []
+    },
+    {
+      "name": "Belo Horizonte",
+      "country": "br",
+      "aliases": []
+    },
+    {
+      "name": "Brasília",
+      "country": "br",
+      "aliases": []
+    },
+    {
+      "name": "Curitiba",
+      "country": "br",
+      "aliases": []
+    },
+    {
+      "name": "Florianópolis",
+      "country": "br",
+      "aliases": []
+    },
+    {
+      "name": "Goiânia",
+      "country": "br",
+      "aliases": []
+    },
+    {
+      "name": "Gramado",
+      "country": "br",
+      "aliases": []
+    },
+    {
+      "name": "Porto Alegre",
+      "country": "br",
+      "aliases": []
+    },
+    {
+      "name": "Recife",
+      "country": "br",
+      "aliases": []
+    },
+    {
+      "name": "Rio de Janeiro",
+      "country": "br",
+      "aliases": [
+        "rio"
+      ]
+    },
+    {
+      "name": "Salvador",
+      "country": "br",
+      "aliases": []
+    },
+    {
+      "name": "São Paulo",
+      "country": "br",
+      "aliases": [
+        "sao paulo",
+        "sao-paulo"
+      ]
+    },
+    {
+      "name": "Vitória",
+      "country": "br",
+      "aliases": []
+    },
+    {
+      "name": "Calgary",
+      "country": "ca",
+      "aliases": []
+    },
+    {
+      "name": "Collingwood",
+      "country": "ca",
+      "aliases": []
+    },
+    {
+      "name": "Edmonton",
+      "country": "ca",
+      "aliases": []
+    },
+    {
+      "name": "Halifax",
+      "country": "ca",
+      "aliases": []
+    },
+    {
+      "name": "Montreal",
+      "country": "ca",
+      "aliases": []
+    },
+    {
+      "name": "Ottawa",
+      "country": "ca",
+      "aliases": []
+    },
+    {
+      "name": "Quebec City",
+      "country": "ca",
+      "aliases": []
+    },
+    {
+      "name": "Saskatoon",
+      "country": "ca",
+      "aliases": []
+    },
+    {
+      "name": "Toronto",
+      "country": "ca",
+      "aliases": []
+    },
+    {
+      "name": "Vancouver",
+      "country": "ca",
+      "aliases": []
+    },
+    {
+      "name": "Victoria",
+      "country": "ca",
+      "aliases": []
+    },
+    {
+      "name": "Waterloo",
+      "country": "ca",
+      "aliases": []
+    },
+    {
+      "name": "Whistler",
+      "country": "ca",
+      "aliases": []
+    },
+    {
+      "name": "Winnipeg",
+      "country": "ca",
+      "aliases": []
+    },
+    {
+      "name": "Basel",
+      "country": "ch",
+      "aliases": []
+    },
+    {
+      "name": "Bern",
+      "country": "ch",
+      "aliases": []
+    },
+    {
+      "name": "Geneva",
+      "country": "ch",
+      "aliases": []
+    },
+    {
+      "name": "Lausanne",
+      "country": "ch",
+      "aliases": []
+    },
+    {
+      "name": "Lugano",
+      "country": "ch",
+      "aliases": []
+    },
+    {
+      "name": "Zurich",
+      "country": "ch",
+      "aliases": []
+    },
+    {
+      "name": "Santiago",
+      "country": "cl",
+      "aliases": []
+    },
+    {
+      "name": "Valparaíso",
+      "country": "cl",
+      "aliases": []
+    },
+    {
+      "name": "Beijing",
+      "country": "cn",
+      "aliases": []
+    },
+    {
+      "name": "Chengdu",
+      "country": "cn",
+      "aliases": []
+    },
+    {
+      "name": "Guangzhou",
+      "country": "cn",
+      "aliases": []
+    },
+    {
+      "name": "Hangzhou",
+      "country": "cn",
+      "aliases": []
+    },
+    {
+      "name": "Nanjing",
+      "country": "cn",
+      "aliases": []
+    },
+    {
+      "name": "Shanghai",
+      "country": "cn",
+      "aliases": []
+    },
+    {
+      "name": "Shenzhen",
+      "country": "cn",
+      "aliases": []
+    },
+    {
+      "name": "Suzhou",
+      "country": "cn",
+      "aliases": []
+    },
+    {
+      "name": "Wuhan",
+      "country": "cn",
+      "aliases": []
+    },
+    {
+      "name": "Bogotá",
+      "country": "co",
+      "aliases": []
+    },
+    {
+      "name": "Cali",
+      "country": "co",
+      "aliases": []
+    },
+    {
+      "name": "Medellín",
+      "country": "co",
+      "aliases": []
+    },
+    {
+      "name": "San José",
+      "country": "cr",
+      "aliases": []
+    },
+    {
+      "name": "Limassol",
+      "country": "cy",
+      "aliases": []
+    },
+    {
+      "name": "Nicosia",
+      "country": "cy",
+      "aliases": []
+    },
+    {
+      "name": "Brno",
+      "country": "cz",
+      "aliases": []
+    },
+    {
+      "name": "Prague",
+      "country": "cz",
+      "aliases": []
+    },
+    {
+      "name": "Aachen",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Berlin",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Bonn",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Bremen",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Cologne",
+      "country": "de",
+      "aliases": [
+        "köln",
+        "koln"
+      ]
+    },
+    {
+      "name": "Darmstadt",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Dresden",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Düsseldorf",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Frankfurt",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Frankfurt am Main",
+      "country": "de",
+      "aliases": [
+        "frankfurt-am-main"
+      ]
+    },
+    {
+      "name": "Freiburg",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Hamburg",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Hannover",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Heidelberg",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Karlsruhe",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Leipzig",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Mainz",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Mannheim",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Munich",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Nuremberg",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Potsdam",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Stuttgart",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Wiesbaden",
+      "country": "de",
+      "aliases": []
+    },
+    {
+      "name": "Aarhus",
+      "country": "dk",
+      "aliases": []
+    },
+    {
+      "name": "Billund",
+      "country": "dk",
+      "aliases": []
+    },
+    {
+      "name": "Copenhagen",
+      "country": "dk",
+      "aliases": []
+    },
+    {
+      "name": "Santo Domingo",
+      "country": "do",
+      "aliases": []
+    },
+    {
+      "name": "Tallinn",
+      "country": "ee",
+      "aliases": []
+    },
+    {
+      "name": "Tartu",
+      "country": "ee",
+      "aliases": []
+    },
+    {
+      "name": "Alexandria",
+      "country": "eg",
+      "aliases": []
+    },
+    {
+      "name": "Cairo",
+      "country": "eg",
+      "aliases": []
+    },
+    {
+      "name": "Giza",
+      "country": "eg",
+      "aliases": []
+    },
+    {
+      "name": "Barcelona",
+      "country": "es",
+      "aliases": []
+    },
+    {
+      "name": "Bilbao",
+      "country": "es",
+      "aliases": []
+    },
+    {
+      "name": "Madrid",
+      "country": "es",
+      "aliases": []
+    },
+    {
+      "name": "Malaga",
+      "country": "es",
+      "aliases": []
+    },
+    {
+      "name": "Seville",
+      "country": "es",
+      "aliases": []
+    },
+    {
+      "name": "Valencia",
+      "country": "es",
+      "aliases": []
+    },
+    {
+      "name": "Addis Ababa",
+      "country": "et",
+      "aliases": []
+    },
+    {
+      "name": "Helsinki",
+      "country": "fi",
+      "aliases": []
+    },
+    {
+      "name": "Oulu",
+      "country": "fi",
+      "aliases": []
+    },
+    {
+      "name": "Tampere",
+      "country": "fi",
+      "aliases": []
+    },
+    {
+      "name": "Nadi",
+      "country": "fj",
+      "aliases": []
+    },
+    {
+      "name": "Suva",
+      "country": "fj",
+      "aliases": []
+    },
+    {
+      "name": "Aix-en-Provence",
+      "country": "fr",
+      "aliases": []
+    },
+    {
+      "name": "Bordeaux",
+      "country": "fr",
+      "aliases": []
+    },
+    {
+      "name": "Cannes",
+      "country": "fr",
+      "aliases": []
+    },
+    {
+      "name": "Grenoble",
+      "country": "fr",
+      "aliases": []
+    },
+    {
+      "name": "Lille",
+      "country": "fr",
+      "aliases": []
+    },
+    {
+      "name": "Lyon",
+      "country": "fr",
+      "aliases": []
+    },
+    {
+      "name": "Montpellier",
+      "country": "fr",
+      "aliases": []
+    },
+    {
+      "name": "Nantes",
+      "country": "fr",
+      "aliases": []
+    },
+    {
+      "name": "Nice",
+      "country": "fr",
+      "aliases": []
+    },
+    {
+      "name": "Paris",
+      "country": "fr",
+      "aliases": []
+    },
+    {
+      "name": "Rennes",
+      "country": "fr",
+      "aliases": []
+    },
+    {
+      "name": "Sophia Antipolis",
+      "country": "fr",
+      "aliases": []
+    },
+    {
+      "name": "Strasbourg",
+      "country": "fr",
+      "aliases": []
+    },
+    {
+      "name": "Toulouse",
+      "country": "fr",
+      "aliases": []
+    },
+    {
+      "name": "Belfast",
+      "country": "gb",
+      "aliases": []
+    },
+    {
+      "name": "Birmingham",
+      "country": "gb",
+      "aliases": []
+    },
+    {
+      "name": "Brighton",
+      "country": "gb",
+      "aliases": []
+    },
+    {
+      "name": "Bristol",
+      "country": "gb",
+      "aliases": []
+    },
+    {
+      "name": "Cardiff",
+      "country": "gb",
+      "aliases": []
+    },
+    {
+      "name": "Edinburgh",
+      "country": "gb",
+      "aliases": []
+    },
+    {
+      "name": "Glasgow",
+      "country": "gb",
+      "aliases": []
+    },
+    {
+      "name": "Leeds",
+      "country": "gb",
+      "aliases": []
+    },
+    {
+      "name": "London",
+      "country": "gb",
+      "aliases": []
+    },
+    {
+      "name": "Manchester",
+      "country": "gb",
+      "aliases": []
+    },
+    {
+      "name": "Oxford",
+      "country": "gb",
+      "aliases": []
+    },
+    {
+      "name": "Tbilisi",
+      "country": "ge",
+      "aliases": []
+    },
+    {
+      "name": "Accra",
+      "country": "gh",
+      "aliases": []
+    },
+    {
+      "name": "Kumasi",
+      "country": "gh",
+      "aliases": []
+    },
+    {
+      "name": "Athens",
+      "country": "gr",
+      "aliases": []
+    },
+    {
+      "name": "Heraklion",
+      "country": "gr",
+      "aliases": []
+    },
+    {
+      "name": "Thessaloniki",
+      "country": "gr",
+      "aliases": []
+    },
+    {
+      "name": "Hong Kong",
+      "country": "hk",
+      "aliases": []
+    },
+    {
+      "name": "Dubrovnik",
+      "country": "hr",
+      "aliases": []
+    },
+    {
+      "name": "Opatija",
+      "country": "hr",
+      "aliases": []
+    },
+    {
+      "name": "Poreč",
+      "country": "hr",
+      "aliases": []
+    },
+    {
+      "name": "Split",
+      "country": "hr",
+      "aliases": []
+    },
+    {
+      "name": "Zadar",
+      "country": "hr",
+      "aliases": []
+    },
+    {
+      "name": "Zagreb",
+      "country": "hr",
+      "aliases": []
+    },
+    {
+      "name": "Šibenik",
+      "country": "hr",
+      "aliases": []
+    },
+    {
+      "name": "Budapest",
+      "country": "hu",
+      "aliases": []
+    },
+    {
+      "name": "Bali",
+      "country": "id",
+      "aliases": []
+    },
+    {
+      "name": "Bandung",
+      "country": "id",
+      "aliases": []
+    },
+    {
+      "name": "Jakarta",
+      "country": "id",
+      "aliases": []
+    },
+    {
+      "name": "Surabaya",
+      "country": "id",
+      "aliases": []
+    },
+    {
+      "name": "Yogyakarta",
+      "country": "id",
+      "aliases": []
+    },
+    {
+      "name": "Dublin",
+      "country": "ie",
+      "aliases": []
+    },
+    {
+      "name": "Dún Laoghaire",
+      "country": "ie",
+      "aliases": [
+        "dun laoghaire"
+      ]
+    },
+    {
+      "name": "Jerusalem",
+      "country": "il",
+      "aliases": []
+    },
+    {
+      "name": "Rishon LeZion",
+      "country": "il",
+      "aliases": []
+    },
+    {
+      "name": "Tel Aviv",
+      "country": "il",
+      "aliases": []
+    },
+    {
+      "name": "Ahmedabad",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Bengaluru",
+      "country": "in",
+      "aliases": [
+        "bangalore",
+        "bengaluru"
+      ]
+    },
+    {
+      "name": "Canaguinim",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Chandigarh",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Chennai",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Dehradun",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Goa",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Gurugram",
+      "country": "in",
+      "aliases": [
+        "gurgaon"
+      ]
+    },
+    {
+      "name": "Hyderabad",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Indore",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Jaipur",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Kochi",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Kolkata",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Mangalore",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Mumbai",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Mussoorie",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Mysuru",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "New Delhi",
+      "country": "in",
+      "aliases": [
+        "delhi",
+        "ncr"
+      ]
+    },
+    {
+      "name": "Noida",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Pune",
+      "country": "in",
+      "aliases": []
+    },
+    {
+      "name": "Reykjavik",
+      "country": "is",
+      "aliases": []
+    },
+    {
+      "name": "Bologna",
+      "country": "it",
+      "aliases": []
+    },
+    {
+      "name": "Florence",
+      "country": "it",
+      "aliases": []
+    },
+    {
+      "name": "Milan",
+      "country": "it",
+      "aliases": []
+    },
+    {
+      "name": "Parma",
+      "country": "it",
+      "aliases": []
+    },
+    {
+      "name": "Rome",
+      "country": "it",
+      "aliases": []
+    },
+    {
+      "name": "Turin",
+      "country": "it",
+      "aliases": []
+    },
+    {
+      "name": "Verona",
+      "country": "it",
+      "aliases": []
+    },
+    {
+      "name": "Chiba",
+      "country": "jp",
+      "aliases": []
+    },
+    {
+      "name": "Fukuoka",
+      "country": "jp",
+      "aliases": []
+    },
+    {
+      "name": "Kobe",
+      "country": "jp",
+      "aliases": []
+    },
+    {
+      "name": "Kyoto",
+      "country": "jp",
+      "aliases": []
+    },
+    {
+      "name": "Nagoya",
+      "country": "jp",
+      "aliases": []
+    },
+    {
+      "name": "Naha",
+      "country": "jp",
+      "aliases": []
+    },
+    {
+      "name": "Osaka",
+      "country": "jp",
+      "aliases": []
+    },
+    {
+      "name": "Sapporo",
+      "country": "jp",
+      "aliases": []
+    },
+    {
+      "name": "Tokyo",
+      "country": "jp",
+      "aliases": []
+    },
+    {
+      "name": "Yokohama",
+      "country": "jp",
+      "aliases": []
+    },
+    {
+      "name": "Mombasa",
+      "country": "ke",
+      "aliases": []
+    },
+    {
+      "name": "Nairobi",
+      "country": "ke",
+      "aliases": []
+    },
+    {
+      "name": "Busan",
+      "country": "kr",
+      "aliases": []
+    },
+    {
+      "name": "Goyang",
+      "country": "kr",
+      "aliases": []
+    },
+    {
+      "name": "Incheon",
+      "country": "kr",
+      "aliases": []
+    },
+    {
+      "name": "Seoul",
+      "country": "kr",
+      "aliases": []
+    },
+    {
+      "name": "Almaty",
+      "country": "kz",
+      "aliases": []
+    },
+    {
+      "name": "Astana",
+      "country": "kz",
+      "aliases": []
+    },
+    {
+      "name": "Colombo",
+      "country": "lk",
+      "aliases": []
+    },
+    {
+      "name": "Kaunas",
+      "country": "lt",
+      "aliases": []
+    },
+    {
+      "name": "Vilnius",
+      "country": "lt",
+      "aliases": []
+    },
+    {
+      "name": "Luxembourg",
+      "country": "lu",
+      "aliases": []
+    },
+    {
+      "name": "Riga",
+      "country": "lv",
+      "aliases": []
+    },
+    {
+      "name": "Casablanca",
+      "country": "ma",
+      "aliases": []
+    },
+    {
+      "name": "Marrakech",
+      "country": "ma",
+      "aliases": []
+    },
+    {
+      "name": "Rabat",
+      "country": "ma",
+      "aliases": []
+    },
+    {
+      "name": "Macao",
+      "country": "mo",
+      "aliases": []
+    },
+    {
+      "name": "Taipa",
+      "country": "mo",
+      "aliases": []
+    },
+    {
+      "name": "St. Julian's",
+      "country": "mt",
+      "aliases": []
+    },
+    {
+      "name": "Valletta",
+      "country": "mt",
+      "aliases": []
+    },
+    {
+      "name": "Guadalajara",
+      "country": "mx",
+      "aliases": []
+    },
+    {
+      "name": "Mexico City",
+      "country": "mx",
+      "aliases": [
+        "mexico-city",
+        "cdmx"
+      ]
+    },
+    {
+      "name": "Monterrey",
+      "country": "mx",
+      "aliases": []
+    },
+    {
+      "name": "Johor Bahru",
+      "country": "my",
+      "aliases": []
+    },
+    {
+      "name": "Kuala Lumpur",
+      "country": "my",
+      "aliases": []
+    },
+    {
+      "name": "Penang",
+      "country": "my",
+      "aliases": []
+    },
+    {
+      "name": "Windhoek",
+      "country": "na",
+      "aliases": []
+    },
+    {
+      "name": "Abuja",
+      "country": "ng",
+      "aliases": []
+    },
+    {
+      "name": "Calabar",
+      "country": "ng",
+      "aliases": []
+    },
+    {
+      "name": "Enugu",
+      "country": "ng",
+      "aliases": []
+    },
+    {
+      "name": "Lagos",
+      "country": "ng",
+      "aliases": []
+    },
+    {
+      "name": "Amsterdam",
+      "country": "nl",
+      "aliases": []
+    },
+    {
+      "name": "Delft",
+      "country": "nl",
+      "aliases": []
+    },
+    {
+      "name": "Eindhoven",
+      "country": "nl",
+      "aliases": []
+    },
+    {
+      "name": "Groningen",
+      "country": "nl",
+      "aliases": []
+    },
+    {
+      "name": "Haarlem",
+      "country": "nl",
+      "aliases": []
+    },
+    {
+      "name": "Hilversum",
+      "country": "nl",
+      "aliases": []
+    },
+    {
+      "name": "Leiden",
+      "country": "nl",
+      "aliases": []
+    },
+    {
+      "name": "Noordwijk",
+      "country": "nl",
+      "aliases": []
+    },
+    {
+      "name": "Rotterdam",
+      "country": "nl",
+      "aliases": []
+    },
+    {
+      "name": "The Hague",
+      "country": "nl",
+      "aliases": []
+    },
+    {
+      "name": "Utrecht",
+      "country": "nl",
+      "aliases": []
+    },
+    {
+      "name": "Bergen",
+      "country": "no",
+      "aliases": []
+    },
+    {
+      "name": "Kristiansand",
+      "country": "no",
+      "aliases": []
+    },
+    {
+      "name": "Lillestrøm",
+      "country": "no",
+      "aliases": []
+    },
+    {
+      "name": "Oslo",
+      "country": "no",
+      "aliases": []
+    },
+    {
+      "name": "Trondheim",
+      "country": "no",
+      "aliases": []
+    },
+    {
+      "name": "Kathmandu",
+      "country": "np",
+      "aliases": []
+    },
+    {
+      "name": "Lalitpur",
+      "country": "np",
+      "aliases": []
+    },
+    {
+      "name": "Nepalgunj",
+      "country": "np",
+      "aliases": []
+    },
+    {
+      "name": "Auckland",
+      "country": "nz",
+      "aliases": []
+    },
+    {
+      "name": "Christchurch",
+      "country": "nz",
+      "aliases": []
+    },
+    {
+      "name": "Rotorua",
+      "country": "nz",
+      "aliases": []
+    },
+    {
+      "name": "Wellington",
+      "country": "nz",
+      "aliases": []
+    },
+    {
+      "name": "Muscat",
+      "country": "om",
+      "aliases": []
+    },
+    {
+      "name": "Panama City",
+      "country": "pa",
+      "aliases": []
+    },
+    {
+      "name": "Lima",
+      "country": "pe",
+      "aliases": []
+    },
+    {
+      "name": "Cebu",
+      "country": "ph",
+      "aliases": []
+    },
+    {
+      "name": "Clark",
+      "country": "ph",
+      "aliases": []
+    },
+    {
+      "name": "Makati",
+      "country": "ph",
+      "aliases": []
+    },
+    {
+      "name": "Manila",
+      "country": "ph",
+      "aliases": []
+    },
+    {
+      "name": "Pasay City",
+      "country": "ph",
+      "aliases": []
+    },
+    {
+      "name": "Taguig",
+      "country": "ph",
+      "aliases": []
+    },
+    {
+      "name": "Islamabad",
+      "country": "pk",
+      "aliases": []
+    },
+    {
+      "name": "Karachi",
+      "country": "pk",
+      "aliases": []
+    },
+    {
+      "name": "Lahore",
+      "country": "pk",
+      "aliases": []
+    },
+    {
+      "name": "Gdańsk",
+      "country": "pl",
+      "aliases": []
+    },
+    {
+      "name": "Katowice",
+      "country": "pl",
+      "aliases": []
+    },
+    {
+      "name": "Kraków",
+      "country": "pl",
+      "aliases": [
+        "krakow",
+        "cracow"
+      ]
+    },
+    {
+      "name": "Nadarzyn",
+      "country": "pl",
+      "aliases": []
+    },
+    {
+      "name": "Poznań",
+      "country": "pl",
+      "aliases": []
+    },
+    {
+      "name": "Warsaw",
+      "country": "pl",
+      "aliases": []
+    },
+    {
+      "name": "Wrocław",
+      "country": "pl",
+      "aliases": []
+    },
+    {
+      "name": "San Juan",
+      "country": "pr",
+      "aliases": []
+    },
+    {
+      "name": "Coimbra",
+      "country": "pt",
+      "aliases": []
+    },
+    {
+      "name": "Lisbon",
+      "country": "pt",
+      "aliases": []
+    },
+    {
+      "name": "Porto",
+      "country": "pt",
+      "aliases": []
+    },
+    {
+      "name": "Doha",
+      "country": "qa",
+      "aliases": []
+    },
+    {
+      "name": "Bucharest",
+      "country": "ro",
+      "aliases": []
+    },
+    {
+      "name": "Cluj-Napoca",
+      "country": "ro",
+      "aliases": []
+    },
+    {
+      "name": "Belgrade",
+      "country": "rs",
+      "aliases": []
+    },
+    {
+      "name": "Moscow",
+      "country": "ru",
+      "aliases": []
+    },
+    {
+      "name": "Saint Petersburg",
+      "country": "ru",
+      "aliases": []
+    },
+    {
+      "name": "Jeddah",
+      "country": "sa",
+      "aliases": []
+    },
+    {
+      "name": "Malham",
+      "country": "sa",
+      "aliases": []
+    },
+    {
+      "name": "Riyadh",
+      "country": "sa",
+      "aliases": []
+    },
+    {
+      "name": "Gothenburg",
+      "country": "se",
+      "aliases": []
+    },
+    {
+      "name": "Malmö",
+      "country": "se",
+      "aliases": []
+    },
+    {
+      "name": "Stockholm",
+      "country": "se",
+      "aliases": []
+    },
+    {
+      "name": "Singapore",
+      "country": "sg",
+      "aliases": []
+    },
+    {
+      "name": "Ljubljana",
+      "country": "si",
+      "aliases": []
+    },
+    {
+      "name": "Bratislava",
+      "country": "sk",
+      "aliases": []
+    },
+    {
+      "name": "Dakar",
+      "country": "sn",
+      "aliases": []
+    },
+    {
+      "name": "San Salvador",
+      "country": "sv",
+      "aliases": []
+    },
+    {
+      "name": "Bangkok",
+      "country": "th",
+      "aliases": []
+    },
+    {
+      "name": "Chiang Mai",
+      "country": "th",
+      "aliases": []
+    },
+    {
+      "name": "Phuket",
+      "country": "th",
+      "aliases": []
+    },
+    {
+      "name": "Ankara",
+      "country": "tr",
+      "aliases": []
+    },
+    {
+      "name": "Istanbul",
+      "country": "tr",
+      "aliases": []
+    },
+    {
+      "name": "Izmir",
+      "country": "tr",
+      "aliases": []
+    },
+    {
+      "name": "Hsinchu",
+      "country": "tw",
+      "aliases": []
+    },
+    {
+      "name": "Kaohsiung",
+      "country": "tw",
+      "aliases": []
+    },
+    {
+      "name": "Taipei",
+      "country": "tw",
+      "aliases": []
+    },
+    {
+      "name": "Arusha",
+      "country": "tz",
+      "aliases": []
+    },
+    {
+      "name": "Dar es Salaam",
+      "country": "tz",
+      "aliases": []
+    },
+    {
+      "name": "Kiev",
+      "country": "ua",
+      "aliases": []
+    },
+    {
+      "name": "Kyiv",
+      "country": "ua",
+      "aliases": []
+    },
+    {
+      "name": "Lviv",
+      "country": "ua",
+      "aliases": []
+    },
+    {
+      "name": "Kampala",
+      "country": "ug",
+      "aliases": []
+    },
+    {
+      "name": "Atlanta",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Austin",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Bellevue",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Berkeley",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Boston",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Boulder",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Brooklyn",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Cambridge",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Charlotte",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Chicago",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Dallas",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Denver",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Detroit",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Houston",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Las Vegas",
+      "country": "us",
+      "aliases": [
+        "las-vegas"
+      ]
+    },
+    {
+      "name": "Los Angeles",
+      "country": "us",
+      "aliases": [
+        "los-angeles",
+        "la"
+      ]
+    },
+    {
+      "name": "Miami",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Minneapolis",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Mountain View",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Nashville",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "New York",
+      "country": "us",
+      "aliases": [
+        "new york city",
+        "nyc",
+        "new-york"
+      ]
+    },
+    {
+      "name": "Oakland",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Orlando",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Palo Alto",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Philadelphia",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Phoenix",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Pittsburgh",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Portland",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Queens",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Raleigh",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Redmond",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Sacramento",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Salt Lake City",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "San Diego",
+      "country": "us",
+      "aliases": [
+        "san-diego"
+      ]
+    },
+    {
+      "name": "San Francisco",
+      "country": "us",
+      "aliases": [
+        "san-francisco",
+        "sf",
+        "bay area"
+      ]
+    },
+    {
+      "name": "San Jose",
+      "country": "us",
+      "aliases": [
+        "san-jose"
+      ]
+    },
+    {
+      "name": "Santa Clara",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Seattle",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Tampa",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Washington",
+      "country": "us",
+      "aliases": []
+    },
+    {
+      "name": "Montevideo",
+      "country": "uy",
+      "aliases": []
+    },
+    {
+      "name": "Tashkent",
+      "country": "uz",
+      "aliases": []
+    },
+    {
+      "name": "Da Nang",
+      "country": "vn",
+      "aliases": []
+    },
+    {
+      "name": "Hanoi",
+      "country": "vn",
+      "aliases": []
+    },
+    {
+      "name": "Ho Chi Minh City",
+      "country": "vn",
+      "aliases": []
+    },
+    {
+      "name": "Saigon",
+      "country": "vn",
+      "aliases": [
+        "ho-chi-minh"
+      ]
+    },
+    {
+      "name": "Cape Town",
+      "country": "za",
+      "aliases": []
+    },
+    {
+      "name": "Centurion",
+      "country": "za",
+      "aliases": []
+    },
+    {
+      "name": "Durban",
+      "country": "za",
+      "aliases": []
+    },
+    {
+      "name": "Johannesburg",
+      "country": "za",
+      "aliases": []
+    },
+    {
+      "name": "Pretoria",
+      "country": "za",
+      "aliases": []
+    },
+    {
+      "name": "Stellenbosch",
+      "country": "za",
+      "aliases": []
+    },
+    {
+      "name": "Umhlanga",
+      "country": "za",
+      "aliases": []
+    }
+  ]
+}

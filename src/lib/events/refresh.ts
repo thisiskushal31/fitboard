@@ -6,6 +6,8 @@ import { defineJob, findUnfinishedJobs, startJob } from "@/lib/jobs/runner";
 import { logServerError } from "@/lib/core/log";
 import { saveSettings } from "@/lib/settings/settings-data";
 
+import { enrichEventPlaces } from "./place-learn";
+import { fetchCompanyEvents } from "./sources/company";
 import { SourceError } from "./sources/http";
 import { fetchConfsTechEvents } from "./sources/confstech";
 import { fetchMeetupEvents } from "./sources/meetup";
@@ -35,6 +37,7 @@ export async function refreshEvents(
     { source: "TECHMEETUPS", fetch: () => fetchTechMeetupsEvents(signal, now) },
     { source: "CONFSTECH", fetch: () => fetchConfsTechEvents(signal, now) },
     { source: "MEETUP", fetch: () => fetchMeetupEvents(signal, now) },
+    { source: "COMPANY", fetch: () => fetchCompanyEvents(signal, now) },
   ];
 
   await step("Looking for tech events near you and worldwide");
@@ -48,9 +51,13 @@ export async function refreshEvents(
   });
   const found = results.flatMap((result) => (result.status === "fulfilled" ? result.value : []));
 
-  await step(`Scoring ${found.length} ${found.length === 1 ? "event" : "events"} against your profile and place`);
+  await step("Resolving event places and learning new cities");
+  const placed = await enrichEventPlaces(found, signal);
+  signal.throwIfAborted();
+
+  await step(`Scoring ${placed.length} ${placed.length === 1 ? "event" : "events"} against your profile and place`);
   try {
-    const added = await upsertEvents(found, now);
+    const added = await upsertEvents(placed, now);
     await rescoreEvents(now);
     await sweepEvents(now);
     const result: EventsRefresh = { at: now.toISOString(), added, sources: outcomes };

@@ -910,6 +910,20 @@ model EventBlock {
   createdAt DateTime @default(now())
 }
 
+// Cities learned while refreshing Events (merged with config/event-places.json).
+model EventPlace {
+  // Folded lookup key, e.g. "san francisco".
+  key       String   @id
+  name      String
+  country   String
+  continent String   @default("")
+  // "seed" is never stored; rows here are learned from fetches or geocoding.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([country])
+}
+
 // ─── Google: Gmail and Calendar ────────────────────────────────────────
 
 // The connected Google account; at most one row, with id "google". It

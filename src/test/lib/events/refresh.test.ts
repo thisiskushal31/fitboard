@@ -25,6 +25,7 @@ vi.mock("@/lib/events/sources/techconf", () => ({
 vi.mock("@/lib/events/sources/techmeetups", () => ({ fetchTechMeetupsEvents: async () => sources.techmeetups }));
 vi.mock("@/lib/events/sources/confstech", () => ({ fetchConfsTechEvents: async () => sources.confstech }));
 vi.mock("@/lib/events/sources/meetup", () => ({ fetchMeetupEvents: async () => sources.meetup }));
+vi.mock("@/lib/events/sources/company", () => ({ fetchCompanyEvents: async () => [] }));
 vi.mock("@/lib/events/store", () => ({
   upsertEvents: async () => {
     if (sources.storeError) throw sources.storeError;
@@ -32,6 +33,9 @@ vi.mock("@/lib/events/store", () => ({
   },
   rescoreEvents: async () => {},
   sweepEvents: async () => ({ removed: 0 }),
+}));
+vi.mock("@/lib/events/place-learn", () => ({
+  enrichEventPlaces: async (events: FoundEvent[]) => events,
 }));
 
 const sample: FoundEvent = {

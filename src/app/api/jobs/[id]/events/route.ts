@@ -19,23 +19,36 @@ export const GET = route<RouteContext<"/api/jobs/[id]/events">>(async (request, 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       let closed = false;
-      const heartbeat = setInterval(() => controller.enqueue(encoder.encode(": still working\n\n")), HEARTBEAT_MS);
+      let unsubscribe = () => {};
+      const write = (chunk: string) => {
+        if (closed) return;
+        try {
+          controller.enqueue(encoder.encode(chunk));
+        } catch {
+          // Client gone (refresh, navigate away) — stop without throwing into Next.
+          stop();
+        }
+      };
+      const heartbeat = setInterval(() => write(": still working\n\n"), HEARTBEAT_MS);
       stop = () => {
         if (closed) return;
         closed = true;
         clearInterval(heartbeat);
         unsubscribe();
-        controller.close();
+        try {
+          controller.close();
+        } catch {
+          // Already closed by the runtime.
+        }
       };
       const send = (job: JobView) => {
-        if (closed) return;
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify(job)}\n\n`));
+        write(`data: ${JSON.stringify(job)}\n\n`);
         if (isFinished(job)) stop();
       };
       // If the client reconnects before close() sticks, wait — don't hammer.
-      controller.enqueue(encoder.encode("retry: 5000\n\n"));
+      write("retry: 5000\n\n");
       // Listen before reading, so a change in between isn't missed.
-      const unsubscribe = subscribeJob(id, send);
+      unsubscribe = subscribeJob(id, send);
       request.signal.addEventListener("abort", () => stop(), { once: true });
       const job = await getJob(id);
       if (job) send(job);

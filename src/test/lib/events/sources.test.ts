@@ -157,11 +157,33 @@ describe("TechConf and TechMeetups parsers", () => {
     );
     const events = await fetchTechMeetupsEvents(undefined, new Date("2026-11-19T12:00:00Z"));
     expect(events.some((event) => event.title === "AI Summit" && event.ticketPrice === "Free")).toBe(true);
+    expect(events.find((event) => event.title === "AI Summit")).toMatchObject({
+      place: "San Francisco, North America",
+      city: "San Francisco",
+      country: "us",
+    });
     expect(events.find((event) => event.title === "AI Summit")?.speakers.some((name) => /Irene/i.test(name))).toBe(true);
     expect(events.find((event) => event.title === "AI Summit")?.audience).toMatch(/Senior/);
-    expect(events.find((event) => event.title === "Hybrid Builders Day")).toMatchObject({ format: "HYBRID", remote: true, audience: "Students and early career" });
-    expect(events.find((event) => event.title === "Remote Leadership")).toMatchObject({ format: "VIRTUAL", audience: "Leaders and executives" });
-    expect(events.find((event) => event.title === "On-site Dev Day")).toMatchObject({ format: "IN_PERSON", country: "us" });
+    expect(events.find((event) => event.title === "Hybrid Builders Day")).toMatchObject({
+      format: "HYBRID",
+      remote: true,
+      audience: "Students and early career",
+      place: "Berlin, Europe",
+      city: "Berlin",
+      country: "de",
+    });
+    expect(events.find((event) => event.title === "Remote Leadership")).toMatchObject({
+      format: "VIRTUAL",
+      audience: "Leaders and executives",
+      place: "Online",
+      city: "",
+    });
+    expect(events.find((event) => event.title === "On-site Dev Day")).toMatchObject({
+      format: "IN_PERSON",
+      country: "us",
+      place: "Austin, North America",
+      city: "Austin",
+    });
     expect(events.filter((event) => event.externalId === "ai-sf-2026")).toHaveLength(1);
 
     vi.stubGlobal("fetch", vi.fn(async () => Response.json({ results: "nope" })));

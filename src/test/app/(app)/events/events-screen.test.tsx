@@ -60,6 +60,7 @@ const lastRefresh = {
     { source: "TECHMEETUPS" as const, found: 0, error: "TechMeetups took too long to answer" },
     { source: "CONFSTECH" as const, found: 1, error: null },
     { source: "MEETUP" as const, found: 0, error: null },
+    { source: "COMPANY" as const, found: 2, error: null },
   ],
 };
 

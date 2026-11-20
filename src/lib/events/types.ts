@@ -3,7 +3,7 @@ import { z } from "zod";
 // Engagement → Events: tech conferences and meetups from public sources,
 // ranked by place proximity then profile fit. Shared by the server and the screen.
 
-export const EVENT_SOURCES = ["TECHCONF", "TECHMEETUPS", "CONFSTECH", "MEETUP"] as const;
+export const EVENT_SOURCES = ["TECHCONF", "TECHMEETUPS", "CONFSTECH", "MEETUP", "COMPANY"] as const;
 export type EventSource = (typeof EVENT_SOURCES)[number];
 
 export const EVENT_SOURCE_INFO: Record<EventSource, { name: string; kind: string }> = {
@@ -11,6 +11,7 @@ export const EVENT_SOURCE_INFO: Record<EventSource, { name: string; kind: string
   TECHMEETUPS: { name: "TechMeetups", kind: "Conferences" },
   CONFSTECH: { name: "confs.tech", kind: "Tech conferences" },
   MEETUP: { name: "Meetup", kind: "Local groups" },
+  COMPANY: { name: "Company sites", kind: "AWS, Google Cloud, MongoDB, …" },
 };
 
 export const EVENT_STATUSES = ["NEW", "SAVED", "DISMISSED"] as const;

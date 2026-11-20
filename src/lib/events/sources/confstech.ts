@@ -2,9 +2,8 @@ import "server-only";
 
 import { z } from "zod";
 
-import { countryCodeFor, countryName } from "@/lib/job-search/countries";
-
 import { getJson, settledInBatches, SourceError } from "./http";
+import { normalizeEventPlace } from "../place";
 import type { FoundEvent } from "../types";
 
 // confs.tech: public conference-data JSON (GitHub via jsDelivr).
@@ -54,12 +53,6 @@ function dayStart(isoDate: string | undefined): string | null {
   return `${isoDate}T00:00:00.000Z`;
 }
 
-function placeLine(city: string, countryLabel: string): string {
-  const code = countryCodeFor(countryLabel);
-  const name = code ? countryName(code) : countryLabel;
-  return [city, name].filter(Boolean).join(", ");
-}
-
 function toEvent(raw: unknown, topic: string, today: string): FoundEvent | null {
   const parsed = conferenceSchema.safeParse(raw);
   if (!parsed.success) return null;
@@ -72,7 +65,7 @@ function toEvent(raw: unknown, topic: string, today: string): FoundEvent | null 
   const city = (item.city ?? "").trim();
   const countryLabel = (item.country ?? "").trim();
   const online = Boolean(item.online) || /^online$/i.test(city) || /^online$/i.test(countryLabel);
-  const country = countryCodeFor(countryLabel) || (/^online$/i.test(countryLabel) ? "" : countryLabel.toLowerCase().slice(0, 8));
+  const where = normalizeEventPlace({ city, country: countryLabel, online });
   const summaryParts = [
     `Topic: ${topic}`,
     item.cfpUrl && item.cfpEndDate ? `CFP open until ${item.cfpEndDate}` : item.cfpUrl ? "CFP listed" : "",
@@ -83,9 +76,9 @@ function toEvent(raw: unknown, topic: string, today: string): FoundEvent | null 
     title: title.slice(0, 300),
     summary: summaryParts.join(" · ").slice(0, 2000),
     url: url.slice(0, 2000),
-    place: online ? "Online" : placeLine(city, countryLabel).slice(0, 300),
-    city: online ? "" : city.slice(0, 120),
-    country: online ? "" : country.slice(0, 8),
+    place: where.place,
+    city: where.city,
+    country: where.country,
     remote: online ? true : false,
     format: online ? "VIRTUAL" : "IN_PERSON",
     startsAt: dayStart(start),

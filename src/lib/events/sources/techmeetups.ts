@@ -2,9 +2,8 @@ import "server-only";
 
 import { z } from "zod";
 
-import { countryCodeFor } from "@/lib/job-search/countries";
-
 import { getJson, settledInBatches, SourceError } from "./http";
+import { normalizeEventPlace } from "../place";
 import type { FoundEvent } from "../types";
 
 // TechMeetups: public conference search API by focus.
@@ -82,13 +81,7 @@ function attendanceFrom(description: string): number | null {
   return Number.isFinite(n) && n > 0 ? n : null;
 }
 
-function countryFromLocation(location: string): string {
-  const parts = location.split(",").map((part) => part.trim()).filter(Boolean);
-  if (parts.length === 0) return "";
-  const last = parts[parts.length - 1];
-  if (/^[A-Z]{2}$/.test(last)) return last.toLowerCase();
-  return countryCodeFor(last) || "";
-}
+const ONLINE_PLACE = /^(?:remote|online|virtual)$/i;
 
 function toEvent(raw: unknown): FoundEvent | null {
   const parsed = conferenceSchema.safeParse(raw);
@@ -101,6 +94,11 @@ function toEvent(raw: unknown): FoundEvent | null {
   const description = (item.description ?? "").trim();
   const format = formatOf(location, description);
   const remote = format === "VIRTUAL" ? true : format === "HYBRID" ? true : false;
+  const where = normalizeEventPlace({
+    location,
+    city: item.city ?? "",
+    online: format === "VIRTUAL" && (!location || ONLINE_PLACE.test(location)),
+  });
   const topics = item.topics ?? [];
   const focus = item.focus?.replace(/-/g, " ") ?? "";
   const summaryParts = [description.slice(0, 800), topics.length ? `Topics: ${topics.join(", ")}` : "", focus ? `Focus: ${focus}` : ""].filter(Boolean);
@@ -110,9 +108,9 @@ function toEvent(raw: unknown): FoundEvent | null {
     title: title.slice(0, 300),
     summary: summaryParts.join("\n\n").slice(0, 20_000),
     url: url.slice(0, 2000),
-    place: location.slice(0, 300),
-    city: (item.city ?? location.split(",")[0] ?? "").slice(0, 120),
-    country: countryFromLocation(location).slice(0, 8),
+    place: where.place,
+    city: where.city,
+    country: where.country,
     remote,
     format,
     startsAt: dayStart(item.start_date),

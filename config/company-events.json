@@ -1,0 +1,61 @@
+{
+  "_comment": "Official company event hubs Fitboard scrapes on Events refresh. Prefer JSON/API or small HTML hubs — multi‑MB marketing pages stall the job. Add pages with a known parser; no code change needed for those kinds.",
+  "companies": [
+    {
+      "id": "aws",
+      "name": "AWS",
+      "parser": "aws-cards",
+      "pages": [
+        "https://aws.amazon.com/events/summits/",
+        "https://aws.amazon.com/events/community-day/",
+        "https://aws.amazon.com/events/reinvent/"
+      ]
+    },
+    {
+      "id": "gcp",
+      "name": "Google Cloud",
+      "parser": "gdg",
+      "pages": [
+        "https://gdg.community.dev/api/search/?result_types=upcoming_event&q=Google%20Cloud&page_size=50&page=1",
+        "https://gdg.community.dev/api/search/?result_types=upcoming_event&q=Cloud%20Community%20Day&page_size=50&page=1",
+        "https://gdg.community.dev/api/search/?result_types=upcoming_event&q=DevFest&page_size=50&page=1"
+      ]
+    },
+    {
+      "id": "mongodb",
+      "name": "MongoDB",
+      "parser": "mongodb",
+      "pages": [
+        "https://www.mongodb.com/events",
+        "https://www.mongodb.com/events/mongodb-local",
+        "https://www.mongodb.com/events/mongodb-local/toronto",
+        "https://www.mongodb.com/events/aws-reinvent",
+        "https://www.mongodb.com/events/mongodb-msft-ignite"
+      ]
+    },
+    {
+      "id": "cloudflare",
+      "name": "Cloudflare",
+      "parser": "json-ld",
+      "pages": ["https://www.cloudflare.com/events/"]
+    },
+    {
+      "id": "microsoft",
+      "name": "Microsoft",
+      "parser": "html-events",
+      "pages": ["https://build.microsoft.com/"]
+    },
+    {
+      "id": "github",
+      "name": "GitHub",
+      "parser": "html-events",
+      "pages": ["https://githubuniverse.com/"]
+    },
+    {
+      "id": "stripe",
+      "name": "Stripe",
+      "parser": "html-events",
+      "pages": ["https://stripe.com/sessions"]
+    }
+  ]
+}

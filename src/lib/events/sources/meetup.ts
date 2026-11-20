@@ -5,10 +5,9 @@ import path from "node:path";
 
 import { z } from "zod";
 
-import { countryCodeFor } from "@/lib/job-search/countries";
-
 import { getText, settledInBatches, SourceError } from "./http";
 import { eventsFromIcs } from "./ics";
+import { normalizeEventPlace } from "../place";
 import type { FoundEvent } from "../types";
 
 // Meetup: public per-group iCal calendars.
@@ -44,14 +43,6 @@ function attendanceFrom(description: string): number | null {
   return Number.isFinite(n) && n > 0 ? n : null;
 }
 
-function countryFromLocation(location: string): string {
-  const parts = location.split(",").map((part) => part.trim()).filter(Boolean);
-  if (parts.length === 0) return "";
-  const last = parts[parts.length - 1];
-  if (/^[A-Z]{2}$/.test(last)) return last.toLowerCase();
-  return countryCodeFor(last) || "";
-}
-
 /** Meetup public iCal feeds for curated tech groups. */
 export async function fetchMeetupEvents(signal?: AbortSignal, now = new Date()): Promise<FoundEvent[]> {
   const groups = await loadGroups();
@@ -79,17 +70,19 @@ export async function fetchMeetupEvents(signal?: AbortSignal, now = new Date()):
       seen.add(externalId);
       const location = item.location;
       const url = item.url || pageUrl(group.slug, item.uid);
+      const isRemote = /\b(online|virtual|zoom|remote)\b/i.test(`${location} ${item.summary} ${item.description}`);
+      const where = normalizeEventPlace({ location, online: isRemote && (!location || /^(?:remote|online|virtual)$/i.test(location.trim())) });
       events.push({
         source: "MEETUP",
         externalId: externalId.slice(0, 300),
         title: item.summary.slice(0, 300),
         summary: [item.description.slice(0, 4000), `Hosted by ${group.name}`].filter(Boolean).join("\n\n"),
         url: url.slice(0, 2000),
-        place: location.slice(0, 300),
-        city: (location.split(",")[0] ?? "").trim().slice(0, 120),
-        country: countryFromLocation(location).slice(0, 8),
-        remote: /\b(online|virtual|zoom|remote)\b/i.test(`${location} ${item.summary} ${item.description}`) ? true : location ? false : null,
-        format: /\b(online|virtual|zoom|remote)\b/i.test(`${location} ${item.summary}`) ? "VIRTUAL" : location ? "IN_PERSON" : "UNKNOWN",
+        place: where.place || location.slice(0, 300),
+        city: where.city,
+        country: where.country,
+        remote: isRemote ? true : location ? false : null,
+        format: isRemote ? "VIRTUAL" : location ? "IN_PERSON" : "UNKNOWN",
         startsAt: item.startsAt,
         endsAt: item.endsAt,
         ticketPrice: /\bfree\b/i.test(item.description) ? "Free" : "",

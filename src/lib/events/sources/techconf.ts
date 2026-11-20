@@ -2,9 +2,8 @@ import "server-only";
 
 import { z } from "zod";
 
-import { countryCodeFor, countryName } from "@/lib/job-search/countries";
-
 import { getJson, SourceError } from "./http";
+import { normalizeEventPlace } from "../place";
 import type { FoundEvent } from "../types";
 
 // TechConf.Directory: public conferences JSON.
@@ -50,11 +49,6 @@ function dayStart(isoDate: string): string | null {
   return `${isoDate}T00:00:00.000Z`;
 }
 
-function placeLine(city: string, countryCode: string): string {
-  const name = countryCode ? countryName(countryCode.toLowerCase()) || countryCode.toUpperCase() : "";
-  return [city, name].filter(Boolean).join(", ");
-}
-
 /** TechConf.Directory's open conference list — upcoming dated events only. */
 export async function fetchTechConfEvents(signal?: AbortSignal, now = new Date()): Promise<FoundEvent[]> {
   let raw: unknown;
@@ -79,11 +73,13 @@ export async function fetchTechConfEvents(signal?: AbortSignal, now = new Date()
     for (const [year, entry] of Object.entries(upcoming)) {
       const start = entry.dates?.start?.trim() ?? "";
       if (!start || start < today) continue;
-      const city = entry.location?.city?.trim() ?? "";
-      const countryRaw = entry.location?.country?.trim() ?? "";
-      const country = countryCodeFor(countryRaw) || countryRaw.toLowerCase();
       const format = formatOf(entry.format);
       const remote = format === "VIRTUAL" ? true : format === "HYBRID" ? true : format === "IN_PERSON" ? false : null;
+      const where = normalizeEventPlace({
+        city: entry.location?.city?.trim() ?? "",
+        country: entry.location?.country?.trim() ?? "",
+        online: format === "VIRTUAL",
+      });
       const tags = (conf.tags ?? []).filter(Boolean);
       events.push({
         source: "TECHCONF",
@@ -91,9 +87,9 @@ export async function fetchTechConfEvents(signal?: AbortSignal, now = new Date()
         title: conf.title.slice(0, 300),
         summary: tags.length > 0 ? `Topics: ${tags.join(", ")}` : "",
         url: `${SITE}/conferences/${encodeURIComponent(conf.id)}`,
-        place: placeLine(city, country),
-        city: city.slice(0, 120),
-        country: country.slice(0, 8),
+        place: where.place,
+        city: where.city,
+        country: where.country,
         remote,
         format,
         startsAt: dayStart(start),

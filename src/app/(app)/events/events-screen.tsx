@@ -14,6 +14,7 @@ import { Select } from "@/components/ui/select";
 import { useJob } from "@/hooks/use-job";
 import { cn } from "@/lib/core/cn";
 import { formatCalendarDate, formatDateTime } from "@/lib/core/dates";
+import { eventLocationLabel } from "@/lib/events/place";
 import {
   EVENT_FORMAT_LABEL,
   EVENT_FORMATS,
@@ -306,7 +307,7 @@ function EventCard({ event: initial }: { event: EventView }) {
               {info.name} · {proximity}
             </span>
           </div>
-          <p className="text-meta text-muted">{[when, event.place].filter(Boolean).join(" · ")}</p>
+          <p className="text-meta text-muted">{[when, eventLocationLabel(event)].filter(Boolean).join(" · ")}</p>
         </div>
       </div>
 

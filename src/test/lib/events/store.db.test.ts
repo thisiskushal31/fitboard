@@ -59,6 +59,12 @@ vi.mock("@/lib/events/sources/confstech", () => ({
 vi.mock("@/lib/events/sources/meetup", () => ({
   fetchMeetupEvents: async () => sources.meetup,
 }));
+vi.mock("@/lib/events/sources/company", () => ({
+  fetchCompanyEvents: async () => [],
+}));
+vi.mock("@/lib/events/place-learn", () => ({
+  enrichEventPlaces: async (events: FoundEvent[]) => events,
+}));
 
 const prisma = () => db.client!;
 const berlin = placeOf(profile.basics);
@@ -193,10 +199,11 @@ describe("refreshing events", () => {
         { source: "TECHMEETUPS", found: 1, error: null },
         { source: "CONFSTECH", found: 1, error: null },
         { source: "MEETUP", found: 1, error: null },
+        { source: "COMPANY", found: 0, error: null },
       ],
     });
     expect(steps[0]).toBe("Looking for tech events near you and worldwide");
-    expect(steps[1]).toMatch(/^Scoring 3 /);
+    expect(steps.some((step) => step.startsWith("Scoring 3 "))).toBe(true);
     expect((await loadSettings()).eventsLastRefresh).toEqual(result);
 
     await refreshEventsJob.run({}, { step: async () => {}, signal: new AbortController().signal } as never);
