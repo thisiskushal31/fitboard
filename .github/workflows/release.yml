@@ -1,7 +1,8 @@
 name: Release
 
 # A semver tag (X.Y.Z or X.Y.Z-lts, with or without a leading v) builds the
-# production image and publishes the GitHub release. A push to main does not.
+# production image and publishes the GitHub release. The release body comes
+# from changelog/<version>.md (required before tagging). A push to main does not.
 
 on:
   push:
@@ -80,32 +81,43 @@ jobs:
 
       - name: Write release notes
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NOTES_FILE: changelog/${{ steps.meta.outputs.version }}.md
         run: |
           set -euo pipefail
-          # Fresh notes every publish. Updating a release with generated notes
-          # appends another Full Changelog line, so the body is replaced below.
-          gh api \
-            --method POST \
-            -H "Accept: application/vnd.github+json" \
-            "/repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
-            -f "tag_name=${GITHUB_REF_NAME}" \
-            --jq .body > /tmp/generated.md
+          # Fresh body every publish (including force re-tag / update of an
+          # existing release). Never append: softprops with append_body would
+          # stack another Full Changelog line on each run.
+          if [ ! -f "$NOTES_FILE" ]; then
+            echo "Missing $NOTES_FILE — add curated release notes before tagging." >&2
+            exit 1
+          fi
+          PREV="$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || true)"
+          export PREV
           python3 - << 'PY'
+          import os
           from pathlib import Path
-          lines = Path("/tmp/generated.md").read_text().splitlines()
-          body, changelogs = [], []
-          for line in lines:
+
+          notes = Path(os.environ["NOTES_FILE"])
+          lines, skipped = [], []
+          for line in notes.read_text().splitlines():
               plain = line.replace("*", "").strip().lower()
               if plain.startswith("full changelog:"):
-                  changelogs.append(line.strip())
-              else:
-                  body.append(line)
-          while body and not body[-1].strip():
-              body.pop()
-          if changelogs:
-              body += ["", changelogs[-1]]
-          Path("release-notes.md").write_text("\n".join(body).rstrip() + "\n")
+                  skipped.append(line.strip())
+                  continue
+              lines.append(line)
+          while lines and not lines[-1].strip():
+              lines.pop()
+          body = "\n".join(lines).rstrip()
+          prev = os.environ.get("PREV", "").strip()
+          repo = os.environ["GITHUB_REPOSITORY"]
+          tag = os.environ["GITHUB_REF_NAME"]
+          parts = [body] if body else []
+          # Exactly one compare link — drop any that were in the markdown file.
+          if prev:
+              parts.append(f"Full Changelog: https://github.com/{repo}/compare/{prev}...{tag}")
+          elif skipped:
+              parts.append(skipped[-1])
+          Path("release-notes.md").write_text(("\n\n".join(parts) + "\n") if parts else "\n")
           PY
 
       - name: Create GitHub Release
@@ -113,4 +125,5 @@ jobs:
         with:
           name: ${{ steps.meta.outputs.is_lts == 'true' && format('{0} LTS', steps.meta.outputs.version) || steps.meta.outputs.version }}
           body_path: release-notes.md
+          # Replace the whole body on update; do not append to a prior publish.
           append_body: false

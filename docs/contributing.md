@@ -42,4 +42,4 @@ I review every pull request myself, and I don't accept bloated code. Before you 
 
 ## What happens to your pull request
 
-When I take a change, I bring it into the next release myself and credit you in the release notes. The pull request is then closed with a link to that release, rather than merged.
+When I take a change, I bring it into the next release myself and credit you in that version’s file under `changelog/`. The pull request is then closed with a link to that release, rather than merged.

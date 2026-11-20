@@ -302,7 +302,7 @@ FITBOARD_IMAGE=fitboard:local FITBOARD_PORT=3300 docker compose -p fitboard-loca
 ```
 
 
-CI runs on a pull request and on a push to `main`. It lints, type-checks and tests. It does not publish an image. A semver tag (`0.0.1`, or `0.0.1-lts`) builds the production image, publishes it to `ghcr.io/<owner>/<repository>` (lower case), and publishes the GitHub release with notes generated from the commits since the previous tag. An LTS tag does not move `latest`.
+CI runs on a pull request and on a push to `main`. It lints, type-checks and tests. It does not publish an image. A semver tag (`0.0.1`, or `0.0.1-lts`) builds the production image, publishes it to `ghcr.io/<owner>/<repository>` (lower case), and publishes the GitHub release whose body comes from `changelog/<version>.md` (write that file before tagging; an LTS tag reuses the same file). The release body also gets one “Full Changelog” compare link to the previous tag. An LTS tag does not move `latest`.
 
 ## Reset
 
