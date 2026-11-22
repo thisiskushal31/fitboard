@@ -70,4 +70,23 @@ describe("enrichEventPlaces", () => {
     expect(db.rows.some((row) => row.key === "akureyri" && row.country === "is")).toBe(true);
     expect(fetch).toHaveBeenCalledTimes(1);
   });
+
+  it("leaves the event alone when geocoding fails or returns no country", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response("nope", { status: 503 })));
+    const [failed] = await enrichEventPlaces([event({ city: "Nowhereville", place: "Nowhereville" })]);
+    expect(failed?.city).toBe("Nowhereville");
+    expect(db.rows).toHaveLength(0);
+
+    vi.stubGlobal("fetch", vi.fn(async () => Response.json([{ name: "X", address: { town: "X" } }])));
+    const [noCountry] = await enrichEventPlaces([event({ city: "GhostTown", place: "GhostTown" })]);
+    expect(noCountry?.country).toBe("");
+  });
+
+  it("keeps virtual events online without geocoding", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const [out] = await enrichEventPlaces([event({ format: "VIRTUAL", place: "Remote", city: "", remote: true })]);
+    expect(out).toMatchObject({ place: "Online", city: "", country: "" });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });

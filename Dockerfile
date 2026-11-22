@@ -15,6 +15,8 @@ FROM base AS dev
 RUN mkdir -p /data && chown node:node /app /data
 USER node
 COPY --chown=node:node package.json yarn.lock .yarnrc.yml ./
+# Yarn resolutions that use `patch:` need the patch files before install.
+COPY --chown=node:node .yarn/patches .yarn/patches
 RUN yarn install --immutable && mkdir .next
 # Chromium for PDFs, matching the installed playwright-core, with the system
 # libraries and fonts it needs (installing those takes root). Only the
@@ -35,6 +37,7 @@ CMD ["sh", "-c", "yarn prisma generate && yarn prisma migrate deploy && yarn pri
 
 FROM base AS deps
 COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn/patches .yarn/patches
 RUN yarn install --immutable
 
 FROM deps AS build

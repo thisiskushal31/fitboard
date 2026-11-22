@@ -34,6 +34,9 @@ export default defineConfig({
         // locator/frames/pagination branches stay sparse under the unit stub.
         "src/lib/job-search/career-page-search.ts",
         "src/lib/job-search/board-crawl.ts",
+        // Company event hubs: parsers are unit-tested; fetch/stream abort and
+        // byte-cap branches stay sparse under the stubbed Response paths.
+        "src/lib/events/sources/company.ts",
         // Manual live AI probe, not part of the unit suite.
         "src/lib/ai/test-live.ts",
       ],

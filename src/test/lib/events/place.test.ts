@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { continentForCountry, eventLocationLabel, humanizeCity, normalizeEventPlace } from "@/lib/events/place";
+import {
+  continentForCountry,
+  countryFromEventLocation,
+  eventLocationLabel,
+  foldPlaceKey,
+  humanizeCity,
+  normalizeEventPlace,
+  seedPlaceCatalog,
+  type PlaceCatalog,
+} from "@/lib/events/place";
 
 describe("event place", () => {
   it("humanises city slugs using the places catalog", () => {
@@ -77,5 +86,40 @@ describe("event place", () => {
     expect(eventLocationLabel({ place: "", city: "las-vegas", country: "us" })).toBe("Las Vegas, North America");
     expect(eventLocationLabel({ place: "Las Vegas, North America", city: "Las Vegas", country: "us" })).toBe("Las Vegas, North America");
     expect(eventLocationLabel({ place: "", city: "", country: "", format: "VIRTUAL", remote: true })).toBe("Online");
+    expect(eventLocationLabel({ place: "", city: "", country: "" })).toBe("");
+  });
+
+  it("resolves ambiguous subdivisions and continent-only locations", () => {
+    expect(normalizeEventPlace({ location: "Perth, WA" })).toMatchObject({ city: "Perth", country: "au" });
+    expect(normalizeEventPlace({ location: "Seattle, WA" })).toMatchObject({ country: "us" });
+    expect(normalizeEventPlace({ location: "San Jose, CA" })).toMatchObject({ country: "us" });
+    expect(normalizeEventPlace({ location: "Unknownville, CA" })).toMatchObject({ country: "us" });
+    expect(normalizeEventPlace({ location: "Europe" })).toMatchObject({ place: "Europe", city: "", country: "" });
+    expect(normalizeEventPlace({ location: "Berlin, Europe" })).toMatchObject({ city: "Berlin", place: "Berlin, Europe" });
+    expect(normalizeEventPlace({ location: "Remote" })).toEqual({ place: "Online", city: "", country: "" });
+    expect(normalizeEventPlace({ online: true, city: "Berlin" })).toEqual({ place: "Online", city: "", country: "" });
+    expect(normalizeEventPlace({ location: "Austin, TX" })).toMatchObject({ country: "us" });
+    expect(normalizeEventPlace({ country: "Germany", city: "Hamburg" })).toMatchObject({ country: "de" });
+    expect(humanizeCity("some-new-burg")).toBe("Some New Burg");
+    expect(humanizeCity("online")).toBe("");
+    expect(humanizeCity("")).toBe("");
+    expect(continentForCountry("")).toBe("");
+    expect(foldPlaceKey("São  Paulo")).toBe("sao paulo");
+    expect(countryFromEventLocation("United States", "")).toBe("us");
+    expect(countryFromEventLocation("", "Online")).toBe("");
+    expect(countryFromEventLocation("", "")).toBe("");
+  });
+
+  it("uses an injected place catalog for lookups", () => {
+    const places: PlaceCatalog = {
+      lookup: (city) =>
+        foldPlaceKey(city) === "xanadu" ? { name: "Xanadu", country: "zz", continent: "Asia" } : undefined,
+    };
+    expect(normalizeEventPlace({ city: "Xanadu" }, places)).toEqual({
+      place: "Xanadu, Asia",
+      city: "Xanadu",
+      country: "zz",
+    });
+    expect(seedPlaceCatalog().lookup("Berlin")?.country).toBe("de");
   });
 });
