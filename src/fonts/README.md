@@ -1,6 +1,6 @@
 # Bundled fonts
 
-All fonts are licensed under the SIL Open Font License 1.1; each folder has its `OFL.txt`.
+Most fonts are licensed under the SIL Open Font License 1.1 (`OFL.txt` in each folder). Latin Modern and TeX Gyre Heros use the GUST Font License (`GUST-FONT-LICENSE.txt`).
 
 | Folder | Family | Styles | Source file in [google/fonts](https://github.com/google/fonts) |
 | --- | --- | --- | --- |
@@ -14,10 +14,12 @@ All fonts are licensed under the SIL Open Font License 1.1; each folder has its 
 | `libre-caslon-text` | Libre Caslon Text | variable 400–700 | `ofl/librecaslontext/LibreCaslonText[wght].ttf` |
 | `playfair-display` | Playfair Display | variable 400–900 | `ofl/playfairdisplay/PlayfairDisplay[wght].ttf` |
 | `fraunces` | Fraunces | variable 100–900, optical size, softness, wonky | `ofl/fraunces/Fraunces[SOFT,WONK,opsz,wght].ttf` |
+| `latin-modern` | Latin Modern Roman | 400, 700, italic 400 | CTAN `lm` OpenType (`lmroman10-*.otf`), GUST Font License |
 | `inter` | Inter | variable 100–900, optical size 14–32 | `ofl/inter/Inter[opsz,wght].ttf` |
 | `manrope` | Manrope | variable 200–800 | `ofl/manrope/Manrope[wght].ttf` |
 | `work-sans` | Work Sans | variable 100–900 | `ofl/worksans/WorkSans[wght].ttf` |
 | `space-grotesk` | Space Grotesk | variable 300–700 | `ofl/spacegrotesk/SpaceGrotesk[wght].ttf` |
+| `tex-gyre-heros` | TeX Gyre Heros (Helvetica) | 400, 700 | GUST TeX Gyre Heros OTFs, GUST Font License |
 | `jetbrains-mono` | JetBrains Mono | variable 100–800 | `ofl/jetbrainsmono/JetBrainsMono[wght].ttf` |
 | `ibm-plex-sans-arabic` | IBM Plex Sans Arabic | 400, 500, 600 | `ofl/ibmplexsansarabic/IBMPlexSansArabic-{Regular,Medium,SemiBold}.ttf` |
 | `ibm-plex-sans-devanagari` | IBM Plex Sans Devanagari | 400, 500, 600 | `ofl/ibmplexsansdevanagari/IBMPlexSansDevanagari-{Regular,Medium,SemiBold}.ttf` |

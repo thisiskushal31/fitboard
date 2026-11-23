@@ -210,12 +210,16 @@ enum ThemeFont {
   LIBRE_CASLON
   PLAYFAIR
   FRAUNCES
+  // Latin Modern Roman: the body face from a typical pdflatex resume (lmodern).
+  LATIN_MODERN
   GEIST
   PLEX_SANS
   INTER
   MANROPE
   WORK_SANS
   SPACE_GROTESK
+  // TeX Gyre Heros: Helvetica clone used as `\fontfamily{phv}` in LaTeX resumes.
+  HELVETICA
   PLEX_MONO
   JETBRAINS_MONO
 }

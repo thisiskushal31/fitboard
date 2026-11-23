@@ -50,9 +50,9 @@ type StyleField = keyof typeof THEME_STYLE_DEFAULTS;
 /** The built-in themes, in the order the theme picker shows them. */
 export const BUILT_IN_THEMES: ThemeData[] = (
   [
-    // LaTeX-inspired: single column, underlined headings, Helvetica-like + roman, black rule.
+    // Matches resume-latex: Helvetica (`phv`) headings + Latin Modern (`lmodern`) body, black rule.
     // ATS-plain (resolveTheme): ASCII dates/contacts/bullets so parsers don't see middot/en-dash mojibake.
-    { id: "latex", name: "LaTeX", headFont: "INTER", bodyFont: "SOURCE_SERIF", accent: "#1d1c1a", layout: "SINGLE", align: "LEFT", headingStyle: "RULE", density: "COMPACT" },
+    { id: "latex", name: "LaTeX", headFont: "HELVETICA", bodyFont: "LATIN_MODERN", accent: "#1d1c1a", layout: "SINGLE", align: "LEFT", headingStyle: "RULE", density: "COMPACT" },
     { id: "editorial", name: "Editorial", headFont: "NEWSREADER", bodyFont: "GEIST", accent: "#7a3b2e", layout: "SINGLE", align: "LEFT", headingStyle: "PLAIN", density: "REGULAR" },
     { id: "classic", name: "Classic", headFont: "GARAMOND", bodyFont: "GARAMOND", accent: "#1d1c1a", layout: "SINGLE", align: "CENTER", headingStyle: "RULE", density: "REGULAR", photoPosition: "ABOVE_NAME" },
     { id: "modern", name: "Modern", headFont: "GEIST", bodyFont: "GEIST", accent: "#2f5d8a", layout: "SPLIT", align: "LEFT", headingStyle: "CAPS", density: "REGULAR", photoShape: "ROUNDED", photoPosition: "SIDEBAR" },
@@ -92,12 +92,14 @@ export const THEME_FONTS: Record<ThemeFont, { label: string; family: string; ser
   [ThemeFont.LIBRE_CASLON]: { label: "Caslon", family: "var(--typeface-libre-caslon)", serif: true },
   [ThemeFont.PLAYFAIR]: { label: "Playfair", family: "var(--typeface-playfair)", serif: true },
   [ThemeFont.FRAUNCES]: { label: "Fraunces", family: "var(--typeface-fraunces)", serif: true },
+  [ThemeFont.LATIN_MODERN]: { label: "Latin Modern", family: "var(--typeface-latin-modern)", serif: true },
   [ThemeFont.GEIST]: { label: "Geist", family: "var(--typeface-geist)", serif: false },
   [ThemeFont.PLEX_SANS]: { label: "Plex Sans", family: "var(--typeface-plex-sans)", serif: false },
   [ThemeFont.INTER]: { label: "Inter", family: "var(--typeface-inter)", serif: false },
   [ThemeFont.MANROPE]: { label: "Manrope", family: "var(--typeface-manrope)", serif: false },
   [ThemeFont.WORK_SANS]: { label: "Work Sans", family: "var(--typeface-work-sans)", serif: false },
   [ThemeFont.SPACE_GROTESK]: { label: "Space Grotesk", family: "var(--typeface-space-grotesk)", serif: false },
+  [ThemeFont.HELVETICA]: { label: "Helvetica", family: "var(--typeface-helvetica)", serif: false },
   [ThemeFont.PLEX_MONO]: { label: "Plex Mono", family: "var(--typeface-plex-mono)", serif: false },
   [ThemeFont.JETBRAINS_MONO]: { label: "JetBrains Mono", family: "var(--typeface-jetbrains-mono)", serif: false },
 };

@@ -49,6 +49,8 @@ describe("resolveTheme", () => {
       timeline: false,
       sideHeadings: false,
       heading: expect.objectContaining({ rule: true }),
+      headFamily: "var(--script-fonts), var(--typeface-greek-sans), var(--typeface-helvetica)",
+      bodyFamily: "var(--script-fonts), var(--typeface-greek-serif), var(--typeface-latin-modern)",
     });
     expect(resolveTheme(theme("editorial")).atsPlain).toBe(false);
   });

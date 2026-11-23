@@ -103,6 +103,19 @@ export const fraunces = localFont({
   preload: false,
 });
 
+/** Latin Modern Roman — `\usepackage{lmodern}` + `\rmfamily` on a pdflatex resume. */
+export const latinModern = localFont({
+  src: [
+    { path: "./latin-modern/LatinModernRoman-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./latin-modern/LatinModernRoman-Bold.woff2", weight: "700", style: "normal" },
+    { path: "./latin-modern/LatinModernRoman-Italic.woff2", weight: "400", style: "italic" },
+  ],
+  variable: "--typeface-latin-modern",
+  fallback: ["Latin Modern Roman", "Computer Modern", "Times New Roman", "serif"],
+  adjustFontFallback: "Times New Roman",
+  preload: false,
+});
+
 export const inter = localFont({
   src: "./inter/Inter-Variable.woff2",
   weight: "100 900",
@@ -131,6 +144,17 @@ export const spaceGrotesk = localFont({
   src: "./space-grotesk/SpaceGrotesk-Variable.woff2",
   weight: "300 700",
   variable: "--typeface-space-grotesk",
+  fallback: ["Helvetica", "Arial", "sans-serif"],
+  preload: false,
+});
+
+/** TeX Gyre Heros — Helvetica clone for LaTeX's `\fontfamily{phv}` headings. */
+export const helvetica = localFont({
+  src: [
+    { path: "./tex-gyre-heros/TeXGyreHeros-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./tex-gyre-heros/TeXGyreHeros-Bold.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--typeface-helvetica",
   fallback: ["Helvetica", "Arial", "sans-serif"],
   preload: false,
 });
@@ -248,10 +272,12 @@ export const fontVariables = [
   libreCaslon,
   playfair,
   fraunces,
+  latinModern,
   inter,
   manrope,
   workSans,
   spaceGrotesk,
+  helvetica,
   jetbrainsMono,
   greekSerif,
   greekSans,
