@@ -31,7 +31,7 @@ test("moves a card from the keyboard", async ({ page }) => {
   await page.goto("/applications");
   await page.getByRole("button", { name: /^Actions for Product Designer, Mobile, Kestrel Maps/ }).focus();
   await page.keyboard.press("Enter");
-  // Radix moves focus to the first item once the menu is open.
+  await expect(page.getByRole("menu")).toBeVisible();
   await expect(page.getByRole("menuitemradio").first()).toBeFocused();
   const interview = page.getByRole("menuitemradio", { name: /Interview/ });
   for (let step = 0; step < 12 && !(await interview.evaluate((item) => item === document.activeElement)); step++) {

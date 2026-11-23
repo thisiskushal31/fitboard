@@ -55,7 +55,8 @@ describe("the fact guard", () => {
   });
 
   it("flags acronyms and credentials the profile doesn't have", () => {
-    expect(check("An MBA and a certified scrum master")).toEqual(["MBA", "certified"]);
+    expect(check("An MBA and a certified scrum master")).toEqual(["MBA"]);
+    expect(check("An MBA and a chartered engineer")).toEqual(["MBA", "chartered"]);
     expect(check("An MSc in Design for Interaction from TU Delft")).toEqual([]);
     expect(check("Knows WCAG 2.2 well")).toEqual([]);
   });

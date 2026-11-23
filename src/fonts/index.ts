@@ -103,7 +103,7 @@ export const fraunces = localFont({
   preload: false,
 });
 
-/** Latin Modern Roman, for the LaTeX resume theme's body. */
+/** Latin Modern Roman. */
 export const latinModern = localFont({
   src: [
     { path: "./latin-modern/LatinModernRoman-Regular.woff2", weight: "400", style: "normal" },
@@ -148,7 +148,7 @@ export const spaceGrotesk = localFont({
   preload: false,
 });
 
-/** TeX Gyre Heros (Helvetica), for the LaTeX resume theme's headings. */
+/** TeX Gyre Heros (Helvetica). */
 export const helvetica = localFont({
   src: [
     { path: "./tex-gyre-heros/TeXGyreHeros-Regular.woff2", weight: "400", style: "normal" },

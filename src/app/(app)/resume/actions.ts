@@ -68,7 +68,7 @@ export const duplicateTheme = action(z.object({ id: z.string().min(1) }), async 
 /**
  * Deletes a custom theme. Documents that used it render in the base theme
  * from then on (the database drops the link); if it was the base theme,
- * Editorial takes over. Answers with the base theme after.
+ * the default built-in takes over. Answers with the base theme after.
  */
 export const deleteTheme = action(z.object({ id: z.string().min(1) }), async ({ id }, { toast }) => {
   const theme = await prisma.theme.findUnique({ where: { id }, select: { name: true, builtIn: true } });

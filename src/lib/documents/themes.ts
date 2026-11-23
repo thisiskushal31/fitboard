@@ -268,7 +268,7 @@ export function resolveTheme(theme: ThemeData, layout: ThemeLayout = theme.layou
     centered: !split && theme.align === ThemeAlign.CENTER,
     banner: theme.headerStyle === HeaderStyle.BANNER,
     timeline: theme.dateStyle === DateStyle.TIMELINE,
-    /** ASCII dates, contacts, and bullets so parsers don't misread middots or en-dashes. */
+    /** ASCII dates, contacts, and bullets. */
     atsPlain: theme.id === "latex",
     photo: {
       shape: theme.photoShape,

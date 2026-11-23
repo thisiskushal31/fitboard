@@ -62,7 +62,7 @@ describe("loadDocuments", () => {
     const loaded = await loadDocuments(ledgerly.id);
     expect(loaded.resume).toMatchObject({ theme: { id: "modern" }, trimmed });
     // No theme of its own: the base theme.
-    expect(loaded.letter?.theme.id).toBe("editorial");
+    expect(loaded.letter?.theme.id).toBe("latex");
     expect(loaded.includeReferences).toBe(false);
     expect(loaded.letterDate.getUTCHours()).toBe(0);
   });

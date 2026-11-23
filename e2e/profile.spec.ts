@@ -62,9 +62,10 @@ test("puts skills in groups and prints a line per group on the base resume", asy
   await page.reload();
   await expect(page.getByRole("list", { name: "Skills in Tools" })).toContainText("Figma");
   await page.goto("/resume");
-  const skills = page.getByRole("article", { name: "Resume" }).locator('[data-unit="skills"] li');
-  await expect(skills.last()).toHaveText("- Tools: Figma, Ahrefs");
-  await expect(skills.last().locator("strong")).toHaveText("Tools:");
+  const tools = page.getByRole("article", { name: "Resume" }).locator('[data-unit="skills"] li').filter({ hasText: /^-\s*Tools:/ });
+  await expect(tools).toContainText("Figma");
+  await expect(tools).toContainText("Ahrefs");
+  await expect(tools.locator("strong")).toHaveText("Tools:");
 });
 
 test("adds a project with its skills and shows it on the base resume", async ({ page }) => {

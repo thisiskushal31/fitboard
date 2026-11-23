@@ -7,19 +7,15 @@ import { buildExport } from "@/lib/upkeep/data-export";
 import { env } from "@/lib/core/env";
 import { prisma } from "@/lib/core/prisma";
 
-// Backups: exports written to FITBOARD_DATA_DIR/backups (nightly, before-import).
-// Development interval backups go under <cwd>/data/backups so the host can open them.
-// They never hold the API key in plain text.
+// Backups: exports under FITBOARD_DATA_DIR/backups (nightly, before-import)
+// or <cwd>/data/backups (development interval). Never hold the API key in plain text.
 
 export type BackupReason = "before-import" | "nightly" | "dev";
 
 /** Nightly and before-import backups. */
 export const backupsDir = () => path.join(env.FITBOARD_DATA_DIR, "backups");
 
-/**
- * Development interval backups under the project tree (`data/backups`), so Docker's
- * `.:/app` bind mount makes them visible on the host (macOS, Windows, Linux).
- */
+/** Development interval backups: `<cwd>/data/backups`. */
 export const devBackupsDir = (cwd = process.cwd()) => path.join(cwd, "data", "backups");
 
 /** Folder for this backup reason. */
@@ -65,10 +61,7 @@ export async function listDevBackups(cwd = process.cwd()): Promise<{ name: strin
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/**
- * Deletes `fitboard-backup-dev-*` files older than `maxAgeMs` (default 24h).
- * Leaves nightly / before-import files alone, even if they share a folder.
- */
+/** Deletes `fitboard-backup-dev-*` files older than `maxAgeMs` (default 24h). */
 export async function pruneDevBackups(
   now = new Date(),
   maxAgeMs = DAY_MS,

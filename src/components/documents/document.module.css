@@ -249,7 +249,7 @@
   break-before: avoid;
 }
 
-/* ASCII hyphens instead of disc bullets, so copied PDF text stays parseable. */
+/* ASCII hyphen markers instead of disc bullets. */
 .atsPlain .bullets {
   list-style: none;
   padding-inline-start: 0;

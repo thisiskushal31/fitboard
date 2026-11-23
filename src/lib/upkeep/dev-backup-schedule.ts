@@ -17,10 +17,7 @@ export function isDevBackupEnabled(nodeEnv = process.env.NODE_ENV): boolean {
   return nodeEnv === "development";
 }
 
-/**
- * One interval run: write a `dev` backup, then prune old ones.
- * Failures are logged only — never thrown into startup, never wipe data.
- */
+/** Writes a `dev` backup, then prunes ones older than 24 hours. */
 export async function runDevBackup(now = new Date()): Promise<"written"> {
   await writeBackup("dev", now);
   await pruneDevBackups(now);

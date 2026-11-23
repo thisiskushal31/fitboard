@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { demoLetterUnits, demoProfile, demoResumeUnits } from "@/lib/profile/demo-profile";
+import { skillsText } from "@/lib/profile/skill-groups";
 
 import { summaryText, tailoringSummary } from "@/lib/ai/tailoring-summary";
 
@@ -53,7 +54,7 @@ describe("tailoringSummary", () => {
       resume: [
         { id: "summary", label: "Summary", text: profile.basics.summary },
         ...profile.experience.map((entry) => ({ id: `experience:${entry.id}`, label: "", text: entry.bullets })),
-        { id: "skills", label: "Skills", text: profile.skills.map((skill) => skill.name).join(" · ") },
+        { id: "skills", label: "Skills", text: skillsText(profile.skills) },
       ],
       letter: [],
     });
@@ -86,7 +87,7 @@ describe("tailoringSummary", () => {
       note: "Lean on research.",
       references: "included",
     });
-    expect(summary.list).toContain("Left out Prototyping, HTML & CSS and Workshop facilitation, which this job isn't about");
+    expect(summary.list).toContain("Left out HTML & CSS, Prototyping and Workshop facilitation, which this job isn't about");
     expect(summary.list).toContain("Included your references, since the posting asks for them");
     expect(summary.list).toContain("Took your note into account: “Lean on research.”");
     expect(summary.list).toContain("Marked 2 details to check (not in your profile or the posting)");

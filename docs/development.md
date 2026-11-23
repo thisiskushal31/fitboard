@@ -240,7 +240,7 @@ Settings → Your data exports everything (profile, custom themes, settings, app
 
 With "Nightly backups" on (the default), the app writes the same export to `backups` every night at 03:00 server time and deletes backups older than `FITBOARD_BACKUP_RETENTION_DAYS` (14 by default). The timer runs inside the app process, so run a single instance of the app. These are the app's own backups: back up the PostgreSQL database itself too, the way your host does it (for example `pg_dump` on a schedule).
 
-In development (`NODE_ENV=development`), the app also writes that export on startup and every hour to **`data/backups/`** under the project root (`fitboard-backup-dev-….json`). Docker's `.:/app` bind mount makes that folder visible on the host (macOS, Windows, or Linux). Files older than 24 hours are removed. Production never starts this interval. Restart the app after pulling this so the schedule starts (`register()` only runs on process start).
+In development (`NODE_ENV=development`), the app also writes that export on startup and every hour to **`data/backups/`** under the project root (`fitboard-backup-dev-….json`). That folder is on the host via Docker's `.:/app` bind mount. Files older than 24 hours are removed. Production never starts this interval.
 
 ### Import size limit
 
