@@ -52,12 +52,7 @@ export function ChipCard({
   );
 }
 
-/**
- * Skills in categories: each group under its name, ungrouped first. Enter
- * adds a skill where you typed it, × removes it everywhere, and a skill's
- * menu moves it to another group. Base resumes print one hyphened line per
- * category ("Cloud & Infrastructure: GCP, AWS, Docker") — never a flat dump.
- */
+/** Skills by category; ungrouped first. Enter adds, × removes, the menu moves a skill between groups. */
 function SkillsCard({ profile, update }: { profile: ProfileData; update: UpdateProfile }) {
   const track = useTrackSave();
   // Made with "New group" and still empty: a group is only saved with its first skill.

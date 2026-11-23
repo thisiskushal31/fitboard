@@ -72,7 +72,7 @@ function CertificationForm({
   );
 }
 
-/** Certifications: professional licences and certifications. Keep degrees and academic courses in Education. */
+/** Professional licences and certifications (issuer, dates, notes). */
 export function CertificationsSection({ profile, update, order }: { profile: ProfileData; update: UpdateProfile; order: EntryOrder }) {
   return (
     <EntryList

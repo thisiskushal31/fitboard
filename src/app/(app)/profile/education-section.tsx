@@ -72,7 +72,7 @@ function EducationForm({
   );
 }
 
-/** Education: degrees and academic courses. Certifications (AWS, PMP, …) have their own section. */
+/** Degrees and academic courses. */
 export function EducationSection({ profile, update, order }: { profile: ProfileData; update: UpdateProfile; order: EntryOrder }) {
   return (
     <EntryList

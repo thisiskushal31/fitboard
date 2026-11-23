@@ -103,7 +103,7 @@ export const fraunces = localFont({
   preload: false,
 });
 
-/** Latin Modern Roman — `\usepackage{lmodern}` + `\rmfamily` on a pdflatex resume. */
+/** Latin Modern Roman, for the LaTeX resume theme's body. */
 export const latinModern = localFont({
   src: [
     { path: "./latin-modern/LatinModernRoman-Regular.woff2", weight: "400", style: "normal" },
@@ -148,7 +148,7 @@ export const spaceGrotesk = localFont({
   preload: false,
 });
 
-/** TeX Gyre Heros — Helvetica clone for LaTeX's `\fontfamily{phv}` headings. */
+/** TeX Gyre Heros (Helvetica), for the LaTeX resume theme's headings. */
 export const helvetica = localFont({
   src: [
     { path: "./tex-gyre-heros/TeXGyreHeros-Regular.woff2", weight: "400", style: "normal" },

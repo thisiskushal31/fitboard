@@ -249,7 +249,7 @@
   break-before: avoid;
 }
 
-/* ATS-plain (LaTeX theme): ASCII hyphen markers, not disc bullets that copy as glyphs. */
+/* ASCII hyphens instead of disc bullets, so copied PDF text stays parseable. */
 .atsPlain .bullets {
   list-style: none;
   padding-inline-start: 0;

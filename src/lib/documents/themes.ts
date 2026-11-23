@@ -50,8 +50,6 @@ type StyleField = keyof typeof THEME_STYLE_DEFAULTS;
 /** The built-in themes, in the order the theme picker shows them. */
 export const BUILT_IN_THEMES: ThemeData[] = (
   [
-    // Matches resume-latex: Helvetica (`phv`) headings + Latin Modern (`lmodern`) body, black rule.
-    // ATS-plain (resolveTheme): ASCII dates/contacts/bullets so parsers don't see middot/en-dash mojibake.
     { id: "latex", name: "LaTeX", headFont: "HELVETICA", bodyFont: "LATIN_MODERN", accent: "#1d1c1a", layout: "SINGLE", align: "LEFT", headingStyle: "RULE", density: "COMPACT" },
     { id: "editorial", name: "Editorial", headFont: "NEWSREADER", bodyFont: "GEIST", accent: "#7a3b2e", layout: "SINGLE", align: "LEFT", headingStyle: "PLAIN", density: "REGULAR" },
     { id: "classic", name: "Classic", headFont: "GARAMOND", bodyFont: "GARAMOND", accent: "#1d1c1a", layout: "SINGLE", align: "CENTER", headingStyle: "RULE", density: "REGULAR", photoPosition: "ABOVE_NAME" },
@@ -270,11 +268,7 @@ export function resolveTheme(theme: ThemeData, layout: ThemeLayout = theme.layou
     centered: !split && theme.align === ThemeAlign.CENTER,
     banner: theme.headerStyle === HeaderStyle.BANNER,
     timeline: theme.dateStyle === DateStyle.TIMELINE,
-    /**
-     * ATS-safe plain text: ASCII hyphens for dates/bullets and "|" for
-     * contacts/languages, so PDF copy-paste and parsers don't turn middots
-     * or en-dashes into mojibake (the failure mode of many LaTeX resumes).
-     */
+    /** ASCII dates, contacts, and bullets so parsers don't misread middots or en-dashes. */
     atsPlain: theme.id === "latex",
     photo: {
       shape: theme.photoShape,

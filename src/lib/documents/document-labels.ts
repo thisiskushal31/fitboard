@@ -421,7 +421,7 @@ export function documentLabels(language: string | null | undefined): DocumentLab
 export function languagesLine(
   languages: readonly { name: string; level: LanguageLevel }[],
   labels: DocumentLabels,
-  /** Default middot; ATS-plain themes pass " | ". */
+  /** Between languages; pass " | " for ASCII. */
   separator = " · ",
 ): string {
   return languages.map((language) => `${language.name}: ${labels.levels[language.level]}`).join(separator);

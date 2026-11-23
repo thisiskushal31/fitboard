@@ -240,6 +240,8 @@ Settings → Your data exports everything (profile, custom themes, settings, app
 
 With "Nightly backups" on (the default), the app writes the same export to `backups` every night at 03:00 server time and deletes backups older than `FITBOARD_BACKUP_RETENTION_DAYS` (14 by default). The timer runs inside the app process, so run a single instance of the app. These are the app's own backups: back up the PostgreSQL database itself too, the way your host does it (for example `pg_dump` on a schedule).
 
+In development (`NODE_ENV=development`), the app also writes that export on startup and every hour to **`data/backups/`** under the project root (`fitboard-backup-dev-….json`). Docker's `.:/app` bind mount makes that folder visible on the host (macOS, Windows, or Linux). Files older than 24 hours are removed. Production never starts this interval. Restart the app after pulling this so the schedule starts (`register()` only runs on process start).
+
 ### Import size limit
 
 Import files are capped at 10 MB, roughly 500 applications. The limit comes from Next.js, which buffers request bodies up to [`experimental.proxyClientMaxBodySize`](https://nextjs.org/docs/app/api-reference/config/next-config-js/proxyClientMaxBodySize) (10 MB by default) because `src/proxy.ts` runs on every request; larger bodies are cut off, so the app refuses them up front. To accept bigger files, raise that option in `next.config.ts` and `IMPORT_MAX_BYTES` in `src/lib/upkeep/import-limits.ts`. Behind a reverse proxy, its own limit applies as well: with nginx, raise `client_max_body_size` (see [Troubleshooting](https://github.com/thisiskushal31/fitboard/wiki/Troubleshooting) in the wiki).

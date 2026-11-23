@@ -37,7 +37,6 @@ export type ResumeContent = {
     skills: string[];
   }[];
   education: { id: string; degree: string; school: string; dates: string; notes: string }[];
-  /** Certifications, between education and publications. */
   certifications: { id: string; name: string; issuer: string; dates: string; notes: string }[];
   /** Publications, word for word, in the profile's order. */
   publications: {
@@ -65,17 +64,14 @@ export type ResumeOptions = {
   showPhoto?: boolean | null;
   /** For "Age N"; defaults to now. */
   today?: Date;
-  /**
-   * ASCII dates and language separators ( " - " / " | " ) for ATS parsers.
-   * Used by the LaTeX theme; other themes keep en-dashes and middots.
-   */
+  /** Use ASCII " - " / " | " instead of en-dashes and middots. */
   plainText?: boolean;
 };
 
 /** The separator between contact details on one line. */
 export const CONTACT_SEPARATOR = "  ·  ";
 
-/** ASCII-safe contact separator for ATS-plain themes (avoids middot mojibake). */
+/** Contact separator when `plainText` is on. */
 export const ATS_CONTACT_SEPARATOR = " | ";
 
 /** Contact details in the order the resume header lists them. */
@@ -170,7 +166,6 @@ export function resumeContent(
     education: profile.education.map((entry) => education(entry, entry.notes)),
     certifications: profile.certifications.map((entry) => certification(entry, entry.notes)),
     publications: resumePublications(profile.publications).map((entry) => publication(entry, entry.citation)),
-    // One "Category: a, b, c" line per group (LaTeX-style); never a bare dump.
     skills: skillsText(profile.skills),
 
     languages: languagesLine(profile.languages, labels, plainText ? " | " : " · "),

@@ -18,6 +18,10 @@ export async function register() {
     const { startBackupSchedule } = await import("@/lib/upkeep/backup-schedule");
     startBackupSchedule();
 
+    // Development only: full export on startup and every hour to ./data/backups.
+    const { startDevBackupSchedule } = await import("@/lib/upkeep/dev-backup-schedule");
+    startDevBackupSchedule();
+
     // The inbox check, while a Google account is connected.
     const { startInboxSchedule } = await import("@/lib/google/sync");
     startInboxSchedule();

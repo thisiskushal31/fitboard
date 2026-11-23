@@ -140,7 +140,7 @@ model Education {
   updatedAt  DateTime @updatedAt
 }
 
-// A professional license or certification (AWS, PMP, CKA, …). Dates work as in Experience.
+// Professional licence or certification. Dates work as in Experience.
 model Certification {
   id         String   @id @default(cuid())
   name       String   @default("")
@@ -210,7 +210,6 @@ enum ThemeFont {
   LIBRE_CASLON
   PLAYFAIR
   FRAUNCES
-  // Latin Modern Roman: the body face from a typical pdflatex resume (lmodern).
   LATIN_MODERN
   GEIST
   PLEX_SANS
@@ -218,7 +217,6 @@ enum ThemeFont {
   MANROPE
   WORK_SANS
   SPACE_GROTESK
-  // TeX Gyre Heros: Helvetica clone used as `\fontfamily{phv}` in LaTeX resumes.
   HELVETICA
   PLEX_MONO
   JETBRAINS_MONO

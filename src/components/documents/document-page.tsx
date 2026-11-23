@@ -126,7 +126,7 @@ export function Contact({ children }: { children: string }) {
   return <bdi dir={hasRightToLeft(children) ? undefined : "ltr"}>{children}</bdi>;
 }
 
-/** Contact details on one line, separated by "  ·  " (or " | " when ATS-plain). */
+/** Contact details on one line; `plainText` uses " | " instead of middots. */
 export function ContactLine({ items, plainText = false }: { items: string[]; plainText?: boolean }) {
   const separator = plainText ? ATS_CONTACT_SEPARATOR : CONTACT_SEPARATOR;
   return (

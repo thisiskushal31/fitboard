@@ -41,7 +41,7 @@ describe("resolveTheme", () => {
     expect(resolveTheme(theme("studio"), "SINGLE")).toMatchObject({ split: false, sidebarEnd: false, tintedSidebar: false });
   });
 
-  it("marks the LaTeX theme ATS-plain: single column, rule headings, no sidebar tricks", () => {
+  it("marks the LaTeX theme ATS-plain with Helvetica headings and Latin Modern body", () => {
     expect(resolveTheme(theme("latex"))).toMatchObject({
       atsPlain: true,
       split: false,
