@@ -103,7 +103,7 @@ Change an application's status only through `setStatus` in `src/lib/status/statu
 
 ### Seed data
 
-Each start runs `prisma db seed`, which creates the six built-in themes, an empty profile and default settings. It never overwrites your profile or settings. To load the sample profile and nine applications (Jane Doe):
+Each start runs `prisma db seed`, which creates the thirteen built-in themes, an empty profile and default settings. It never overwrites your profile or settings. To load the sample profile and nine applications (Jane Doe):
 
 ```bash
 docker/bin/yarn prisma db seed -- --demo           # refuses if you already have a profile or applications

@@ -41,6 +41,18 @@ describe("resolveTheme", () => {
     expect(resolveTheme(theme("studio"), "SINGLE")).toMatchObject({ split: false, sidebarEnd: false, tintedSidebar: false });
   });
 
+  it("marks the LaTeX theme ATS-plain: single column, rule headings, no sidebar tricks", () => {
+    expect(resolveTheme(theme("latex"))).toMatchObject({
+      atsPlain: true,
+      split: false,
+      banner: false,
+      timeline: false,
+      sideHeadings: false,
+      heading: expect.objectContaining({ rule: true }),
+    });
+    expect(resolveTheme(theme("editorial")).atsPlain).toBe(false);
+  });
+
   it("puts white on dark accents and ink on light ones", () => {
     expect(resolveTheme(theme("signal")).onAccent).toBe("#ffffff");
     expect(resolveTheme({ ...theme("signal"), accent: "#f2c94c" }).onAccent).toBe("#1d1c1a");
@@ -80,9 +92,9 @@ describe("layouts and colours", () => {
 
 describe("printCss", () => {
   it("prints on the configured paper with the theme's padding as page margins", () => {
-    // Regular: 50 × 54 units; a unit is 210 / 640 mm on A4.
+    // Regular: 42 × 46 units; a unit is 210 / 640 mm on A4.
     expect(printCss(theme("editorial"), "A4")).toMatch(
-      /^@page \{ size: 210mm 297mm; margin: 16.406mm 17.719mm; \}\n:root \{ --u: 0.328125mm; \}\n/,
+      /^@page \{ size: 210mm 297mm; margin: 13.781mm 15.094mm; \}\n:root \{ --u: 0.328125mm; \}\n/,
     );
     expect(printCss(theme("technical"), "LETTER")).toMatch(/^@page \{ size: 215.9mm 279.4mm; margin: 12.819mm 14.168mm; \}/);
   });

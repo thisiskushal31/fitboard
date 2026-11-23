@@ -6,7 +6,7 @@ import { BUILT_IN_THEMES } from "@/lib/documents/themes";
 
 import { draftFrom, ThemeBuilder, type ThemeDraft } from "@/app/(app)/resume/theme-builder";
 
-const editorial = BUILT_IN_THEMES[0];
+const editorial = BUILT_IN_THEMES.find((theme) => theme.id === "editorial")!;
 
 function renderBuilder(draft: ThemeDraft = draftFrom(editorial)) {
   const handlers = { onChange: vi.fn(), onSave: vi.fn(), onCancel: vi.fn() };

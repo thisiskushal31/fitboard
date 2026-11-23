@@ -14,7 +14,7 @@ describe("StrengthMeter", () => {
   it("is a labelled progress bar with the score and the hint", () => {
     render(
       <StrengthMeter
-        profile={{ basics: { ...basics, name: "Jane" }, skills: [], languages: [], experience: [{} as never], projects: [], education: [], publications: [], references: [], facts: [], photo: null }}
+        profile={{ basics: { ...basics, name: "Jane" }, skills: [], languages: [], experience: [{} as never], projects: [], education: [], certifications: [], publications: [], references: [], facts: [], photo: null }}
       />,
     );
     const bar = screen.getByRole("progressbar", { name: "Profile strength" });

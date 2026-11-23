@@ -380,6 +380,54 @@ export const restoreEducation = action(educationFields, async (entry) =>
   ),
 );
 
+// ─── Certifications ───────────────────────────────────────────────────
+
+const certificationFields = z.object({
+  id,
+  name: text(200),
+  issuer: text(200),
+  notes: text(5000),
+  ...dateSpan,
+});
+
+const certificationItem = (entry: z.infer<typeof certificationFields>) => ({
+  id: entry.id,
+  name: entry.name,
+  issuer: entry.issuer,
+  notes: entry.notes,
+  startYear: entry.startYear,
+  startMonth: entry.startMonth,
+  endYear: entry.endYear,
+  endMonth: entry.endMonth,
+  current: entry.current,
+});
+
+export const createCertification = action(z.object({}), async () => {
+  const manual = (await loadSettings()).certificationOrder === "manual";
+  const sort = manual ? await firstSort(prisma.certification) : await nextSort(prisma.certification);
+  return certificationItem(await prisma.certification.create({ data: { sort } }));
+});
+
+export const saveCertification = action(certificationFields, async ({ id, ...data }) => {
+  await prisma.certification.updateMany({ where: { id }, data });
+  return null;
+});
+
+export const removeCertification = action(z.object({ id }), async ({ id }) => {
+  await prisma.certification.deleteMany({ where: { id } });
+  return null;
+});
+
+export const restoreCertification = action(certificationFields, async (entry) =>
+  certificationItem(
+    await prisma.certification.upsert({
+      where: { id: entry.id },
+      create: { ...entry, sort: await nextSort(prisma.certification) },
+      update: {},
+    }),
+  ),
+);
+
 // ─── Publications ─────────────────────────────────────────────────────
 
 const publicationFields = z.object({
@@ -437,11 +485,11 @@ export const reorderPublications = action(z.object({ ids: z.array(id) }), async 
 
 // ─── Order ────────────────────────────────────────────────────────────
 
-const section = z.enum(["experience", "project", "education"]);
+const section = z.enum(["experience", "project", "education", "certification"]);
 type Section = z.infer<typeof section>;
 
 /** Each ordered section's setting. */
-const ORDER_SETTING = { experience: "experienceOrder", project: "projectOrder", education: "educationOrder" } as const;
+const ORDER_SETTING = { experience: "experienceOrder", project: "projectOrder", education: "educationOrder", certification: "certificationOrder" } as const;
 
 /** The section's table, as far as ordering needs it. */
 function entries(db: Prisma.TransactionClient, section: Section) {
@@ -452,6 +500,9 @@ function entries(db: Prisma.TransactionClient, section: Section) {
   }
   if (section === "project") {
     return { list: () => db.project.findMany({ select }), setSort: (entryId: string, sort: number) => db.project.update(setSort(entryId, sort)) };
+  }
+  if (section === "certification") {
+    return { list: () => db.certification.findMany({ select }), setSort: (entryId: string, sort: number) => db.certification.update(setSort(entryId, sort)) };
   }
   return { list: () => db.education.findMany({ select }), setSort: (entryId: string, sort: number) => db.education.update(setSort(entryId, sort)) };
 }
@@ -468,7 +519,7 @@ export const reorderEntries = action(z.object({ section, ids: z.array(id) }), as
       throw new ActionError("The list changed in the meantime. Reload the page and try again.");
     }
     for (const [sort, entryId] of ids.entries()) await table.setSort(entryId, sort);
-    await saveSettings({ [ORDER_SETTING[section]]: "manual" }, tx);
+    await saveSettings({ [ORDER_SETTING[section] as string]: "manual" }, tx);
   });
   return null;
 });

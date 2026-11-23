@@ -30,6 +30,10 @@ export const importedProfileSchema = z.object({
     .array(z.object({ name: z.string(), link: z.string(), bullets: z.string(), skills: z.array(z.string()), ...span, unverified }))
     .default([]),
   education: z.array(z.object({ degree: z.string(), school: z.string(), notes: z.string(), ...span, unverified })),
+  /** Absent in readings made before certifications. */
+  certifications: z
+    .array(z.object({ name: z.string(), issuer: z.string(), notes: z.string(), ...span, unverified }))
+    .default([]),
   /** Absent in readings made before publications. */
   publications: z.array(z.object({ citation: z.string(), link: z.string(), unverified })).default([]),
   references: z.array(
@@ -52,6 +56,7 @@ export function importCounts(profile: ImportedProfile): string {
     plural(profile.projects.length, "project", "projects"),
     plural(profile.education.length, "degree", "degrees"),
     // Optional and rare: only said when there are some.
+    ...(profile.certifications.length > 0 ? [plural(profile.certifications.length, "certification", "certifications")] : []),
     ...(profile.publications.length > 0 ? [plural(profile.publications.length, "publication", "publications")] : []),
     plural(profile.skills.length, "skill", "skills"),
     plural(profile.languages.length, "language", "languages"),

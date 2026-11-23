@@ -22,7 +22,7 @@ import {
   type Task,
 } from "./prompt-parts";
 
-export const TAILOR_RESUME_VERSION = "tailor-resume@6";
+export const TAILOR_RESUME_VERSION = "tailor-resume@7";
 
 const answerSchema = z.object({
   summary: z.string(),
@@ -31,6 +31,7 @@ const answerSchema = z.object({
   /** The profile's skills, most relevant first; leave out ones that don't help. */
   skills: z.array(z.string()),
   education: z.array(z.object({ id: z.string(), notes: z.string() })),
+  certifications: z.array(z.object({ id: z.string(), notes: z.string() })).default([]),
 });
 
 const INSTRUCTIONS = `You tailor a candidate's resume to one job, as JSON.
@@ -40,6 +41,7 @@ const INSTRUCTIONS = `You tailor a candidate's resume to one job, as JSON.
 - projects: every project from the profile, by id, with 1–3 bullets each, written like the roles' bullets: what was built and what it shows that this job cares about.
 - skills: the candidate's own skills, most relevant to this job first. Copy their names exactly; you may leave out ones that don't help.
 - education: every entry by id, with its notes shortened or left empty.
+- certifications: every certification entry by id, with its notes shortened or left empty. Never invent a certification or change its name or issuer; only the notes may be refined.
 - The profile's publications go on the resume word for word, so don't answer with them; the summary may mention them.`;
 
 /**asked for when "Resume length" has a limit; anything still over is trimmed afterwards (). */
@@ -112,7 +114,8 @@ export const tailorResume: Task<TailorInput, Unit[]> = async (provider, { profil
 export function resumeUnits(profile: ProfileData, answer: z.infer<typeof answerSchema>, labels: DocumentLabels = ENGLISH_LABELS): Unit[] {
   const roles = new Map(answer.roles.map((role) => [role.id, role.bullets]));
   const projects = new Map(answer.projects.map((project) => [project.id, project.bullets]));
-  const notes = new Map(answer.education.map((entry) => [entry.id, entry.notes]));
+  const educationNotes = new Map(answer.education.map((entry) => [entry.id, entry.notes]));
+  const certificationNotes = new Map((answer.certifications ?? []).map((entry) => [entry.id, entry.notes]));
   const skills = [...new Set(answer.skills.flatMap((name) => profile.skills.find((skill) => sameName(skill.name, name)) ?? []))];
   const units: Unit[] = [
     { id: "summary", label: "Summary", text: answer.summary.trim() },
@@ -129,7 +132,12 @@ export function resumeUnits(profile: ProfileData, answer: z.infer<typeof answerS
     ...profile.education.map((entry) => ({
       id: `education:${entry.id}`,
       label: entry.degree || entry.school,
-      text: (notes.get(entry.id) ?? entry.notes).trim(),
+      text: (educationNotes.get(entry.id) ?? entry.notes).trim(),
+    })),
+    ...profile.certifications.map((entry) => ({
+      id: `certification:${entry.id}`,
+      label: entry.name || entry.issuer,
+      text: (certificationNotes.get(entry.id) ?? entry.notes).trim(),
     })),
     ...resumePublications(profile.publications).map((entry) => ({
       id: `publication:${entry.id}`,

@@ -37,6 +37,7 @@ const imported: ImportedProfile = {
     { name: "Design tokens CLI", link: "", bullets: "Built a CLI", skills: ["figma"], startYear: 2024, startMonth: null, endYear: null, endMonth: null, current: true, unverified: [] },
   ],
   education: [{ degree: "MSc Interaction Design", school: "TU Delft", notes: "", startYear: 2015, startMonth: null, endYear: 2017, endMonth: null, current: false, unverified: [] }],
+  certifications: [{ name: "AWS Certified Developer", issuer: "Amazon Web Services", notes: "", startYear: 2023, startMonth: 1, endYear: null, endMonth: null, current: true, unverified: [] }],
   publications: [
     { citation: "Doe, J. (2024). Calm payouts.", link: "https://doi.org/10.5555/1", unverified: [] },
     { citation: "Doe, J. (2025). A new one.", link: "", unverified: [] },

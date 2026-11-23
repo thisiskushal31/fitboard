@@ -162,7 +162,7 @@
 }
 
 .skillLine + .skillLine {
-  margin-top: calc(var(--u) * 3);
+  margin-top: calc(var(--u) * 1);
 }
 
 .skillLabel {
@@ -172,7 +172,7 @@
 .section {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--u) * 6);
+  gap: calc(var(--u) * 4);
 }
 
 .sectionTitle {
@@ -236,7 +236,7 @@
 }
 
 .bullets {
-  margin-top: calc(var(--u) * 3);
+  margin-top: calc(var(--u) * 2);
   padding-inline-start: 1.1em;
   list-style: disc;
 }
@@ -249,8 +249,23 @@
   break-before: avoid;
 }
 
+/* ATS-plain (LaTeX theme): ASCII hyphen markers, not disc bullets that copy as glyphs. */
+.atsPlain .bullets {
+  list-style: none;
+  padding-inline-start: 0;
+}
+
+.atsPlain .bullets li {
+  padding-left: 0.9em;
+  text-indent: -0.9em;
+}
+
+.atsPlain .bullets li::before {
+  content: "- ";
+}
+
 .entrySkills {
-  margin-top: calc(var(--u) * 3);
+  margin-top: calc(var(--u) * 2);
   font-size: 0.9em;
   color: var(--doc-muted);
 }

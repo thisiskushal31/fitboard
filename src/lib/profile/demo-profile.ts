@@ -4,6 +4,7 @@ import { publicationLabel } from "@/lib/documents/citation";
 import { LANGUAGE_LEVELS, type DateSpan, type ProfileData } from "@/lib/profile/profile";
 
 import sample from "../../../prisma/seed/prototype-sample.json";
+import { skillsText } from "@/lib/profile/skill-groups";
 
 // Jane Doe's sample profile, shared by the demo seed
 // (prisma/seed/demo.ts), document previews on /dev/documents and tests.
@@ -53,7 +54,14 @@ export function demoProfile(): ProfileData {
       summary: basics.summary,
       showAge,
     },
-    skills: skills.map((name) => ({ id: skillId(name), name, group: "" })),
+    skills: skills.map((name) => ({
+      id: skillId(name),
+      name,
+      // Same shape as a real Profile → Skills card: category then the skill.
+      group:
+        ["Figma", "Prototyping"].includes(name) ? "Tools" : ["User research", "Workshop facilitation"].includes(name) ? "Research" : "Design",
+    })),
+
     languages: languages.map(({ name, level }, index) => ({
       id: `language-${index + 1}`,
       name,
@@ -84,6 +92,15 @@ export function demoProfile(): ProfileData {
       notes: entry.notes,
       ...dateSpan(entry.start, entry.end),
     })),
+    certifications: [
+      {
+        id: "cert-1",
+        name: "AWS Certified Developer – Associate",
+        issuer: "Amazon Web Services",
+        notes: "Scored 892/1000",
+        ...dateSpan("Mar 2022", "Mar 2025"),
+      },
+    ],
     publications: publications.map(({ id, citation, link }) => ({ id, citation, link, onResumes: true })),
     references: references.map(({ id, name, relation, company, email, phone }) => ({
       id,
@@ -110,10 +127,13 @@ export function demoResumeUnits(
 ): Unit[] {
   const { experience, projects, education, publications, skills, languages } = sample.profile;
   const { resume, requirements } = sample.ledgerly;
-  // Skills the posting asks for come first.
+  // Skills the posting asks for come first; still printed as Category: skills lines.
   const asked = requirements.flatMap((requirement) =>
     "skill" in requirement && requirement.skill && skills.includes(requirement.skill) ? [requirement.skill] : [],
   );
+  const ordered = [...asked, ...skills.filter((skill) => !asked.includes(skill))];
+  const grouped = demoProfile().skills;
+  const byName = new Map(grouped.map((skill) => [skill.name, skill]));
   return [
     { id: "summary", label: "Summary", text: resume.summary },
     ...experience.map((entry) => ({
@@ -122,12 +142,21 @@ export function demoResumeUnits(
       text: resume.experience[entry.id as keyof typeof resume.experience],
     })),
     ...projects.map((entry) => ({ id: `project:${projectId(entry.id)}`, label: `${entry.name} project`, text: entry.bullets })),
-    { id: "skills", label: "Skills", text: [...asked, ...skills.filter((skill) => !asked.includes(skill))].join(", ") },
+    {
+      id: "skills",
+      label: "Skills",
+      text: skillsText(ordered.flatMap((name) => (byName.has(name) ? [byName.get(name)!] : []))),
+    },
     ...education.map((entry) => ({
       id: `education:${educationId(entry.id)}`,
       label: entry.degree,
       text: entry.notes,
     })),
+    {
+      id: "certification:cert-1",
+      label: "AWS Certified Developer – Associate",
+      text: "Scored 892/1000",
+    },
     ...publications.map((entry) => ({
       id: `publication:${publicationId(entry.id)}`,
       label: publicationLabel(entry.citation),

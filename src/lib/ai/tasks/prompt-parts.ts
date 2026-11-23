@@ -74,6 +74,17 @@ export function profileForPrompt(profile: ProfileData, { includeReferences = fal
         dates: formatDateRange(entry),
         notes: entry.notes,
       })),
+      ...(profile.certifications.length > 0
+        ? {
+            certifications: profile.certifications.map((entry) => ({
+              id: entry.id,
+              name: entry.name,
+              issuer: entry.issuer,
+              dates: formatDateRange(entry),
+              notes: entry.notes,
+            })),
+          }
+        : {}),
       // Citations as plain text, without their links, and only those shown on resumes.
       ...(publications.length > 0 ? { publications } : {}),
       ...(includeReferences

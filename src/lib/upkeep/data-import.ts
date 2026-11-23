@@ -114,6 +114,7 @@ export async function importExport(db: PrismaClient, data: FitboardExport): Prom
         tx.profileField.deleteMany(),
         tx.language.deleteMany(),
         tx.education.deleteMany(),
+        tx.certification.deleteMany(),
         tx.publication.deleteMany(),
         tx.reference.deleteMany(),
         tx.fact.deleteMany(),
@@ -136,6 +137,7 @@ export async function importExport(db: PrismaClient, data: FitboardExport): Prom
         skipDuplicates: true,
       });
       await tx.education.createMany({ data: profile.education });
+      await tx.certification.createMany({ data: profile.certifications });
       await tx.publication.createMany({ data: profile.publications });
       await tx.reference.createMany({ data: profile.references });
       await tx.fact.createMany({ data: profile.facts });

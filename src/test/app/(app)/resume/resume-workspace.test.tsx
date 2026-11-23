@@ -81,7 +81,7 @@ describe("ResumeWorkspace", () => {
 
   it("falls back to the first theme when the base theme is missing", () => {
     render(<ResumeWorkspace {...props} baseThemeId="deleted" />);
-    expect(previewLabel()).toBe("Editorial");
+    expect(previewLabel()).toBe("LaTeX");
   });
 
   it("shows a picked theme right away and saves it as the base theme", async () => {
@@ -163,15 +163,15 @@ describe("managing themes", () => {
 
   it("asks before deleting, says how many applications use the theme, then falls back", async () => {
     const user = userEvent.setup();
-    vi.mocked(deleteTheme).mockResolvedValueOnce({ ok: true, data: { baseThemeId: "editorial" } });
+    vi.mocked(deleteTheme).mockResolvedValueOnce({ ok: true, data: { baseThemeId: "latex" } });
     render(<ResumeWorkspace {...props} themes={[...BUILT_IN_THEMES, custom]} baseThemeId="c1" usage={{ c1: 2 }} />);
     await user.click(screen.getByRole("button", { name: "Delete Quiet green…" }));
     const dialog = screen.getByRole("alertdialog", { name: "Delete “Quiet green”?" });
-    expect(dialog).toHaveTextContent("2 applications use it; their documents will use your base theme instead. Editorial becomes your base theme.");
+    expect(dialog).toHaveTextContent("2 applications use it; their documents will use your base theme instead. LaTeX becomes your base theme.");
     await user.click(within(dialog).getByRole("button", { name: "Delete theme" }));
     expect(deleteTheme).toHaveBeenCalledWith({ id: "c1" });
     expect(screen.queryByRole("button", { name: /Quiet green theme/ })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Editorial theme, in use" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "LaTeX theme, in use" })).toBeInTheDocument();
   });
 
   it("exports the theme in use as a file", async () => {

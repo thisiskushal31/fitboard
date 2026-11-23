@@ -59,7 +59,7 @@ describe("settings and themes", () => {
     expect((await loadSettings()).paper).toBe("A4");
   });
 
-  it("falls back to Editorial when the custom base theme is deleted", async () => {
+  it("falls back to LaTeX when the custom base theme is deleted", async () => {
     const custom = await prisma().theme.create({
       data: { name: "Mine", headFont: "GARAMOND", bodyFont: "GARAMOND", accent: "#2f5d8a" },
     });
@@ -67,7 +67,7 @@ describe("settings and themes", () => {
     expect((await loadSettings()).baseThemeId).toBe(custom.id);
 
     await prisma().theme.delete({ where: { id: custom.id } });
-    expect((await loadSettings()).baseThemeId).toBe("editorial");
+    expect((await loadSettings()).baseThemeId).toBe("latex");
   });
 
   it("refuses to delete a built-in theme", async () => {

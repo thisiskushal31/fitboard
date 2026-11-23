@@ -36,7 +36,14 @@ export const SECTIONS = [
     optional: false,
     label: "Education",
     title: "Education",
-    hint: "Degrees, courses, certificates: anything that helps tell your story.",
+    hint: "Degrees and academic courses: anything that helps tell your story.",
+  },
+  {
+    id: "certifications",
+    optional: true,
+    label: "Certifications",
+    title: "Certifications",
+    hint: "Professional licences and certifications — AWS, PMP, CKA and the like. Keep degrees and academic courses in Education.",
   },
   {
     id: "publications",

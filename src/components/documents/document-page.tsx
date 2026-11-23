@@ -3,7 +3,7 @@ import { Fragment, type CSSProperties, type ReactNode } from "react";
 import type { PaperSize } from "@/generated/prisma/enums";
 import { cn } from "@/lib/core/cn";
 import { hasRightToLeft, type TextDirection } from "@/lib/documents/document-language";
-import { CONTACT_SEPARATOR } from "@/lib/documents/resume-content";
+import { ATS_CONTACT_SEPARATOR, CONTACT_SEPARATOR } from "@/lib/documents/resume-content";
 import { PAPER_SIZES, SIDEBAR, type ResolvedTheme } from "@/lib/documents/themes";
 
 import styles from "./document.module.css";
@@ -50,6 +50,7 @@ function themeClasses(theme: ResolvedTheme) {
     theme.timeline && styles.timeline,
     theme.heading.marker === "bar" && styles.headingBar,
     theme.heading.marker === "band" && styles.headingBand,
+    theme.atsPlain && styles.atsPlain,
   );
 }
 
@@ -125,13 +126,14 @@ export function Contact({ children }: { children: string }) {
   return <bdi dir={hasRightToLeft(children) ? undefined : "ltr"}>{children}</bdi>;
 }
 
-/** Contact details on one line, separated by "  ·  ". */
-export function ContactLine({ items }: { items: string[] }) {
+/** Contact details on one line, separated by "  ·  " (or " | " when ATS-plain). */
+export function ContactLine({ items, plainText = false }: { items: string[]; plainText?: boolean }) {
+  const separator = plainText ? ATS_CONTACT_SEPARATOR : CONTACT_SEPARATOR;
   return (
     <p className={styles.contactLine}>
       {items.map((item, index) => (
         <Fragment key={index}>
-          {index > 0 && CONTACT_SEPARATOR}
+          {index > 0 && separator}
           <Contact>{item}</Contact>
         </Fragment>
       ))}

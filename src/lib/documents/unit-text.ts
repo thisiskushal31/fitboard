@@ -22,6 +22,11 @@ export function isPublicationUnit(unitId: string): boolean {
   return unitId.startsWith("publication:");
 }
 
+/** Whether a unit holds a certification's notes. */
+export function isCertificationUnit(unitId: string): boolean {
+  return unitId.startsWith("certification:");
+}
+
 /** Text for a unit as written in the editor: a role's or project's bullets cleaned up, anything else trimmed. */
 export function cleanUnitText(unitId: string, text: string): string {
   return isBulletUnit(unitId) ? bulletLines(text) : text.trim();
@@ -33,7 +38,7 @@ export function cleanUnitText(unitId: string, text: string): string {
  */
 export function unitName(unit: { id: string; label: string }): string {
   const label = unit.label.trim();
-  if (["experience:", "project:", "education:", "publication:"].some((prefix) => unit.id.startsWith(prefix))) return label || "entry";
+  if (["experience:", "project:", "education:", "certification:", "publication:"].some((prefix) => unit.id.startsWith(prefix))) return label || "entry";
   if (unit.id.startsWith("paragraph:")) {
     const name = label.toLowerCase() || "paragraph";
     return /\bparagraph$/.test(name) ? name : `${name} paragraph`;

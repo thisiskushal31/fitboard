@@ -16,6 +16,7 @@ export type DocumentLabels = {
   projects: string;
   publications: string;
   education: string;
+  certifications: string;
   skills: string;
   languages: string;
   contact: string;
@@ -52,6 +53,7 @@ const WORDS: Record<string, Words> = {
     projects: "Projects",
     publications: "Publications",
     education: "Education",
+    certifications: "Certifications",
     skills: "Skills",
     languages: "Languages",
     contact: "Contact",
@@ -69,6 +71,7 @@ const WORDS: Record<string, Words> = {
     projects: "Projecten",
     publications: "Publicaties",
     education: "Opleiding",
+    certifications: "Certificeringen",
     skills: "Vaardigheden",
     languages: "Talen",
     contact: "Contact",
@@ -85,6 +88,7 @@ const WORDS: Record<string, Words> = {
     projects: "Projekte",
     publications: "Publikationen",
     education: "Ausbildung",
+    certifications: "Zertifizierungen",
     skills: "Kenntnisse",
     languages: "Sprachen",
     contact: "Kontakt",
@@ -101,6 +105,7 @@ const WORDS: Record<string, Words> = {
     projects: "Projets",
     publications: "Publications",
     education: "Formation",
+    certifications: "Certifications",
     skills: "Compétences",
     languages: "Langues",
     contact: "Contact",
@@ -117,6 +122,7 @@ const WORDS: Record<string, Words> = {
     projects: "Proyectos",
     publications: "Publicaciones",
     education: "Formación",
+    certifications: "Certificaciones",
     skills: "Habilidades",
     languages: "Idiomas",
     contact: "Contacto",
@@ -133,6 +139,7 @@ const WORDS: Record<string, Words> = {
     projects: "Progetti",
     publications: "Pubblicazioni",
     education: "Formazione",
+    certifications: "Certificazioni",
     skills: "Competenze",
     languages: "Lingue",
     contact: "Contatti",
@@ -149,6 +156,7 @@ const WORDS: Record<string, Words> = {
     projects: "Projetos",
     publications: "Publicações",
     education: "Formação",
+    certifications: "Certificações",
     skills: "Competências",
     languages: "Idiomas",
     contact: "Contato",
@@ -165,6 +173,7 @@ const WORDS: Record<string, Words> = {
     projects: "Projekty",
     publications: "Publikacje",
     education: "Wykształcenie",
+    certifications: "Certyfikaty",
     skills: "Umiejętności",
     languages: "Języki",
     contact: "Kontakt",
@@ -181,6 +190,7 @@ const WORDS: Record<string, Words> = {
     projects: "Projekt",
     publications: "Publikationer",
     education: "Utbildning",
+    certifications: "Certifieringar",
     skills: "Kompetenser",
     languages: "Språk",
     contact: "Kontakt",
@@ -197,6 +207,7 @@ const WORDS: Record<string, Words> = {
     projects: "Projekter",
     publications: "Publikationer",
     education: "Uddannelse",
+    certifications: "Certificeringer",
     skills: "Kompetencer",
     languages: "Sprog",
     contact: "Kontakt",
@@ -213,6 +224,7 @@ const WORDS: Record<string, Words> = {
     projects: "Prosjekter",
     publications: "Publikasjoner",
     education: "Utdanning",
+    certifications: "Sertifiseringer",
     skills: "Kompetanse",
     languages: "Språk",
     contact: "Kontakt",
@@ -229,6 +241,7 @@ const WORDS: Record<string, Words> = {
     projects: "Projektit",
     publications: "Julkaisut",
     education: "Koulutus",
+    certifications: "Sertifikaatit",
     skills: "Osaaminen",
     languages: "Kielitaito",
     contact: "Yhteystiedot",
@@ -245,6 +258,7 @@ const WORDS: Record<string, Words> = {
     projects: "Projekty",
     publications: "Publikace",
     education: "Vzdělání",
+    certifications: "Certifikáty",
     skills: "Dovednosti",
     languages: "Jazyky",
     contact: "Kontakt",
@@ -261,6 +275,7 @@ const WORDS: Record<string, Words> = {
     projects: "Έργα",
     publications: "Δημοσιεύσεις",
     education: "Εκπαίδευση",
+    certifications: "Πιστοποιήσεις",
     skills: "Δεξιότητες",
     languages: "Γλώσσες",
     contact: "Επικοινωνία",
@@ -277,6 +292,7 @@ const WORDS: Record<string, Words> = {
     projects: "Projeler",
     publications: "Yayınlar",
     education: "Eğitim",
+    certifications: "Sertifikalar",
     skills: "Yetkinlikler",
     languages: "Diller",
     contact: "İletişim",
@@ -293,6 +309,7 @@ const WORDS: Record<string, Words> = {
     projects: "المشاريع",
     publications: "المنشورات",
     education: "التعليم",
+    certifications: "الشهادات المهنية",
     skills: "المهارات",
     languages: "اللغات",
     contact: "التواصل",
@@ -309,6 +326,7 @@ const WORDS: Record<string, Words> = {
     projects: "پروژه‌ها",
     publications: "انتشارات",
     education: "تحصیلات",
+    certifications: "گواهینامه‌ها",
     skills: "مهارت‌ها",
     languages: "زبان‌ها",
     contact: "اطلاعات تماس",
@@ -325,6 +343,7 @@ const WORDS: Record<string, Words> = {
     projects: "परियोजनाएँ",
     publications: "प्रकाशन",
     education: "शिक्षा",
+    certifications: "प्रमाणपत्र",
     skills: "कौशल",
     languages: "भाषाएँ",
     contact: "संपर्क",
@@ -341,6 +360,7 @@ const WORDS: Record<string, Words> = {
     projects: "项目经历",
     publications: "发表论文",
     education: "教育背景",
+    certifications: "证书",
     skills: "技能",
     languages: "语言能力",
     contact: "联系方式",
@@ -357,6 +377,7 @@ const WORDS: Record<string, Words> = {
     projects: "プロジェクト",
     publications: "論文・著作",
     education: "学歴",
+    certifications: "資格・認定",
     skills: "スキル",
     languages: "語学",
     contact: "連絡先",
@@ -373,6 +394,7 @@ const WORDS: Record<string, Words> = {
     projects: "프로젝트",
     publications: "논문 및 저서",
     education: "학력",
+    certifications: "자격증",
     skills: "기술",
     languages: "언어",
     contact: "연락처",
@@ -396,8 +418,13 @@ export function documentLabels(language: string | null | undefined): DocumentLab
 }
 
 /** "Dutch: Native · English: Fluent (C2)", the profile's languages as a resume lists them. */
-export function languagesLine(languages: readonly { name: string; level: LanguageLevel }[], labels: DocumentLabels): string {
-  return languages.map((language) => `${language.name}: ${labels.levels[language.level]}`).join(" · ");
+export function languagesLine(
+  languages: readonly { name: string; level: LanguageLevel }[],
+  labels: DocumentLabels,
+  /** Default middot; ATS-plain themes pass " | ". */
+  separator = " · ",
+): string {
+  return languages.map((language) => `${language.name}: ${labels.levels[language.level]}`).join(separator);
 }
 
 /** "Age 34", in the document's language and digits. */

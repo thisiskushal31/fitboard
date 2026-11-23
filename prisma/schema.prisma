@@ -124,11 +124,27 @@ model ProjectSkill {
   @@index([skillId])
 }
 
-// A degree, course or certificate. Dates work as in Experience.
+// A degree or academic course. Dates work as in Experience.
 model Education {
   id         String   @id @default(cuid())
   degree     String   @default("")
   school     String   @default("")
+  startYear  Int?
+  startMonth Int?
+  endYear    Int?
+  endMonth   Int?
+  current    Boolean  @default(false)
+  notes      String   @default("")
+  sort       Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// A professional license or certification (AWS, PMP, CKA, …). Dates work as in Experience.
+model Certification {
+  id         String   @id @default(cuid())
+  name       String   @default("")
+  issuer     String   @default("")
   startYear  Int?
   startMonth Int?
   endYear    Int?

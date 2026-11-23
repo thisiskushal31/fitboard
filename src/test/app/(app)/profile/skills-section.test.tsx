@@ -34,6 +34,7 @@ const profile = (): ProfileData => ({
   ],
   projects: [],
   education: [],
+  certifications: [],
   publications: [],
   references: [],
   facts: [],

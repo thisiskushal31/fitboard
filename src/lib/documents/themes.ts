@@ -50,6 +50,9 @@ type StyleField = keyof typeof THEME_STYLE_DEFAULTS;
 /** The built-in themes, in the order the theme picker shows them. */
 export const BUILT_IN_THEMES: ThemeData[] = (
   [
+    // LaTeX-inspired: single column, underlined headings, Helvetica-like + roman, black rule.
+    // ATS-plain (resolveTheme): ASCII dates/contacts/bullets so parsers don't see middot/en-dash mojibake.
+    { id: "latex", name: "LaTeX", headFont: "INTER", bodyFont: "SOURCE_SERIF", accent: "#1d1c1a", layout: "SINGLE", align: "LEFT", headingStyle: "RULE", density: "COMPACT" },
     { id: "editorial", name: "Editorial", headFont: "NEWSREADER", bodyFont: "GEIST", accent: "#7a3b2e", layout: "SINGLE", align: "LEFT", headingStyle: "PLAIN", density: "REGULAR" },
     { id: "classic", name: "Classic", headFont: "GARAMOND", bodyFont: "GARAMOND", accent: "#1d1c1a", layout: "SINGLE", align: "CENTER", headingStyle: "RULE", density: "REGULAR", photoPosition: "ABOVE_NAME" },
     { id: "modern", name: "Modern", headFont: "GEIST", bodyFont: "GEIST", accent: "#2f5d8a", layout: "SPLIT", align: "LEFT", headingStyle: "CAPS", density: "REGULAR", photoShape: "ROUNDED", photoPosition: "SIDEBAR" },
@@ -176,8 +179,8 @@ export const DENSITIES: Record<
   Density,
   { label: string; paddingY: number; paddingX: number; gap: number; fontSize: number; lineHeight: number; itemGap: number }
 > = {
-  [Density.COMPACT]: { label: "Compact", paddingY: 38, paddingX: 42, gap: 14, fontSize: 9.5, lineHeight: 1.42, itemGap: 7 },
-  [Density.REGULAR]: { label: "Regular", paddingY: 50, paddingX: 54, gap: 20, fontSize: 10.5, lineHeight: 1.5, itemGap: 10 },
+  [Density.COMPACT]: { label: "Compact", paddingY: 38, paddingX: 42, gap: 12, fontSize: 9.5, lineHeight: 1.42, itemGap: 6 },
+  [Density.REGULAR]: { label: "Regular", paddingY: 42, paddingX: 46, gap: 15, fontSize: 10.5, lineHeight: 1.45, itemGap: 8 },
   [Density.AIRY]: { label: "Airy", paddingY: 62, paddingX: 64, gap: 26, fontSize: 10.5, lineHeight: 1.65, itemGap: 13 },
 };
 
@@ -265,6 +268,12 @@ export function resolveTheme(theme: ThemeData, layout: ThemeLayout = theme.layou
     centered: !split && theme.align === ThemeAlign.CENTER,
     banner: theme.headerStyle === HeaderStyle.BANNER,
     timeline: theme.dateStyle === DateStyle.TIMELINE,
+    /**
+     * ATS-safe plain text: ASCII hyphens for dates/bullets and "|" for
+     * contacts/languages, so PDF copy-paste and parsers don't turn middots
+     * or en-dashes into mojibake (the failure mode of many LaTeX resumes).
+     */
+    atsPlain: theme.id === "latex",
     photo: {
       shape: theme.photoShape,
       // Only a sidebar layout has a sidebar to put it in.

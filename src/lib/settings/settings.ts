@@ -68,7 +68,7 @@ export const pagesInWords = (pages: number) => (pages === 1 ? "one page" : pages
 // name, flags as "true"/"false", lists as JSON. A missing key, or a value that
 // doesn't fit, reads as the default below; null means "not set".
 
-export const DEFAULT_BASE_THEME = "editorial";
+export const DEFAULT_BASE_THEME = "latex";
 
 const flag = (fallback: boolean) => z.stringbool().catch(fallback);
 
@@ -141,10 +141,11 @@ export const settingsSchema = z.object({
   dashboardPeriod: z.enum(["30d", "90d", "all"]).catch("all"),
   /** Days without news before "Worth a look" suggests a follow-up. */
   quietDays: z.coerce.number().int().min(1).max(60).catch(7),
-  /** Experience, projects and education: newest first by date, or the order set by hand. */
+  /** Experience, projects, education and certifications: newest first by date, or the order set by hand. */
   experienceOrder: z.enum(["date", "manual"]).catch("date"),
   projectOrder: z.enum(["date", "manual"]).catch("date"),
   educationOrder: z.enum(["date", "manual"]).catch("date"),
+  certificationOrder: z.enum(["date", "manual"]).catch("date"),
   /** Why the last nightly backup failed; null once one works again. */
   backupProblem: z.string().nullable().catch(null),
   // Job search. Null means "not set in the app": FITBOARD_JOBS_SOURCE

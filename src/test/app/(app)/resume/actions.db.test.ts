@@ -39,7 +39,7 @@ describe("setBaseTheme", () => {
 
   it("refuses a theme that doesn't exist", async () => {
     expect(await setBaseTheme({ id: "gone" })).toMatchObject({ ok: false, error: expect.stringMatching(/doesn't exist/) });
-    expect(await baseThemeId()).toBe("editorial");
+    expect(await baseThemeId()).toBe("latex");
   });
 });
 
@@ -118,10 +118,10 @@ describe("managing themes", () => {
     const application = await prisma().application.create({ data: { title: "Designer · Acme", company: "Acme" } });
     await prisma().document.create({ data: { applicationId: application.id, kind: "RESUME", units: [], themeId: copy.data.id } });
 
-    expect(await deleteTheme({ id: copy.data.id })).toEqual({ ok: true, data: { baseThemeId: "editorial" }, toast: "Deleted “Modern copy”." });
+    expect(await deleteTheme({ id: copy.data.id })).toEqual({ ok: true, data: { baseThemeId: "latex" }, toast: "Deleted “Modern copy”." });
     expect(await prisma().theme.findUnique({ where: { id: copy.data.id } })).toBeNull();
     expect((await prisma().document.findFirstOrThrow()).themeId).toBeNull();
-    expect(await baseThemeId()).toBe("editorial");
+    expect(await baseThemeId()).toBe("latex");
   });
 
   it("keeps the base theme when another theme is deleted, and never deletes a built-in", async () => {

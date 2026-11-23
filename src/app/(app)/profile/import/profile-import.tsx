@@ -177,7 +177,7 @@ export function ProfileImport({
             <Card className="flex flex-col gap-4">
               <p className="text-sm text-muted">
                 <strong className="font-medium text-ink">Merge</strong> adds all this to your profile; where your profile already has the same
-                detail, role, degree or reference, what the resume says wins. <strong className="font-medium text-ink">Replace</strong> clears your
+                detail, role, degree, certification or reference, what the resume says wins. <strong className="font-medium text-ink">Replace</strong> clears your
                 profile first.
               </p>
               <div className="flex flex-wrap items-center gap-3">
@@ -196,7 +196,7 @@ export function ProfileImport({
               open={confirmReplace}
               onOpenChange={setConfirmReplace}
               title="Replace your profile?"
-              description="Your basics, skills, languages, roles, projects, education, publications and references are removed first; then your profile holds exactly what was read from the resume. Your applications and their documents stay as they are."
+              description="Your basics, skills, languages, roles, projects, education, certifications, publications and references are removed first; then your profile holds exactly what was read from the resume. Your applications and their documents stay as they are."
               confirmLabel="Replace my profile"
               onConfirm={() => void apply("replace")}
             />
@@ -316,6 +316,21 @@ function Preview({ profile }: { profile: ImportedProfile }) {
             <Entry
               key={index}
               title={[entry.degree, entry.school].filter(Boolean).join(" · ")}
+              meta={formatDateRange(entry)}
+              unverified={entry.unverified}
+            >
+              {entry.notes && <p>{entry.notes}</p>}
+            </Entry>
+          ))}
+        </Section>
+      )}
+
+      {profile.certifications.length > 0 && (
+        <Section title="Certifications">
+          {profile.certifications.map((entry, index) => (
+            <Entry
+              key={index}
+              title={[entry.name, entry.issuer].filter(Boolean).join(" · ")}
               meta={formatDateRange(entry)}
               unverified={entry.unverified}
             >

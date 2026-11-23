@@ -6,7 +6,7 @@ import { BUILT_IN_THEMES } from "@/lib/documents/themes";
 
 import { CoverLetterDocument } from "@/components/documents/cover-letter-document";
 
-const editorial = BUILT_IN_THEMES[0];
+const editorial = BUILT_IN_THEMES.find((theme) => theme.id === "editorial")!;
 const { basics } = demoProfile();
 const letter = {
   theme: editorial,

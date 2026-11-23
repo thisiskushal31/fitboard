@@ -2,7 +2,7 @@ import "server-only";
 
 import { photoFromFields } from "@/lib/profile/photo";
 import { prisma } from "@/lib/core/prisma";
-import { basicsFromFields, factTexts, inEntryOrder, type FactItem, type ProfileData } from "@/lib/profile/profile";
+import { basicsFromFields, factTexts, inEntryOrder, type CertificationItem, type FactItem, type ProfileData } from "@/lib/profile/profile";
 import { loadSettings } from "@/lib/settings/settings-data";
 
 /** The profile's name, "" without one: for the sidebar, the sign-in greeting and file names. */
@@ -17,13 +17,14 @@ export async function loadProfileName(): Promise<string> {
  * publications are always in the order set by hand.
  */
 export async function loadProfile(): Promise<ProfileData> {
-  const [fields, skills, languages, experience, projects, education, publications, references, facts, settings] = await Promise.all([
+  const [fields, skills, languages, experience, projects, education, certifications, publications, references, facts, settings] = await Promise.all([
     prisma.profileField.findMany(),
     prisma.skill.findMany({ orderBy: [{ sort: "asc" }, { createdAt: "asc" }] }),
     prisma.language.findMany({ orderBy: [{ sort: "asc" }, { createdAt: "asc" }] }),
     prisma.experience.findMany({ include: { skills: { select: { skillId: true } } } }),
     prisma.project.findMany({ include: { skills: { select: { skillId: true } } } }),
     prisma.education.findMany(),
+    prisma.certification.findMany(),
     prisma.publication.findMany({ orderBy: [{ sort: "asc" }, { createdAt: "asc" }] }),
     prisma.reference.findMany({ orderBy: [{ sort: "asc" }, { createdAt: "asc" }] }),
     loadFacts(null),
@@ -65,6 +66,17 @@ export async function loadProfile(): Promise<ProfileData> {
       id: entry.id,
       degree: entry.degree,
       school: entry.school,
+      notes: entry.notes,
+      startYear: entry.startYear,
+      startMonth: entry.startMonth,
+      endYear: entry.endYear,
+      endMonth: entry.endMonth,
+      current: entry.current,
+    })),
+    certifications: inEntryOrder(certifications, settings.certificationOrder).map((entry): CertificationItem => ({
+      id: entry.id,
+      name: entry.name,
+      issuer: entry.issuer,
       notes: entry.notes,
       startYear: entry.startYear,
       startMonth: entry.startMonth,

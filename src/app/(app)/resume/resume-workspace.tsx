@@ -14,9 +14,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { PaperSize } from "@/generated/prisma/enums";
 import type { ProfileData } from "@/lib/profile/profile";
 import { saveFile } from "@/lib/core/save-file";
-import { pagesInWords } from "@/lib/settings/settings";
+import { DEFAULT_BASE_THEME, pagesInWords } from "@/lib/settings/settings";
 import { parseThemeFile, themeFile, themeFileName } from "@/lib/documents/theme-file";
-import { PAPER_SIZES, type ThemeData } from "@/lib/documents/themes";
+import { BUILT_IN_THEMES, PAPER_SIZES, type ThemeData } from "@/lib/documents/themes";
 
 import { deleteTheme, duplicateTheme, importTheme, saveTheme, setBaseTheme } from "./actions";
 import { draftFrom, ThemeBuilder, type ThemeDraft } from "./theme-builder";
@@ -253,6 +253,7 @@ function deleteDescription(applications: number): string {
     applications === 0
       ? "No application uses it."
       : `${applications === 1 ? "One application uses" : `${applications} applications use`} it; their documents will use your base theme instead.`;
-  return `${used} Editorial becomes your base theme. This can't be undone, but you can export the theme first.`;
+  const fallback = BUILT_IN_THEMES.find((theme) => theme.id === DEFAULT_BASE_THEME)?.name ?? "LaTeX";
+  return `${used} ${fallback} becomes your base theme. This can't be undone, but you can export the theme first.`;
 }
 

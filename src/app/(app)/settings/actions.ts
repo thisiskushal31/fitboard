@@ -319,6 +319,7 @@ export const deleteEverything = action(z.object({ confirm: z.literal("DELETE") }
     await tx.skill.deleteMany();
     await tx.language.deleteMany();
     await tx.education.deleteMany();
+    await tx.certification.deleteMany();
     await tx.publication.deleteMany();
     await tx.reference.deleteMany();
     await tx.fact.deleteMany();

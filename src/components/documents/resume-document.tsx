@@ -46,7 +46,9 @@ const sampleText = (content: ResumeContent) =>
 export function ResumeDocument({ theme, profile, paper, layout, language, renderUnit = plainUnit, ...options }: ResumeDocumentProps) {
   const resolved = resolveTheme(theme, layout);
   const labels = documentLabels(language);
-  const content = resumeContent(profile, options, labels);
+  const plainText = resolved.atsPlain;
+  const skillMark = plainText ? `${labels.skills}: ` : `${labels.skills} · `;
+  const content = resumeContent(profile, { ...options, plainText }, labels);
   const { lang, dir } = documentLanguage(language, sampleText(content));
   const { shape, position } = resolved.photo;
   const photo = (size: "header" | "sidebar", className?: string) =>
@@ -103,7 +105,7 @@ export function ResumeDocument({ theme, profile, paper, layout, language, render
                   )}
                   {role.skills.length > 0 && (
                     <p className={styles.entrySkills}>
-                      <span className={styles.accent}>{`${labels.skills} · `}</span>
+                      <span className={styles.accent}>{skillMark}</span>
                       {role.skills.join(", ")}
                     </p>
                   )}
@@ -140,7 +142,7 @@ export function ResumeDocument({ theme, profile, paper, layout, language, render
                   )}
                   {project.skills.length > 0 && (
                     <p className={styles.entrySkills}>
-                      <span className={styles.accent}>{`${labels.skills} · `}</span>
+                      <span className={styles.accent}>{skillMark}</span>
                       {project.skills.join(", ")}
                     </p>
                   )}
@@ -159,6 +161,20 @@ export function ResumeDocument({ theme, profile, paper, layout, language, render
               id: `education:${entry.id}`,
               className: styles.entry,
               head: <EntryHead title={entry.degree} at={entry.school} dates={entry.dates} timeline={resolved.timeline} />,
+              children: entry.notes && <p className={styles.muted}>{entry.notes}</p>,
+            })}
+          </Fragment>
+        ))}
+      </DocumentSection>
+    ),
+    content.certifications.length > 0 && (
+      <DocumentSection key="certifications" title={labels.certifications}>
+        {content.certifications.map((entry) => (
+          <Fragment key={entry.id}>
+            {renderUnit({
+              id: `certification:${entry.id}`,
+              className: styles.entry,
+              head: <EntryHead title={entry.name} at={entry.issuer} dates={entry.dates} timeline={resolved.timeline} />,
               children: entry.notes && <p className={styles.muted}>{entry.notes}</p>,
             })}
           </Fragment>
@@ -226,7 +242,7 @@ export function ResumeDocument({ theme, profile, paper, layout, language, render
     <>
       <h1 className={styles.name}>{content.name}</h1>
       {content.headline && <p className={styles.headline}>{content.headline}</p>}
-      {!resolved.split && content.contacts.length > 0 && <ContactLine items={content.contacts} />}
+      {!resolved.split && content.contacts.length > 0 && <ContactLine items={content.contacts} plainText={plainText} />}
     </>
   );
   // A photo beside the name puts the name, headline and contacts in a block of their own.
@@ -273,12 +289,14 @@ function ResumePhoto({ src, name, shape, size, className }: { src: string; name:
   );
 }
 
-/** "Sep 2015 – May 2018" that, in a narrow column, only wraps after the dash. */
-const breakAfterDash = (dates: string) =>
-  dates
-    .split(" – ")
+/** "Sep 2015 – May 2018" (or ASCII " - ") that, in a narrow column, only wraps after the dash. */
+const breakAfterDash = (dates: string) => {
+  const sep = dates.includes(" – ") ? " – " : " - ";
+  return dates
+    .split(sep)
     .map((part) => part.replaceAll(" ", " "))
-    .join(" – ");
+    .join(sep.replace(/ /g, " "));
+};
 
 /**
  * "Senior Product Designer, Northwind Logistics" with the dates at the end of
@@ -304,7 +322,7 @@ function EntryHead({ title, at, dates, timeline }: { title: string; at: ReactNod
   );
 }
 
-/** The Skills section: a hyphened line per group, bold label then comma-separated skills. */
+/** The Skills section: a hyphened line per category — bold "Category:" then comma-separated skills. */
 function SkillLines({ text }: { text: string }) {
   const lines = text
     .split("\n")
@@ -317,7 +335,7 @@ function SkillLines({ text }: { text: string }) {
         return (
           <li key={index} className={styles.skillLine}>
             {"- "}
-            {label && <strong className={styles.skillLabel}>{label}: </strong>}
+            {label ? <strong className={styles.skillLabel}>{label}: </strong> : null}
             {skills}
           </li>
         );

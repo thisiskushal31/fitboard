@@ -31,6 +31,8 @@ type DateFormatOptions = {
   locale?: string;
   /** Word for an ongoing entry. */
   present?: string;
+  /** Between start and end; default en-dash. ATS-plain themes use " - ". */
+  rangeSeparator?: string;
 };
 
 /**
@@ -57,7 +59,7 @@ export function formatDateRange(span: DateSpan, options: DateFormatOptions = {})
   const end = span.current
     ? (options.present ?? "Present")
     : formatMonthYear(span.endYear, span.endMonth, options);
-  return [start, end].filter(Boolean).join(" – ");
+  return [start, end].filter(Boolean).join(options.rangeSeparator ?? " – ");
 }
 
 /** The Basics fields in the form's order. */
@@ -129,6 +131,8 @@ export type ProjectItem = DateSpan & {
   skillIds: string[];
 };
 export type EducationItem = DateSpan & { id: string; degree: string; school: string; notes: string };
+/** A professional license or certification: who issued it, the dates it's valid, and optional notes. */
+export type CertificationItem = DateSpan & { id: string; name: string; issuer: string; notes: string };
 /** A publication: the citation as written, with **bold** and *italic*, and where to read it. */
 export type PublicationItem = { id: string; citation: string; link: string; onResumes: boolean };
 export type ReferenceItem = {
@@ -150,6 +154,8 @@ export type ProfileData = {
   experience: ExperienceItem[];
   projects: ProjectItem[];
   education: EducationItem[];
+  /** Professional licences and certifications (AWS, PMP, CKA, …). */
+  certifications: CertificationItem[];
   /** In the order set by hand, with the ones kept off resumes too. */
   publications: PublicationItem[];
   references: ReferenceItem[];

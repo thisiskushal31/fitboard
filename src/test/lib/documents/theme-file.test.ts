@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { parseThemeFile, themeFile, themeFileName } from "@/lib/documents/theme-file";
 import { BUILT_IN_THEMES } from "@/lib/documents/themes";
 
-const editorial = BUILT_IN_THEMES[0];
+const editorial = BUILT_IN_THEMES.find((theme) => theme.id === "editorial")!;
 
 describe("theme files", () => {
   it("exports the look without ids, and reads it back", () => {

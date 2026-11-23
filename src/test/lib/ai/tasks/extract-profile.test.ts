@@ -107,7 +107,7 @@ describe("extractProfile", () => {
   it("checks the answer: dates in range, levels, one of each skill, and names looked up in the resume", async () => {
     const provider = new MockProvider({ reply: () => answer });
     const { data, promptVersion } = await extractProfile(provider, { resume: RESUME, today: new Date("2026-09-29") }, options);
-    expect(promptVersion).toBe("extract-profile@4");
+    expect(promptVersion).toBe("extract-profile@5");
     expect(data.basics).toEqual({
       name: "John Doe",
       headline: "Senior Product Designer",

@@ -33,6 +33,7 @@ export const writtenResumeSchema = z.object({
   projects: z.array(z.object({ id: z.string(), bullets: z.array(z.string().max(400)).max(6) })).default([]),
   skills: z.array(z.string().max(100)).describe("The profile's own skills, most relevant first; others are dropped"),
   education: z.array(z.object({ id: z.string(), notes: z.string().max(600) })).default([]),
+  certifications: z.array(z.object({ id: z.string(), notes: z.string().max(600) })).default([]),
 });
 
 export const writtenLetterSchema = z.object({

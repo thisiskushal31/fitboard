@@ -42,6 +42,7 @@ const written = (overrides: Partial<WrittenApplication> = {}): WrittenApplicatio
     projects: [],
     skills: [profile.skills[0].name, "Not a skill of theirs"],
     education: [],
+    certifications: [],
   },
   letter: {
     recipient: "Acme · Hiring team\nBerlin",
@@ -79,7 +80,10 @@ describe("an application written in Claude chat", () => {
     expect(units.find((unit) => unit.id === `experience:${role.id}`)?.text).toBe("Led the redesign of the payments flow");
     // Only the profile's own roles and skills, and its publications word for word.
     expect(units.some((unit) => unit.id === "experience:made-up")).toBe(false);
-    expect(units.find((unit) => unit.id === "skills")?.text).toBe(profile.skills[0].name);
+    // skillsText formats skills with their group names; check the skill is present and the made-up one is not.
+    const skillsText = units.find((unit) => unit.id === "skills")?.text ?? "";
+    expect(skillsText).toContain(profile.skills[0].name);
+    expect(skillsText).not.toContain("Not a skill of theirs");
     const shown = profile.publications.filter((entry) => entry.onResumes);
     expect(units.filter((unit) => unit.id.startsWith("publication:")).map((unit) => unit.text)).toEqual(shown.map((entry) => entry.citation));
 

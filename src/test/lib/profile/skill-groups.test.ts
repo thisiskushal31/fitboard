@@ -18,9 +18,14 @@ describe("skill groups", () => {
     expect(inEditorOrder(skills).map(({ name }) => name)).toEqual(["Figma", "HTML & CSS", "GEO", "AEO", "Crawl budget", "Log analysis"]);
   });
 
-  it("writes a line per group, led by its name, and one without a label for the rest", () => {
-    expect(skillsText(inEditorOrder(skills))).toBe("Figma, HTML & CSS\nAI search: GEO, AEO\nTechnical SEO: Crawl budget, Log analysis");
-    expect(skillsText([skill("Figma"), skill("Prototyping")])).toBe("Figma, Prototyping");
+  it("writes a Category: skills line per group, named groups first, ungrouped as Other", () => {
+    expect(skillsText(inEditorOrder(skills))).toBe(
+      "AI search: GEO, AEO\nTechnical SEO: Crawl budget, Log analysis\nOther: Figma, HTML & CSS",
+    );
+    expect(skillsText([skill("Figma"), skill("Prototyping")])).toBe("Other: Figma, Prototyping");
+    expect(skillsText([skill("GCP", "Cloud & Infrastructure"), skill("AWS", "Cloud & Infrastructure")])).toBe(
+      "Cloud & Infrastructure: GCP, AWS",
+    );
     expect(skillsText([])).toBe("");
   });
 

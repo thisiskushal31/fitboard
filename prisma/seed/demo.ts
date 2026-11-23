@@ -33,6 +33,7 @@ type Db = Pick<
   | "experience"
   | "project"
   | "education"
+  | "certification"
   | "publication"
   | "reference"
   | "fact"
@@ -68,6 +69,7 @@ export async function hasUserData(db: Db): Promise<boolean> {
     db.experience.count(),
     db.project.count(),
     db.education.count(),
+    db.certification.count(),
     db.publication.count(),
     db.reference.count(),
     db.fact.count(),
@@ -103,6 +105,7 @@ export async function seedDemo(
         await tx.experience.deleteMany();
         await tx.project.deleteMany();
         await tx.education.deleteMany();
+        await tx.certification.deleteMany();
         await tx.publication.deleteMany();
         await tx.reference.deleteMany();
         await tx.fact.deleteMany();
@@ -118,9 +121,9 @@ export async function seedDemo(
       });
 
       const skillIds = new Map<string, string>();
-      for (const [sort, name] of skills.entries()) {
-        const skill = await tx.skill.create({ data: { name, sort } });
-        skillIds.set(name, skill.id);
+      for (const [sort, skill] of demoProfile().skills.entries()) {
+        const created = await tx.skill.create({ data: { name: skill.name, group: skill.group, sort } });
+        skillIds.set(skill.name, created.id);
       }
       await tx.language.createMany({
         data: languages.map(({ name, level }, sort) => ({ name, level: LEVELS_BY_LABEL.get(level)!, sort })),
@@ -179,6 +182,12 @@ export async function seedDemo(
         })),
       });
       await tx.fact.createMany({ data: facts.map((text, sort) => ({ text, sort })) });
+
+      // ── Certifications ──
+      for (const cert of demoProfile().certifications) {
+        const { id: _, ...fields } = cert;
+        await tx.certification.create({ data: { ...fields, sort: 0 } });
+      }
 
       // ── Applications ──
       const ledgerly = sample.ledgerly;

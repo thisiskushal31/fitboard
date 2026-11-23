@@ -25,15 +25,16 @@ export async function applyImportedProfile(db: PrismaClient, profile: ImportedPr
         await tx.experience.deleteMany();
         await tx.project.deleteMany();
         await tx.education.deleteMany();
+        await tx.certification.deleteMany();
         await tx.publication.deleteMany();
         await tx.reference.deleteMany();
         await tx.language.deleteMany();
         await tx.skill.deleteMany();
         await tx.profileField.deleteMany({ where: { key: { in: [...BASICS_FIELDS] } } });
-        await saveSettings({ experienceOrder: "date", projectOrder: "date", educationOrder: "date" }, tx);
+        await saveSettings({ experienceOrder: "date", projectOrder: "date", educationOrder: "date", certificationOrder: "date" }, tx);
       }
       const order = settingsFromRows(
-        await tx.setting.findMany({ where: { key: { in: ["experienceOrder", "projectOrder", "educationOrder"] } } }),
+        await tx.setting.findMany({ where: { key: { in: ["experienceOrder", "projectOrder", "educationOrder", "certificationOrder"] } } }),
       );
 
       for (const [key, value] of Object.entries(profile.basics)) {
@@ -85,6 +86,14 @@ export async function applyImportedProfile(db: PrismaClient, profile: ImportedPr
         else await tx.education.create({ data: { ...fields, sort: nextEducationSort() } });
       }
 
+      const nextCertSort = await sorter(tx, "certification", order.certificationOrder === "manual");
+      const certs = await tx.certification.findMany();
+      for (const fields of profile.certifications.map(withoutFlags)) {
+        const match = certs.find((cert) => sameName(cert.name, fields.name) && sameName(cert.issuer, fields.issuer));
+        if (match) await tx.certification.update({ where: { id: match.id }, data: filled(fields) });
+        else await tx.certification.create({ data: { ...fields, sort: nextCertSort() } });
+      }
+
       // Publications are in an order set by hand: the file's go after the ones there, in its order.
       // One that's already there keeps its citation, which may have bold and italics; the file can give it a link.
       const publications = await tx.publication.findMany();
@@ -129,14 +138,16 @@ async function applyLanguages(tx: Tx, profile: ImportedProfile): Promise<void> {
 }
 
 /** Sort values for new entries: first in an order set by hand, else after the rest. */
-async function sorter(tx: Tx, section: "experience" | "project" | "education", manual: boolean): Promise<() => number> {
+async function sorter(tx: Tx, section: "experience" | "project" | "education" | "certification", manual: boolean): Promise<() => number> {
   const range = { _min: { sort: true }, _max: { sort: true } } as const;
   const { _min, _max } =
     section === "experience"
       ? await tx.experience.aggregate(range)
       : section === "project"
         ? await tx.project.aggregate(range)
-        : await tx.education.aggregate(range);
+        : section === "certification"
+          ? await tx.certification.aggregate(range)
+          : await tx.education.aggregate(range);
   let first = (_min.sort ?? 1) - 1;
   let last = (_max.sort ?? -1) + 1;
   return manual ? () => first-- : () => last++;

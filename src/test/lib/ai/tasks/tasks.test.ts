@@ -250,7 +250,7 @@ describe("tailorResume", () => {
 
   it("returns units, keeping only real roles and the profile's own skills", async () => {
     const { data, promptVersion } = await tailorResume(model(answer), { profile, extracted, match: null, facts: [], posting }, options);
-    expect(promptVersion).toBe("tailor-resume@6");
+    expect(promptVersion).toBe("tailor-resume@7");
     expect(data.map((unit) => unit.id)).toEqual([
       "summary",
       "experience:e1",
@@ -260,6 +260,7 @@ describe("tailorResume", () => {
       "skills",
       "education:d1",
       "education:d2",
+      "certification:cert-1",
       "publication:u1",
       "languages",
     ]);
@@ -271,7 +272,7 @@ describe("tailorResume", () => {
     expect(data.find((unit) => unit.id === "experience:e1")?.text).toBe("Led the carrier portal redesign\nOwned the design system");
     // A role the model skipped keeps its own bullets.
     expect(data.find((unit) => unit.id === "experience:e2")?.text).toBe(profile.experience[1].bullets);
-    expect(data.find((unit) => unit.id === "skills")?.text).toBe("Design systems, Figma, User research");
+    expect(data.find((unit) => unit.id === "skills")?.text).toBe("Design: Design systems\nTools: Figma\nResearch: User research");
     expect(data.find((unit) => unit.id === "languages")?.text).toBe("Dutch: Native · English: Fluent (C2) · German: Intermediate (B1)");
   });
 
@@ -320,8 +321,8 @@ describe("tailorResume", () => {
 describe("resumeUnits' skills", () => {
   it("keeps the model's order, a line per group where its first skill comes, only the profile's own skills", () => {
     const grouped = { ...demoProfile(), skills: demoProfile().skills.map((skill) => ({ ...skill, group: ["Figma", "Prototyping"].includes(skill.name) ? "Tools" : "" })) };
-    const units = resumeUnits(grouped, { summary: "", roles: [], projects: [], education: [], skills: ["figma", "User research", "Prototyping", "Kubernetes", "Design systems"] });
-    expect(units.find((unit) => unit.id === "skills")?.text).toBe("Tools: Figma, Prototyping\nUser research, Design systems");
+    const units = resumeUnits(grouped, { summary: "", roles: [], projects: [], education: [], certifications: [], skills: ["figma", "User research", "Prototyping", "Kubernetes", "Design systems"] });
+    expect(units.find((unit) => unit.id === "skills")?.text).toBe("Tools: Figma, Prototyping\nOther: User research, Design systems");
   });
 });
 

@@ -1,8 +1,8 @@
 import type { Unit } from "@/lib/applications/application-data";
 import { ageLabel, ENGLISH_LABELS, languagesLine, type DocumentLabels } from "@/lib/documents/document-labels";
 import { publicationHref, publicationLink } from "@/lib/documents/citation";
-import { ageOn, formatDateRange, resumePublications, type Basics, type ProfileData } from "@/lib/profile/profile";
-import { inEditorOrder, skillsText } from "@/lib/profile/skill-groups";
+import { ageOn, formatDateRange, resumePublications, type Basics, type CertificationItem, type ProfileData } from "@/lib/profile/profile";
+import { skillsText } from "@/lib/profile/skill-groups";
 
 // What a resume shows, worked out from the profile (the base resume) or from
 // a tailored document's units, so the renderer only has to lay it out.
@@ -37,6 +37,8 @@ export type ResumeContent = {
     skills: string[];
   }[];
   education: { id: string; degree: string; school: string; dates: string; notes: string }[];
+  /** Certifications, between education and publications. */
+  certifications: { id: string; name: string; issuer: string; dates: string; notes: string }[];
   /** Publications, word for word, in the profile's order. */
   publications: {
     id: string;
@@ -63,10 +65,18 @@ export type ResumeOptions = {
   showPhoto?: boolean | null;
   /** For "Age N"; defaults to now. */
   today?: Date;
+  /**
+   * ASCII dates and language separators ( " - " / " | " ) for ATS parsers.
+   * Used by the LaTeX theme; other themes keep en-dashes and middots.
+   */
+  plainText?: boolean;
 };
 
 /** The separator between contact details on one line. */
 export const CONTACT_SEPARATOR = "  ·  ";
+
+/** ASCII-safe contact separator for ATS-plain themes (avoids middot mojibake). */
+export const ATS_CONTACT_SEPARATOR = " | ";
 
 /** Contact details in the order the resume header lists them. */
 export function contactItems(basics: Basics, today = new Date(), labels = ENGLISH_LABELS): string[] {
@@ -100,12 +110,16 @@ const lines = (text: string) =>
 /** What the resume shows, with its dates and levels in the words of `labels`. */
 export function resumeContent(
   profile: ProfileData,
-  { units, includeReferences = false, showPhoto, today = new Date() }: ResumeOptions = {},
+  { units, includeReferences = false, showPhoto, today = new Date(), plainText = false }: ResumeOptions = {},
   labels: DocumentLabels = ENGLISH_LABELS,
 ): ResumeContent {
   const { basics } = profile;
   const skillNames = new Map(profile.skills.map((skill) => [skill.id, skill.name]));
-  const dates = { locale: labels.locale, present: labels.present };
+  const dates = {
+    locale: labels.locale,
+    present: labels.present,
+    ...(plainText ? { rangeSeparator: " - " } : {}),
+  };
 
   const experience = (entry: ProfileData["experience"][number], bullets: string) => ({
     id: entry.id,
@@ -137,6 +151,13 @@ export function resumeContent(
     dates: formatDateRange(entry, dates),
     notes: notes.trim(),
   });
+  const certification = (entry: CertificationItem, notes: string) => ({
+    id: entry.id,
+    name: entry.name.trim(),
+    issuer: entry.issuer.trim(),
+    dates: formatDateRange(entry, dates),
+    notes: notes.trim(),
+  });
 
   const content: ResumeContent = {
     name: basics.name.trim() || "Your name",
@@ -147,10 +168,12 @@ export function resumeContent(
     experience: profile.experience.map((entry) => experience(entry, entry.bullets)),
     projects: profile.projects.map((entry) => project(entry, entry.bullets)),
     education: profile.education.map((entry) => education(entry, entry.notes)),
+    certifications: profile.certifications.map((entry) => certification(entry, entry.notes)),
     publications: resumePublications(profile.publications).map((entry) => publication(entry, entry.citation)),
-    // A line per group (Category: a, b, c), as Profile → Skills shows them.
-    skills: skillsText(inEditorOrder(profile.skills)),
-    languages: languagesLine(profile.languages, labels),
+    // One "Category: a, b, c" line per group (LaTeX-style); never a bare dump.
+    skills: skillsText(profile.skills),
+
+    languages: languagesLine(profile.languages, labels, plainText ? " | " : " · "),
     references: includeReferences
       ? profile.references.map((reference) => ({
           id: reference.id,
@@ -181,6 +204,9 @@ export function resumeContent(
     content.projects = withUnit("project:", profile.projects).map(({ entry, text }) => project(entry, text));
     content.education = withUnit("education:", profile.education).map(({ entry, text }) =>
       education(entry, text),
+    );
+    content.certifications = withUnit("certification:", profile.certifications).map(({ entry, text }) =>
+      certification(entry, text),
     );
     content.publications = withUnit("publication:", profile.publications).flatMap(({ entry, text }) =>
       text.trim() ? [publication(entry, text)] : [],

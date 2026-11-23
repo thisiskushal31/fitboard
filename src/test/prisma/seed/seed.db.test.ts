@@ -21,15 +21,18 @@ beforeEach(async () => {
 afterAll(() => db.$disconnect());
 
 describe("built-in seed", () => {
-  it("creates the twelve themes and nothing else", async () => {
+  it("creates the thirteen themes and nothing else", async () => {
     expect(await db.theme.findMany({ orderBy: { id: "asc" }, select: { id: true, builtIn: true } })).toEqual(
-      ["atlas", "chronicle", "classic", "console", "editorial", "folio", "ledger", "minimal", "modern", "signal", "studio", "technical"].map((id) => ({ id, builtIn: true })),
+      ["atlas", "chronicle", "classic", "console", "editorial", "folio", "latex", "ledger", "minimal", "modern", "signal", "studio", "technical"].map((id) => ({
+        id,
+        builtIn: true,
+      })),
     );
     // An empty profile and default settings are empty tables.
     expect(await db.profileField.count()).toBe(0);
     expect(await db.setting.count()).toBe(0);
     expect(await db.application.count()).toBe(0);
-    expect(BUILT_IN_THEMES).toHaveLength(12);
+    expect(BUILT_IN_THEMES).toHaveLength(13);
   });
 
   it("is safe to run again: it keeps the user's data and restores changed built-in themes", async () => {
@@ -42,7 +45,7 @@ describe("built-in seed", () => {
 
     expect((await basics()).name).toBe("Me");
     expect((await db.setting.findUniqueOrThrow({ where: { key: "paper" } })).value).toBe("LETTER");
-    expect(await db.theme.count()).toBe(13);
+    expect(await db.theme.count()).toBe(14);
     expect(await db.theme.findUniqueOrThrow({ where: { id: "classic" } })).toMatchObject({ accent: "#1d1c1a", headerStyle: "PLAIN", dateStyle: "INLINE" });
   });
 });
@@ -138,12 +141,14 @@ describe("demo seed", () => {
       "Skills",
       "MSc Design for Interaction",
       "BA Communication Design",
+      "AWS Certified Developer – Associate",
       "Publication “Doe, J., & Vermeer, K. (2016). Trust in…”",
       "Languages",
     ]);
     const [publication] = await db.publication.findMany();
     expect(resume.find((unit) => unit.id === `publication:${publication.id}`)?.text).toBe(publication.citation);
-    expect(resume.find((unit) => unit.id === "skills")?.text).toMatch(/^Design systems, User research, Figma, /);
+    expect(resume.find((unit) => unit.id === "skills")?.text).toMatch(/^Design: Design systems/);
+    expect(resume.find((unit) => unit.id === "skills")?.text).toMatch(/Tools: Figma/);
     const [project] = await db.project.findMany({ include: { skills: { include: { skill: true } } } });
     expect(resume.find((unit) => unit.id === `project:${project.id}`)?.text).toBe(project.bullets);
     expect(project.skills.map((link) => link.skill.name).sort()).toEqual(["Design systems", "Figma", "HTML & CSS"]);
