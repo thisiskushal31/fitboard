@@ -76,12 +76,7 @@ describe("dev backups", () => {
   });
 
   it("startDevBackupSchedule does nothing outside development", () => {
-    const previous = process.env.NODE_ENV;
-    process.env.NODE_ENV = "production";
-    try {
-      startDevBackupSchedule();
-    } finally {
-      process.env.NODE_ENV = previous;
-    }
+    vi.stubEnv("NODE_ENV", "production");
+    startDevBackupSchedule();
   });
 });
